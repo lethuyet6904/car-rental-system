@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thuê Xe Đà Nẵng - Xe Tốt Giá Rẻ</title>
+    <!-- Google Fonts (Inter) giúp giao diện hiện đại hơn -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #007bff; /* Xanh hiện đại */
+            --dark-color: #1a1d20;
+            --gray-light: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--dark-color);
+        }
+
+        /* Navbar Tối ưu */
+        .navbar {
+            background: rgba(26, 29, 32, 0.85) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 15px 0;
+            transition: all 0.3s ease;
+        }
+        .navbar-brand {
+            letter-spacing: 1px;
+            font-size: 1.3rem;
+        }
+        .nav-link {
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+        }
+
+        /* Hero Section Đẹp & Sâu hơn */
+        .hero {
+            background: linear-gradient(180deg, rgba(26,29,32,0.6) 0%, rgba(26,29,32,0.85) 100%),
+                        url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1920&q=80') no-repeat center center;
+            background-size: cover;
+            min-height: 95vh;
+            display: flex;
+            align-items: center;
+            color: white;
+            padding-top: 80px;
+        }
+        
+        /* Search Box Đột phá */
+        .search-box {
+            background: white;
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            text-align: left;
+        }
+        .search-box .form-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: #6c757d;
+            margin-bottom: 8px;
+        }
+        .search-box .form-control, .search-box .form-select {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-weight: 500;
+            color: var(--dark-color);
+            transition: all 0.2s;
+        }
+        .search-box .form-control:focus, .search-box .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.15);
+        }
+        .btn-search {
+            border-radius: 12px;
+            padding: 12px;
+            font-weight: 600;
+            background-color: var(--primary-color);
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-search:hover {
+            background-color: #0069d9;
+            transform: translateY(-2px);
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 80px 0;
+            background-color: var(--gray-light);
+        }
+        .feature-box {
+            padding: 40px 30px;
+            border-radius: 20px;
+            background: white;
+            border: 1px solid rgba(0,0,0,0.03);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+        }
+        .feature-box:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 30px rgba(0,0,0,0.05);
+        }
+        .feature-icon-wrapper {
+            width: 70px;
+            height: 70px;
+            background-color: rgba(0, 123, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+        .feature-box h4 {
+            font-weight: 600;
+            font-size: 1.25rem;
+            margin-bottom: 12px;
+        }
+
+        /* Avatar & User Dropdown */
+        .avatar-circle {
+            width: 36px; 
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        .dropdown-menu {
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.05);
+            padding: 8px;
+        }
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">
+            <i class="fas fa-car-side me-2 text-primary"></i>THUÊ XE ĐÀ NẴNG
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item"><a class="nav-link text-white" href="/">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Thuê Xe</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Chủ Xe</a></li>
+
+                <!-- Line phân cách nhẹ trên menu di động -->
+                <hr class="d-lg-none text-white-50 w-100 my-2">
+
+                <!-- Chưa đăng nhập -->
+                <div th:if="${currentUser == null}" class="d-flex align-items-center ms-lg-2">
+                    <a class="btn btn-link text-white text-decoration-none mx-2 fw-500" href="/auth/login">Đăng Nhập</a>
+                    <a class="btn btn-primary px-4 rounded-pill" href="/auth/register">Đăng Ký</a>
+                </div>
+
+                <!-- Đã đăng nhập -->
+                <div th:if="${currentUser != null}" class="dropdown ms-lg-3">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center text-white backend-user" href="#" data-bs-toggle="dropdown">
+                        <img th:src="${currentUser.avatar != null ? currentUser.avatar : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80'}" 
+                             class="avatar-circle me-2" alt="Avatar">
+                        <span th:text="${currentUser.fullName}">Nguyễn Văn A</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow">
+                        <li><a class="dropdown-item" href="/owner/owner-registration"><i class="fas fa-key me-2 text-muted"></i>Đăng ký làm chủ xe</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="/auth/logout"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                    </ul>
+                </div>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <h1 class="display-4 fw-bold mb-3">Thuê Xe Tự Lái Đà Nẵng</h1>
+                <p class="lead mb-5 text-white-50">Hơn 200 xe đời mới chất lượng cao • Giao xe tận nơi • Thủ tục nhanh gọn</p>
+
+                <!-- Search Box -->
+                <div class="search-box mx-auto" style="max-width: 950px;">
+                    <form th:action="@{/xe/tim-kiem}" method="get">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label"><i class="fas fa-map-marker-alt me-1"></i> Địa điểm nhận xe</label>
+                                <select class="form-select" name="location">
+                                    <option value="DaNang">Đà Nẵng (Sân bay / Trung tâm)</option>
+                                    <option value="HoiAn">Hội An</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label"><i class="far fa-calendar-alt me-1"></i> Ngày nhận</label>
+                                <input type="date" class="form-control" name="startDate">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label"><i class="far fa-calendar-check me-1"></i> Ngày trả</label>
+                                <input type="date" class="form-control" name="endDate">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary btn-search w-100 py-3">
+                                    <i class="fas fa-search me-1"></i> Tìm Xe
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section class="features-section">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <div class="feature-icon-wrapper">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <h4>Đa dạng dòng xe</h4>
+                    <p class="text-muted mb-0">Hơn 200+ dòng xe Sedan, SUV, MPV, Bán tải đời mới sẵn sàng phục vụ.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <div class="feature-icon-wrapper">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h4>Bảo hiểm chuyến đi</h4>
+                    <p class="text-muted mb-0">An tâm vững tay lái với các gói bảo hiểm vật chất xe đi kèm tối ưu.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <div class="feature-icon-wrapper">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h4>Hỗ trợ đường dài 24/7</h4>
+                    <p class="text-muted mb-0">Đội ngũ kỹ thuật và CSKH luôn đồng hành bên bạn trên mọi cung đường.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
