@@ -19,7 +19,7 @@
                     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
                     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-                    <form th:action="@{/owner/dang-ky-chu-xe}" method="post" 
+                    <form th:action="@{/owner-register}" method="post" 
                           enctype="multipart/form-data" th:object="${ownerRegistrationRequest}">
 
                         <div class="row mb-3">

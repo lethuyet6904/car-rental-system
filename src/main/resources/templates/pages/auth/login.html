@@ -20,7 +20,7 @@
                     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
                     <div th:if="${param.logout}" class="alert alert-success">Bạn đã đăng xuất thành công.</div>
 
-                    <form th:action="@{/auth/login}" method="post" th:object="${loginRequest}">
+                    <form th:action="@{/login}" method="post" th:object="${loginRequest}">
 
                         <div class="mb-3">
                             <label class="form-label">Số điện thoại</label>
@@ -33,14 +33,14 @@
                         </div>
 
                         <div class="d-flex justify-content-between mb-3">
-                            <a href="/auth/forgot-password">Quên mật khẩu?</a>
+                            <a href="/forgot-password">Quên mật khẩu?</a>
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100 mb-3">Đăng Nhập</button>
                     </form>
 
                     <div class="text-center">
-                        <a href="/auth/register">Chưa có tài khoản? Đăng ký ngay</a>
+                        <a href="/register">Chưa có tài khoản? Đăng ký ngay</a>
                     </div>
                 </div>
             </div>

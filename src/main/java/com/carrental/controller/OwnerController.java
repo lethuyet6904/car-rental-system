@@ -9,7 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/owner")
 public class OwnerController {
 
     private final UserService userService;
@@ -30,7 +29,7 @@ public class OwnerController {
 
         model.addAttribute("ownerRegistrationRequest", new OwnerRegistrationRequest());
         model.addAttribute("user", user);
-        return "owner/owner-registration";
+        return "pages/owner/owner-registration";
     }
 
     @PostMapping("/owner-registration")
@@ -46,10 +45,10 @@ public class OwnerController {
 
            
 
-            return "owner/owner-registration";
+            return "pages/owner/owner-registration";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
-            return "owner/owner-registration";
+            return "pages/owner/owner-registration";
         }
     }
 }

@@ -19,7 +19,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -31,71 +30,11 @@ public class AuthController {
 //		this.jwtTokenProvider = new JwtTokenProvider();
 //    }
 
-    // ====================== ĐĂNG KÝ ======================
-    @GetMapping("/register")
-    public String showRegister(Model model) {
-        model.addAttribute("registerRequest", new RegisterRequest());
-        return "auth/register";
-    }
-
-    @PostMapping("/register")
-    public String register(@Valid @ModelAttribute RegisterRequest request,
-                           BindingResult result, Model model) {
-
-        if (result.hasErrors()) {
-            return "auth/register";
-        }
-
-        if (!request.getPassword().equals(request.getConfirmPassword())) {
-            model.addAttribute("error", "Mật khẩu xác nhận không khớp!");
-            return "auth/register";
-        }
-
-        try {
-            userService.register(request);
-            model.addAttribute("success", "Đăng ký thành công! Vui lòng đăng nhập.");
-            return "redirect:/auth/login";
-        } catch (Exception e) {
-            model.addAttribute("error", e.getMessage());
-            return "auth/register";
-        }
-    }
-
-    // ====================== QUÊN MẬT KHẨU ======================
-    @GetMapping("/forgot-password")
-    public String showForgotPassword(Model model) {
-        model.addAttribute("forgotRequest", new ForgotPasswordRequest());
-        return "auth/forgot-password";
-    }
-
-    @PostMapping("/forgot-password")
-    public String forgotPassword(@Valid @ModelAttribute("forgotRequest") ForgotPasswordRequest request,
-                                 BindingResult result, Model model) {
-
-        if (result.hasErrors()) {
-            return "auth/forgot-password";
-        }
-
-        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            model.addAttribute("error", "Xác nhận mật khẩu không khớp");
-            return "auth/forgot-password";
-        }
-
-        try {
-            userService.resetPassword(request.getEmail(), request.getNewPassword());
-            model.addAttribute("success", "Đổi mật khẩu thành công! Vui lòng đăng nhập.");
-            return "redirect:/auth/login";
-        } catch (Exception e) {
-            model.addAttribute("error", e.getMessage());
-            return "auth/forgot-password";
-        }
-    }
-
     // ====================== ĐĂNG NHẬP ======================
     @GetMapping("/login")
     public String showLogin(Model model) {
         model.addAttribute("loginRequest", new LoginRequest());
-        return "auth/login";
+        return "pages/auth/login";
     }
 
     @PostMapping("/login")
@@ -103,7 +42,7 @@ public class AuthController {
                         BindingResult result, Model model, HttpServletResponse response) {
 
         if (result.hasErrors()) {
-            return "auth/login";
+            return "pages/auth/login";
         }
 
         try {
@@ -132,7 +71,67 @@ public class AuthController {
 
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
-            return "auth/login";
+            return "pages/auth/login";
+        }
+    }
+
+    // ====================== ĐĂNG KÝ ======================
+    @GetMapping("/register")
+    public String showRegister(Model model) {
+        model.addAttribute("registerRequest", new RegisterRequest());
+        return "pages/auth/register";
+    }
+
+    @PostMapping("/register")
+    public String register(@Valid @ModelAttribute RegisterRequest request,
+                           BindingResult result, Model model) {
+
+        if (result.hasErrors()) {
+            return "pages/auth/register";
+        }
+
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            model.addAttribute("error", "Mật khẩu xác nhận không khớp!");
+            return "pages/auth/register";
+        }
+
+        try {
+            userService.register(request);
+            model.addAttribute("success", "Đăng ký thành công! Vui lòng đăng nhập.");
+            return "redirect:/auth/login";
+        } catch (Exception e) {
+            model.addAttribute("error", e.getMessage());
+            return "pages/auth/register";
+        }
+    }
+
+    // ====================== QUÊN MẬT KHẨU ======================
+    @GetMapping("/forgot-password")
+    public String showForgotPassword(Model model) {
+        model.addAttribute("forgotRequest", new ForgotPasswordRequest());
+        return "pages/auth/forgot-password";
+    }
+
+    @PostMapping("/forgot-password")
+    public String forgotPassword(@Valid @ModelAttribute("forgotRequest") ForgotPasswordRequest request,
+                                 BindingResult result, Model model) {
+
+        if (result.hasErrors()) {
+            return "pages/auth/forgot-password";
+        }
+
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            model.addAttribute("error", "Xác nhận mật khẩu không khớp");
+            return "pages/auth/forgot-password";
+        }
+
+        try {
+            userService.resetPassword(request.getEmail(), request.getNewPassword());
+            model.addAttribute("success", "Đổi mật khẩu thành công! Vui lòng đăng nhập.");
+            return "redirect:/auth/login";
+        } catch (Exception e) {
+            model.addAttribute("error", e.getMessage());
+            return "pages/auth/forgot-password";
         }
     }
 
