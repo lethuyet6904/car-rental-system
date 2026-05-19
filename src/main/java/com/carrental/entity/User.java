@@ -3,6 +3,10 @@ package com.carrental.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+
+import com.carrental.enums.UserRole;
+import com.carrental.enums.UserStatus;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -39,11 +43,15 @@ public class User {
     @Column(name = "avatar", length = 500)
     private String avatar;
 
+    // varchar(20) NOT NULL, CHECK: Customer/Owner/Admin
+    @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false, length = 20)
-    private String role = "Customer";
+    private UserRole role;
 
+    // varchar(20) NOT NULL, CHECK: Active/Locked
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    private String status = "Active";
+    private UserStatus status;
 
     @Column(name = "lockReason", length = 255)
     private String lockReason;
@@ -51,4 +59,14 @@ public class User {
     @CreationTimestamp
     @Column(name = "createdAt")
     private LocalDateTime createdAt;
+    
+ // Tự động gán createdAt trước khi INSERT
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+        // Default status khi mới tạo
+        if (this.status == null) this.status = UserStatus.Active;
+        // Default role khi đăng ký bình thường
+        if (this.role == null) this.role = UserRole.Customer;
+    }
 }

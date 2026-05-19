@@ -4,9 +4,15 @@ import com.carrental.dto.LoginRequest;
 import com.carrental.dto.RegisterRequest;
 import com.carrental.dto.ForgotPasswordRequest;
 import com.carrental.entity.User;
+import com.carrental.security.JwtTokenProvider;
 import com.carrental.service.UserService;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,13 +20,16 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public AuthController(UserService userService) {
-        this.userService = userService;
-    }
+//    public AuthController(UserService userService) {
+//        this.userService = userService;
+//		this.jwtTokenProvider = new JwtTokenProvider();
+//    }
 
     // ====================== ĐĂNG KÝ ======================
     @GetMapping("/register")
@@ -91,7 +100,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public String login(@Valid @ModelAttribute LoginRequest request,
-                        BindingResult result, Model model, HttpSession session) {
+                        BindingResult result, Model model, HttpServletResponse response) {
 
         if (result.hasErrors()) {
             return "auth/login";
@@ -99,14 +108,25 @@ public class AuthController {
 
         try {
             User user = userService.login(request.getPhone(), request.getPassword());
-
-            session.setAttribute("currentUser", user);
-            session.setMaxInactiveInterval(60 * 60); // 1 giờ
+            
+            // Tạo JWT token
+            String token = jwtTokenProvider.generateToken(
+                    user.getPhone(),
+                    user.getRole().name()
+            );
+            
+            // Lưu token vào cookie
+            Cookie cookie = new Cookie("JWT_TOKEN", token);
+            cookie.setHttpOnly(true);   // JS không đọc được — tránh XSS
+            cookie.setPath("/");        // Gửi cookie cho mọi request
+            cookie.setMaxAge(24 * 60 * 60); // 24 giờ
+            
+            response.addCookie(cookie);
 
             // SỬA Ở ĐÂY: Dùng getRole() thay vì getVaiTro()
             return switch (user.getRole()) {
-                case "ADMIN" -> "redirect:/admin/dashboard";
-                case "OWNER" -> "redirect:/owner/dashboard";
+            case Admin    -> "redirect:/admin/dashboard";
+            case Owner    -> "redirect:/owner/dashboard";
                 default -> "redirect:/";        // Trang chủ
             };
 

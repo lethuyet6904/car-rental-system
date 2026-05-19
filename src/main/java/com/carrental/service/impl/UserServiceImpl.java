@@ -4,6 +4,8 @@ import com.carrental.dto.OwnerRegistrationRequest;
 import com.carrental.dto.RegisterRequest;
 import com.carrental.entity.OwnerRegistration;
 import com.carrental.entity.User;
+import com.carrental.enums.UserRole;
+import com.carrental.enums.UserStatus;
 import com.carrental.repository.OwnerRegistrationRepository;
 import com.carrental.repository.UserRepository;
 import com.carrental.service.UserService;
@@ -37,8 +39,8 @@ public class UserServiceImpl implements UserService {
         user.setPhone(req.getPhone());
         user.setAddress(req.getAddress());
         user.setPassword(PasswordUtil.hashPassword(req.getPassword()));
-        user.setRole("Customer");
-        user.setStatus("Active");
+        user.setRole(UserRole.Customer);
+        user.setStatus(UserStatus.Active);
 
         return userRepository.save(user);
     }
