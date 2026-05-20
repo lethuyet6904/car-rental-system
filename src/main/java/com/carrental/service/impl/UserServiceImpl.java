@@ -6,23 +6,22 @@ import com.carrental.entity.OwnerRegistration;
 import com.carrental.entity.User;
 import com.carrental.enums.UserRole;
 import com.carrental.enums.UserStatus;
+import com.carrental.enums.VerificationStatus;
 import com.carrental.repository.OwnerRegistrationRepository;
 import com.carrental.repository.UserRepository;
 import com.carrental.service.UserService;
 import com.carrental.util.PasswordUtil;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final OwnerRegistrationRepository ownerRegistrationRepository;
-
-    public UserServiceImpl(UserRepository userRepository, 
-                           OwnerRegistrationRepository ownerRegistrationRepository) {
-        this.userRepository = userRepository;
-        this.ownerRegistrationRepository = ownerRegistrationRepository;
-    }
 
     @Override
     public User register(RegisterRequest req) {
@@ -49,8 +48,9 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByPhone(phone)
                 .orElseThrow(() -> new RuntimeException("Sai số điện thoại hoặc mật khẩu"));
 
-        if ("Locked".equals(user.getStatus())) {
-            throw new RuntimeException("Tài khoản đã bị khóa");
+        // So sánh đúng kiểu Enum
+        if (UserStatus.Locked.equals(user.getStatus())) {
+            throw new RuntimeException("Tài khoản đã bị khóa. Lý do: " + user.getLockReason());
         }
 
         if (!PasswordUtil.checkPassword(password, user.getPassword())) {
@@ -60,19 +60,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-
     public void applyForOwner(Long userId, OwnerRegistrationRequest req) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
 
-        if (ownerRegistrationRepository.existsByUser_UserIdAndStatus(userId, "Pending")) {
+        if (ownerRegistrationRepository.existsByUser_UserIdAndStatus(userId, VerificationStatus.Pending)) {
             throw new RuntimeException("Bạn đã có đơn đăng ký đang chờ duyệt!");
         }
 
         OwnerRegistration reg = new OwnerRegistration();
         reg.setUser(user);
-        reg.setStatus("Pending");
 
         ownerRegistrationRepository.save(reg);
     }
@@ -84,10 +82,4 @@ public class UserServiceImpl implements UserService {
         user.setPassword(PasswordUtil.hashPassword(newPassword));
         userRepository.save(user);
     }
-
-	@Override
-	public void registerAsOwner(Long userId, OwnerRegistrationRequest request) {
-		// TODO Auto-generated method stub
-		
-	}
 }

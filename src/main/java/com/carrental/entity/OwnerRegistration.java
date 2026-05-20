@@ -3,6 +3,9 @@ package com.carrental.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+
+import com.carrental.enums.VerificationStatus;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,8 +25,9 @@ public class OwnerRegistration {
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    private String status = "Pending";
+    private VerificationStatus status;
 
     @Column(name = "rejectReason", length = 300)
     private String rejectReason;
@@ -34,4 +38,10 @@ public class OwnerRegistration {
 
     @Column(name = "reviewedAt")
     private LocalDateTime reviewedAt;
+    
+    @PrePersist
+    public void prePersist() {
+        this.submittedAt = LocalDateTime.now();
+        if (this.status == null) this.status = VerificationStatus.Pending;
+    }
 }

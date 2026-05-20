@@ -9,7 +9,6 @@ import com.carrental.service.UserService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -138,8 +137,13 @@ public class AuthController {
 
     // ====================== ĐĂNG XUẤT ======================
     @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
+    public String logout(HttpServletResponse response) {
+    	// Xóa cookie JWT_TOKEN bằng cách set maxAge = 0
+        Cookie cookie = new Cookie("JWT_TOKEN", null);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // ← maxAge = 0 → browser xóa cookie ngay
+        response.addCookie(cookie);
         return "redirect:/auth/login?logout=true";
     }
 }
