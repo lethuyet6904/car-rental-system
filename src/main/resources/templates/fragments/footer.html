@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<footer th:fragment="footer" class="ct-footer">
+    <div class="container px-4">
+        <div class="row g-5 ct-footer__grid">
+
+            <div class="col-lg-4 col-md-12">
+                <a class="ct-footer__brand" th:href="@{/}">
+                    Car<span>to</span>
+                </a>
+                <p class="ct-footer__desc">
+                    Nền tảng chia sẻ ô tô tự lái công nghệ hàng đầu Việt Nam. Kết nối khách hàng có nhu cầu với hàng nghìn chủ xe uy tín trên toàn quốc.
+                </p>
+                <div class="ct-footer__socials">
+                    <a href="#" aria-label="Facebook" class="ct-footer__social-link">
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
+                    <a href="#" aria-label="Zalo" class="ct-footer__social-link">
+                        <i class="fa-solid fa-comment-dots"></i>
+                    </a>
+                    <a href="#" aria-label="YouTube" class="ct-footer__social-link">
+                        <i class="fa-brands fa-youtube"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <h5 class="ct-footer__col-title">Dành cho khách thuê</h5>
+                <ul class="ct-footer__links list-unstyled">
+                    <li><a th:href="@{/cars}">Tìm kiếm xe nhanh</a></li>
+                    <li><a th:href="@{/customer/rentals}">Hướng dẫn đặt chuyến</a></li>
+                    <li><a th:href="@{/promotions}">Mã giảm giá hot</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <h5 class="ct-footer__col-title">Dành cho đối tác chủ xe</h5>
+                <ul class="ct-footer__links list-unstyled">
+                    <li><a th:href="@{/owner/register}">Đăng ký xe trên Carto</a></li>
+                    <li><a th:href="@{/owner/dashboard}">Quy chế vận hành</a></li>
+                    <li><a href="#">Chính sách chia sẻ thu nhập</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-12">
+                <h5 class="ct-footer__col-title">Chính sách & Hỗ trợ</h5>
+                <ul class="ct-footer__links list-unstyled">
+                    <li><a th:href="@{/about}">Về chúng tôi</a></li>
+                    <li><a th:href="@{/terms}">Điều khoản và Điều kiện</a></li>
+                    <li><a th:href="@{/privacy}">Chính sách bảo mật dữ liệu</a></li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="ct-footer__bottom">
+            <span>© 2026 Carto Platform. Bảo lưu mọi quyền.</span>
+            <span>Hệ thống phát triển bởi <th:block th:text="${'Team 3 người Java Fullstack'}">Đội ngũ kỹ sư</th:block></span>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

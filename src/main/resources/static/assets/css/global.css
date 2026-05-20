@@ -1,0 +1,496 @@
+/* =====================================================
+   global.css  –  Carto Platform (Mioto Style Redesign)
+   Phạm vi: Design Tokens, Reset Base, Navbar, Footer & Utilities
+   ===================================================== */
+
+/* ── 1. DESIGN TOKENS (HỆ THỐNG BIẾN CHUẨN) ────────── */
+:root {
+    /* Bảng màu trung tính (Grayscale) */
+    --ct-dark:         #121214;    /* Màu tối nền sâu */
+    --ct-dark-card:    #1E1E22;    /* Nền thẻ tối */
+    --ct-text-main:    #18181B;    /* Chữ chính */
+    --ct-text-muted:   #71717A;    /* Chữ phụ, mờ */
+    --ct-gray-300:     #D4D4D8;
+    --ct-gray-200:     #E4E4E7;
+    --ct-gray-100:     #F4F4F5;
+    --ct-white:        #FFFFFF;
+
+    /* Màu sắc thương hiệu (Brand Accent - Xanh Lá Công Nghệ Mioto) */
+    --ct-primary:      #5FCF86;
+    --ct-primary-hover:#4EBA74;
+    --ct-primary-bg:   rgba(95, 207, 134, 0.08);
+
+    /* Hệ màu bổ trợ khác */
+    --ct-gold:         #F59E0B;
+    --ct-gold-bg:      rgba(245, 158, 11, 0.1);
+    --ct-danger:       #EF4444;
+    --ct-danger-bg:    #FEF2F2;
+
+    /* Cấu hình Typography */
+    --font-family:     'Plus Jakarta Sans', sans-serif;
+
+    /* Hệ thống Bo góc (Border Radius) */
+    --r-xs:  4px;
+    --r-sm:  8px;
+    --r-md:  12px;
+    --r-lg:  16px;
+    --r-xl:  24px;
+
+    /* Hệ thống Đổ bóng (Box Shadow) */
+    --shadow-sm:   0 4px 12px rgba(0, 0, 0, 0.04);
+    --shadow-md:   0 10px 25px rgba(0, 0, 0, 0.08);
+    --shadow-lg:   0 16px 40px rgba(0, 0, 0, 0.12);
+
+    /* Hiệu ứng chuyển động (Transition) */
+    --transition:  all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── 2. RESET / BASE STYLES ────────────────────────── */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: #FAFAFA;
+    color: var(--ct-text-main);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding-top: 76px; /* Khoảng trống bằng chiều cao navbar để tránh đè nội dung do dùng fixed-top */
+}
+
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition);
+}
+
+ul {
+    list-style: none;
+}
+
+button, input, select {
+    font-family: inherit;
+    outline: none;
+}
+
+/* ── 3. UTILITIES & BUTTONS (TIỆN ÍCH DÙNG CHUNG) ──── */
+.ct-section-badge {
+    display: inline-block;
+    background: var(--ct-primary-bg);
+    color: var(--ct-primary-hover);
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+}
+
+.ct-section-title {
+    font-weight: 800;
+    color: var(--ct-text-main);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+}
+
+.ct-section-sub {
+    font-size: 0.95rem;
+    color: var(--ct-text-muted);
+    max-width: 550px;
+    margin: 8px auto 0 auto;
+}
+
+/* Base Button Style */
+.ct-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border-radius: var(--r-md);
+    font-size: 0.9rem;
+    font-weight: 700;
+    border: 1.5px solid transparent;
+    transition: var(--transition);
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.ct-btn-primary {
+    background: var(--ct-primary);
+    color: var(--ct-white) !important;
+}
+.ct-btn-primary:hover {
+    background: var(--ct-primary-hover);
+    transform: translateY(-1px);
+}
+
+.ct-btn-nav {
+    color: var(--ct-text-main);
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 10px 16px;
+}
+.ct-btn-nav:hover {
+    color: var(--ct-primary-hover);
+}
+
+.ct-btn-ghost-dark {
+    background: transparent;
+    border-color: var(--ct-gray-300);
+    color: var(--ct-text-main);
+}
+.ct-btn-ghost-dark:hover {
+    border-color: var(--ct-text-main);
+    background: var(--ct-gray-100);
+}
+
+/* ── 4. NAVBAR (THANH ĐIỀU HƯỚNG FIXED) ────────────── */
+/* ── 4. NAVBAR (CẬP NHẬT KÍCH THƯỚC CHỮ VÀ NÚT ĐĂNG NHẬP) ── */
+.ct-navbar {
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(228, 228, 231, 0.7);
+    padding: 14px 0;
+    transition: var(--transition);
+}
+
+.ct-navbar__brand {
+    font-size: 1.65rem; /* Tăng nhẹ kích thước logo */
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--ct-text-main) !important;
+}
+.ct-navbar__brand span {
+    color: var(--ct-primary);
+}
+
+/* Tăng kích thước chữ menu chính từ 0.95rem lên 1.05rem */
+.ct-navbar__link {
+    font-size: 1.05rem; 
+    font-weight: 600;
+    color: #3F3F46 !important;
+    padding: 8px 18px !important; /* Tăng khoảng cách đệm cho thoáng */
+    border-radius: var(--r-sm);
+    transition: var(--transition);
+}
+.ct-navbar__link:hover, 
+.ct-navbar__link.active {
+    color: var(--ct-primary-hover) !important;
+    background: var(--ct-primary-bg);
+}
+
+/* Nút Đăng ký (Dạng chữ text-link) */
+.ct-btn-nav {
+    color: var(--ct-text-main);
+    font-weight: 700;
+    font-size: 1rem; /* Đồng bộ kích thước chữ */
+    padding: 10px 16px;
+    transition: var(--transition);
+}
+.ct-btn-nav:hover {
+    color: var(--ct-primary-hover);
+}
+
+/* NÚT ĐĂNG NHẬP CHUẨN FORM (Khắc phục lỗi chưa ổn) */
+.ct-btn-primary {
+    background: var(--ct-primary);
+    color: var(--ct-white) !important;
+    font-weight: 700;
+    font-size: 1rem;            /* Kích thước chữ vừa vặn, dễ đọc */
+    padding: 10px 24px;         /* Khoảng cách đệm chuẩn để nút nhìn cân đối, vuông vắn */
+    border-radius: 12px;        /* Bo góc mềm mại giống app Mioto */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    box-shadow: 0 4px 14px rgba(95, 207, 134, 0.25); /* Thêm đổ bóng nhẹ cho nút nổi bật */
+    transition: var(--transition);
+}
+.ct-btn-primary:hover {
+    background: var(--ct-primary-hover);
+    box-shadow: 0 6px 20px rgba(95, 207, 134, 0.35);
+    transform: translateY(-1px); /* Hiệu ứng nhấc nhẹ lên khi hover */
+}
+
+/* Khối User Dropdown (Khi đã đăng nhập) */
+.ct-user-dropdown-btn {
+    background: var(--ct-gray-100);
+    border: 1px solid var(--ct-gray-200);
+    padding: 8px 16px; /* Tăng nhẹ để bằng chiều cao nút Đăng nhập */
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.ct-user-dropdown-btn:hover {
+    background: var(--ct-gray-200);
+}
+
+.ct-user-avatar {
+    width: 28px;
+    height: 28px;
+    background: var(--ct-primary);
+    color: var(--ct-white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+}
+
+.ct-user-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--ct-text-main);
+}
+
+.ct-chevron {
+    font-size: 0.7rem;
+    color: var(--ct-text-muted);
+    transition: var(--transition);
+}
+.dropdown-menu.show ~ .ct-user-dropdown-btn .ct-chevron {
+    transform: rotate(180deg);
+}
+
+.ct-dropdown-menu {
+    border: 1px solid rgba(244, 244, 245, 0.9);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-md);
+    padding: 8px;
+    min-width: 230px;
+    margin-top: 10px !important;
+}
+
+.ct-dropdown-item {
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 10px 14px;
+    border-radius: var(--r-md);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #3F3F46;
+    transition: var(--transition);
+}
+.ct-dropdown-item i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+}
+.ct-dropdown-item:hover {
+    background: var(--ct-gray-100);
+    color: var(--ct-text-main);
+}
+
+.ct-dropdown-item--danger {
+    color: var(--ct-danger);
+}
+.ct-dropdown-item--danger i {
+    color: var(--ct-danger);
+}
+.ct-dropdown-item--danger:hover {
+    background: var(--ct-danger-bg);
+    color: var(--ct-danger);
+}
+
+.ct-dropdown-divider {
+    margin: 6px 0;
+    border-top: 1px solid var(--ct-gray-200);
+    opacity: 1;
+}
+
+/* ── FIX LỖI SELECT BỊ DỒN TRÁI VÀ TRÀN CHỮ ── */
+/* ── CUSTOM DROPDOWN SELECT ── */
+.ct-custom-select {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    border: none;
+    background-color: transparent;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 0; /* Ép sát lề trái */
+    color: var(--ct-text-main);
+}
+.ct-custom-select .text-placeholder {
+    color: #A1A1AA; /* Màu xám khi chưa chọn */
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* Mũi tên custom thay thế mũi tên mặc định của Bootstrap */
+.ct-custom-select::after {
+    content: "\f107"; /* Icon chevron-down của FontAwesome */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    border: none;
+    color: #3F3F46;
+    font-size: 0.9rem;
+}
+
+/* ── STYLE CHO MENU XỔ XUỐNG ── */
+.ct-dropdown-menu {
+    border: 1px solid var(--ct-gray-200);
+    border-radius: 12px;
+    padding: 8px;
+    margin-top: 12px !important; /* Đẩy ra xa nút bấm một chút */
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08) !important;
+}
+.ct-dropdown-menu .dropdown-item {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--ct-text-main);
+    transition: all 0.2s ease;
+}
+/* Hiệu ứng hover chuẩn xanh lá của Carto */
+.ct-dropdown-menu .dropdown-item:hover,
+.ct-dropdown-menu .dropdown-item:focus {
+    background-color: rgba(95, 207, 134, 0.1); 
+    color: var(--ct-primary);
+}
+
+/* ── 5. FOOTER (CHÂN TRANG NỀN TỐI SANG TRỌNG) ──────── */
+.ct-footer {
+    background: var(--ct-dark);
+    color: #A1A1AA;
+    padding: 80px 0 30px 0;
+    margin-top: 80px;
+    border-top: 1px solid #27272A;
+}
+
+.ct-footer__brand {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--ct-white) !important;
+    display: inline-block;
+    margin-bottom: 16px;
+}
+.ct-footer__brand span {
+    color: var(--ct-primary);
+}
+
+.ct-footer__desc {
+    font-size: 0.9rem;
+    line-height: 1.65;
+    margin-bottom: 24px;
+    max-width: 320px;
+}
+
+/* Các vòng tròn liên kết Mạng xã hội */
+.ct-footer__socials {
+    display: flex;
+    gap: 12px;
+}
+.ct-footer__social-link {
+    width: 38px;
+    height: 38px;
+    background: var(--ct-dark-card);
+    border: 1px solid #27272A;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #A1A1AA;
+    transition: var(--transition);
+}
+.ct-footer__social-link:hover {
+    background: var(--ct-primary);
+    color: var(--ct-white);
+    border-color: var(--ct-primary);
+    transform: translateY(-2px);
+}
+
+.ct-footer__col-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--ct-white);
+    margin-bottom: 20px;
+    letter-spacing: 0.05em;
+}
+
+.ct-footer__links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.ct-footer__links a {
+    font-size: 0.9rem;
+    color: #A1A1AA;
+    transition: var(--transition);
+}
+.ct-footer__links a:hover {
+    color: var(--ct-primary);
+    padding-left: 2px; /* Hiệu ứng đẩy nhẹ khi hover link */
+}
+
+.ct-footer__bottom {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid #27272A;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+    color: #71717A;
+}
+
+/* ── 6. RESPONSIVE MEDIA QUERIES (TỐI ƯU GIAO DIỆN) ── */
+@media (max-width: 991px) {
+    body {
+        padding-top: 72px;
+    }
+}
+
+@media (max-width: 767px) {
+    .ct-footer__bottom {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+    
+    /* Tối ưu giao diện thanh Navbar thu gọn trên Mobile */
+    #mainNav {
+        background: var(--ct-white);
+        border-radius: var(--r-md);
+        margin-top: 12px;
+        padding: 16px;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--ct-gray-100);
+    }
+    
+    .ct-navbar__actions {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--ct-gray-200);
+        width: 100%;
+        justify-content: p-start;
+    }
+}
