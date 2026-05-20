@@ -19,7 +19,7 @@
                     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
                     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-                    <form th:action="@{/register}" method="post" th:object="${registerRequest}">
+                    <form th:action="@{/auth/register}" method="post" th:object="${registerRequest}">
 
                         <div class="mb-3">
                             <label class="form-label">Họ và tên</label>
@@ -56,7 +56,7 @@
                     </form>
 
                     <div class="text-center mt-3">
-                        <a href="/login">Đã có tài khoản? Đăng nhập</a>
+                        <a href="/auth/login">Đã có tài khoản? Đăng nhập</a>
                     </div>
                 </div>
             </div>

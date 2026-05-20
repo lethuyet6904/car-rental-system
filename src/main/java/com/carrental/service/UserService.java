@@ -10,6 +10,4 @@ public interface UserService {
     void resetPassword(String email, String newPassword);
 
     void applyForOwner(Long userId, OwnerRegistrationRequest request);
-
-    void registerAsOwner(Long userId, OwnerRegistrationRequest request);
 }
