@@ -25,9 +25,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            // Dùng STATELESS vì JWT tự mang thông tin auth, không cần server lưu session
+            // Cho phép tạo session khi cần (navbar dùng session.user để hiển thị)
+            // JWT vẫn là cơ chế auth chính thông qua filter
             .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .authorizeHttpRequests(auth -> auth
 
                 // ── PUBLIC ── Ai cũng vào được
@@ -37,6 +38,7 @@ public class SecurityConfig {
                     "/auth/login",
                     "/auth/register",
                     "/auth/forgot-password",
+                    "/auth/logout",
                     "/assets/**",
                     "/error"
                 ).permitAll()

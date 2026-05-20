@@ -34,6 +34,14 @@
                     <!-- Form -->
                     <form th:action="@{/auth/register}" method="post" th:object="${registerRequest}">
 
+                        <!-- Hiển thị lỗi validation -->
+                        <div th:if="${#fields.hasErrors('*')}" class="ct-alert ct-alert--danger">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            <div>
+                                <p th:each="err : ${#fields.errors('*')}" th:text="${err}" style="margin:0 0 4px 0;"></p>
+                            </div>
+                        </div>
+
                         <div class="mb-3">
                             <label class="ct-form-label">
                                 <i class="fa-solid fa-user"></i> Họ và tên

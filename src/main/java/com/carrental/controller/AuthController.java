@@ -8,10 +8,13 @@ import com.carrental.security.JwtTokenProvider;
 import com.carrental.service.UserService;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -32,14 +35,22 @@ public class AuthController {
 
     // ====================== ĐĂNG NHẬP ======================
     @GetMapping("/login")
-    public String showLogin(Model model) {
+    public String showLogin(Model model, HttpServletResponse response) {
+        // Nếu đã đăng nhập rồi → redirect về trang chủ
+        if (isAuthenticated()) {
+            return "redirect:/";
+        }
+        // Không cho trình duyệt cache trang login
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
         model.addAttribute("loginRequest", new LoginRequest());
         return "pages/auth/login";
     }
 
     @PostMapping("/login")
     public String login(@Valid @ModelAttribute LoginRequest request,
-                        BindingResult result, Model model, HttpServletResponse response) {
+                        BindingResult result, Model model,
+                        HttpServletRequest httpRequest, HttpServletResponse response) {
 
         if (result.hasErrors()) {
             return "pages/auth/login";
@@ -61,12 +72,15 @@ public class AuthController {
             cookie.setMaxAge(24 * 60 * 60); // 24 giờ
             
             response.addCookie(cookie);
+            
+            // Lưu user vào session để navbar fragment hiển thị đúng
+            httpRequest.getSession().setAttribute("user", user);
 
             // SỬA Ở ĐÂY: Dùng getRole() thay vì getVaiTro()
             return switch (user.getRole()) {
-            case Admin    -> "redirect:/admin/dashboard";
-            case Owner    -> "redirect:/owner/dashboard";
-                default -> "redirect:/";        // Trang chủ
+            case Admin -> "redirect:/admin/dashboard";
+            case Owner -> "redirect:/owner/dashboard";
+            	default -> "redirect:/";
             };
 
         } catch (Exception e) {
@@ -77,9 +91,21 @@ public class AuthController {
 
     // ====================== ĐĂNG KÝ ======================
     @GetMapping("/register")
-    public String showRegister(Model model) {
+    public String showRegister(Model model, HttpServletResponse response) {
+        if (isAuthenticated()) {
+            return "redirect:/";
+        }
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
         model.addAttribute("registerRequest", new RegisterRequest());
         return "pages/auth/register";
+    }
+
+    // Kiểm tra user đã đăng nhập chưa
+    private boolean isAuthenticated() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth != null && auth.isAuthenticated()
+                && !"anonymousUser".equals(auth.getPrincipal());
     }
 
     @PostMapping("/register")
@@ -87,6 +113,12 @@ public class AuthController {
                            BindingResult result, Model model) {
 
         if (result.hasErrors()) {
+            // Gom tất cả lỗi validation thành chuỗi để hiển thị
+            StringBuilder sb = new StringBuilder();
+            result.getAllErrors().forEach(err -> {
+                sb.append(err.getDefaultMessage()).append(". ");
+            });
+            model.addAttribute("error", sb.toString().trim());
             return "pages/auth/register";
         }
 
@@ -137,13 +169,17 @@ public class AuthController {
 
     // ====================== ĐĂNG XUẤT ======================
     @GetMapping("/logout")
-    public String logout(HttpServletResponse response) {
+    public String logout(HttpServletRequest httpRequest, HttpServletResponse response) {
     	// Xóa cookie JWT_TOKEN bằng cách set maxAge = 0
         Cookie cookie = new Cookie("JWT_TOKEN", null);
         cookie.setHttpOnly(true);
         cookie.setPath("/");
         cookie.setMaxAge(0); // ← maxAge = 0 → browser xóa cookie ngay
         response.addCookie(cookie);
+        
+        // Xóa session
+        httpRequest.getSession().invalidate();
+        
         return "redirect:/auth/login?logout=true";
     }
 }

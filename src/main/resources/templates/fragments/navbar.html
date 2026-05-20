@@ -48,7 +48,7 @@
                         </button>
                         
                         <ul class="dropdown-menu dropdown-menu-end ct-dropdown-menu" aria-labelledby="userMenu">
-                            <th:block th:if="${session.user.role.name() == 'CUSTOMER' or session.user.role.name() == 'OWNER'}">
+                            <th:block th:if="${session.user.role.name() == 'Customer' or session.user.role.name() == 'Owner'}">
                                 <li>
                                     <a class="dropdown-item ct-dropdown-item" th:href="@{/customer/rentals}">
                                         <i class="fa-solid fa-rectangle-list"></i> Chuyến đi của tôi
@@ -56,7 +56,7 @@
                                 </li>
                             </th:block>
 
-                            <th:block th:if="${session.user.role.name() == 'OWNER'}">
+                            <th:block th:if="${session.user.role.name() == 'Owner'}">
                                 <li><hr class="ct-dropdown-divider"/></li>
                                 <li>
                                     <a class="dropdown-item ct-dropdown-item text-success" th:href="@{/owner/dashboard}">
@@ -70,7 +70,7 @@
                                 </li>
                             </th:block>
 
-                            <th:block th:if="${session.user.role.name() == 'ADMIN'}">
+                            <th:block th:if="${session.user.role.name() == 'Admin'}">
                                 <li>
                                     <a class="dropdown-item ct-dropdown-item text-danger" th:href="@{/admin/dashboard}">
                                         <i class="fa-solid fa-chart-line"></i> Quản trị hệ thống

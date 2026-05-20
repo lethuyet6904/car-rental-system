@@ -94,6 +94,12 @@
     font-weight: 400;
 }
 
+/* Ẩn nút reveal password mặc định của Edge/Chromium */
+.ct-form-control::-ms-reveal,
+.ct-form-control::-ms-clear {
+    display: none;
+}
+
 /* Input group với icon bên phải (password toggle) */
 .ct-input-group {
     position: relative;
