@@ -183,9 +183,9 @@ src/main/resources/
 ## 📁 FRONTEND – Cấu trúc thư mục
 
 ```
-src/main/resources/static/
+src/main/resources/templates/
 │
-├── index.html                               ← Trang chủ (tìm kiếm xe, hiển thị xe nổi bật)
+├── home.html                               ← Trang chủ (tìm kiếm xe, hiển thị xe nổi bật)
 │
 ├── assets/
 │   ├── css/

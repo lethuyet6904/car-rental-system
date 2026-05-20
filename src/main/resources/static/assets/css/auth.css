@@ -1,0 +1,305 @@
+/* =====================================================
+   auth.css  –  Carto Platform (Auth Pages)
+   Phạm vi: Login, Register, Forgot Password
+   Đồng bộ với global.css & home.css
+   ===================================================== */
+
+/* ── 1. AUTH PAGE WRAPPER ──────────────────────────── */
+.ct-auth-page {
+    min-height: calc(100vh - 76px);
+    background-color: #FAFAFA;
+    display: flex;
+    align-items: center;
+    padding: 48px 0 80px 0;
+}
+
+/* ── 2. AUTH CARD ──────────────────────────────────── */
+.ct-auth-card {
+    background: #FFFFFF;
+    border-radius: var(--r-xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--ct-gray-200);
+    padding: 40px 36px;
+    width: 100%;
+}
+
+/* ── 3. AUTH HEADER ────────────────────────────────── */
+.ct-auth-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--ct-primary-bg);
+    color: var(--ct-primary-hover);
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+}
+
+.ct-auth-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--ct-text-main);
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+}
+
+.ct-auth-subtitle {
+    font-size: 0.9rem;
+    color: var(--ct-text-muted);
+    margin-bottom: 28px;
+}
+
+/* ── 4. FORM FIELDS ────────────────────────────────── */
+.ct-form-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--ct-text-main);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ct-form-label i {
+    color: var(--ct-primary);
+    font-size: 0.85rem;
+    width: 14px;
+}
+
+.ct-form-control {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--ct-gray-200);
+    border-radius: var(--r-md);
+    font-family: var(--font-family);
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--ct-text-main);
+    background: #FFFFFF;
+    transition: var(--transition);
+}
+
+.ct-form-control:focus {
+    border-color: var(--ct-primary);
+    box-shadow: 0 0 0 3px rgba(95, 207, 134, 0.15);
+    outline: none;
+}
+
+.ct-form-control::placeholder {
+    color: #A1A1AA;
+    font-weight: 400;
+}
+
+/* Input group với icon bên phải (password toggle) */
+.ct-input-group {
+    position: relative;
+}
+
+.ct-input-group .ct-form-control {
+    padding-right: 44px;
+}
+
+.ct-input-toggle {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--ct-text-muted);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.ct-input-toggle:hover {
+    color: var(--ct-primary-hover);
+}
+
+/* ── 5. SUBMIT BUTTON ──────────────────────────────── */
+.ct-auth-btn {
+    width: 100%;
+    padding: 13px 24px;
+    background: var(--ct-primary);
+    color: #FFFFFF;
+    border: none;
+    border-radius: var(--r-md);
+    font-family: var(--font-family);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 14px rgba(95, 207, 134, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.ct-auth-btn:hover {
+    background: var(--ct-primary-hover);
+    box-shadow: 0 6px 20px rgba(95, 207, 134, 0.4);
+    transform: translateY(-1px);
+}
+
+.ct-auth-btn--warning {
+    background: var(--ct-gold);
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+}
+
+.ct-auth-btn--warning:hover {
+    background: #D97706;
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+}
+
+/* ── 6. LINKS & FOOTER TEXT ────────────────────────── */
+.ct-auth-link {
+    color: var(--ct-primary-hover);
+    font-weight: 700;
+    font-size: 0.88rem;
+    transition: var(--transition);
+}
+
+.ct-auth-link:hover {
+    color: var(--ct-primary);
+    text-decoration: underline;
+}
+
+.ct-auth-link--muted {
+    color: var(--ct-text-muted);
+    font-weight: 600;
+}
+
+.ct-auth-link--muted:hover {
+    color: var(--ct-text-main);
+}
+
+.ct-auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0;
+    color: var(--ct-text-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.ct-auth-divider::before,
+.ct-auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--ct-gray-200);
+}
+
+.ct-auth-footer-text {
+    font-size: 0.88rem;
+    color: var(--ct-text-muted);
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* ── 7. ALERTS ─────────────────────────────────────── */
+.ct-alert {
+    padding: 12px 16px;
+    border-radius: var(--r-md);
+    font-size: 0.88rem;
+    font-weight: 600;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.ct-alert i {
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.ct-alert--danger {
+    background: var(--ct-danger-bg);
+    color: var(--ct-danger);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.ct-alert--success {
+    background: var(--ct-primary-bg);
+    color: var(--ct-primary-hover);
+    border: 1px solid rgba(95, 207, 134, 0.25);
+}
+
+/* ── 8. BACK TO HOME SUBTLE LINK ────────────────────── */
+.ct-auth-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--ct-text-muted);
+    margin-bottom: 24px;
+    transition: var(--transition);
+}
+
+.ct-auth-back:hover {
+    color: var(--ct-primary-hover);
+    gap: 8px;
+}
+
+/* ── 9. TRUST BADGES (REGISTER PAGE) ───────────────── */
+.ct-trust-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--ct-text-muted);
+}
+
+.ct-trust-item i {
+    color: var(--ct-primary);
+    font-size: 0.85rem;
+}
+
+/* ── 10. OTP STYLES ─────────────────────────────────── */
+.ct-otp-hint {
+    background: var(--ct-primary-bg);
+    border: 1px solid rgba(95, 207, 134, 0.25);
+    border-radius: var(--r-md);
+    padding: 12px 16px;
+    font-size: 0.88rem;
+    color: var(--ct-primary-hover);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.ct-otp-hint i {
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.ct-otp-input {
+    letter-spacing: 0.3em;
+    font-size: 1.2rem !important;
+    font-weight: 700 !important;
+    text-align: center;
+}
+
+/* ── 11. RESPONSIVE ─────────────────────────────────── */
+@media (max-width: 575px) {
+    .ct-auth-card {
+        padding: 28px 20px;
+        border-radius: var(--r-lg);
+    }
+
+    .ct-auth-title {
+        font-size: 1.4rem;
+    }
+}

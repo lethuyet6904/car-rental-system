@@ -37,9 +37,7 @@ public class SecurityConfig {
                     "/auth/login",
                     "/auth/register",
                     "/auth/forgot-password",
-                    "/css/**",
-                    "/js/**",
-                    "/images/**",
+                    "/assets/**",
                     "/error"
                 ).permitAll()
 
