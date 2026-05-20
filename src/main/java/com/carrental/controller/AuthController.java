@@ -76,7 +76,7 @@ public class AuthController {
             // Lưu user vào session để navbar fragment hiển thị đúng
             httpRequest.getSession().setAttribute("user", user);
 
-            // SỬA Ở ĐÂY: Dùng getRole() thay vì getVaiTro()
+            // SỬA Ở ĐÂY: Dùng getRole()
             return switch (user.getRole()) {
             case Admin -> "redirect:/admin/dashboard";
             case Owner -> "redirect:/owner/dashboard";

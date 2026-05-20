@@ -1,6 +1,7 @@
 package com.carrental.controller;
 
 import com.carrental.repository.UserRepository;
+import com.carrental.service.CarService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HomeController {
 
     private final UserRepository userRepository;
+    private final CarService carService;
 
     @GetMapping("/")
     public String home(Model model, HttpServletRequest request) {
@@ -29,6 +31,9 @@ public class HomeController {
                 );
             }
         }
+
+        model.addAttribute("cars", carService.getActiveCars());
+
         return "home";
     }
 }

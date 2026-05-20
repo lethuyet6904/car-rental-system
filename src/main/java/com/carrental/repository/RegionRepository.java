@@ -10,4 +10,5 @@ import java.util.List;
 public interface RegionRepository extends JpaRepository<Region, Long> {
     List<Region> findByStatus(CategoryStatus status);
     boolean existsByRegionName(String regionName);
+    Region findByRegionName(String regionName);
 }

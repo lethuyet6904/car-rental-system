@@ -22,111 +22,43 @@
         </div>
 
         <div class="row g-4">
-            <div class="col-xl-3 col-lg-4 col-md-6">
+            <!-- Lặp qua danh sách xe từ server -->
+            <div class="col-xl-3 col-lg-4 col-md-6" th:each="car : ${cars}">
                 <div class="ct-car-card">
                     <div class="ct-car-card__thumb">
-                        <img src="https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=600&q=80" alt="VinFast VF8"/>
-                        <span class="ct-car-badge ct-car-badge--green">Giao xe tận nơi</span>
+                        <!-- Nếu có ảnh thì dùng, không thì dùng placeholder -->
+                        <img th:src="${car.thumbnailUrl != null ? car.thumbnailUrl : '/assets/images/car-placeholder.png'}"
+                             th:alt="${car.modelName}"/>
                     </div>
                     <div class="ct-car-card__body">
                         <div class="ct-car-tags">
-                            <span class="ct-tag-item">Số tự động</span>
-                            <span class="ct-tag-item">Xe điện</span>
+                            <span class="ct-tag-item" th:text="${car.transmission.name()}">Số tự động</span>
+                            <span class="ct-tag-item" th:text="${car.fuel.name()}">Xăng</span>
                         </div>
-                        <h3 class="ct-car-name">VinFast VF8 Plus</h3>
+                        <h3 class="ct-car-name" th:text="${car.modelName}">Tên xe</h3>
                         <div class="ct-car-meta">
-                            <span class="ct-car-rating"><i class="fa-solid fa-star"></i> 5.0</span>
-                            <span class="ct-car-trips">• 42 chuyến</span>
+                            <span class="ct-car-rating">
+                                <i class="fa-solid fa-star"></i>
+                                <span th:text="${car.avgRating}">5.0</span>
+                            </span>
                         </div>
                         <hr class="ct-card-divider"/>
                         <div class="ct-car-price-row">
-                            <span class="ct-car-location"><i class="fa-solid fa-location-dot"></i> Hải Châu, Đà Nẵng</span>
+                            <span class="ct-car-location">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <span th:text="${car.pickupLocation}">Địa điểm</span>
+                            </span>
                             <div class="ct-car-price">
-                                <strong>1.200.000đ</strong><span>/ngày</span>
+                                <strong th:text="${#numbers.formatInteger(car.pricePerDay, 0, 'COMMA') + 'đ'}">0đ</strong>
+                                <span>/ngày</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-xl-3 col-lg-4 col-md-6">
-                <div class="ct-car-card">
-                    <div class="ct-car-card__thumb">
-                        <img src="https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&w=600&q=80" alt="Hyundai Accent"/>
-                        <span class="ct-car-badge ct-car-badge--purple">Giá tốt</span>
-                    </div>
-                    <div class="ct-car-card__body">
-                        <div class="ct-car-tags">
-                            <span class="ct-tag-item">Số tự động</span>
-                            <span class="ct-tag-item">Xăng</span>
-                        </div>
-                        <h3 class="ct-car-name">Hyundai Accent 2023</h3>
-                        <div class="ct-car-meta">
-                            <span class="ct-car-rating"><i class="fa-solid fa-star"></i> 4.9</span>
-                            <span class="ct-car-trips">• 118 chuyến</span>
-                        </div>
-                        <hr class="ct-card-divider"/>
-                        <div class="ct-car-price-row">
-                            <span class="ct-car-location"><i class="fa-solid fa-location-dot"></i> Cẩm Lệ, Đà Nẵng</span>
-                            <div class="ct-car-price">
-                                <strong>750.000đ</strong><span>/ngày</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-lg-4 col-md-6">
-                <div class="ct-car-card">
-                    <div class="ct-car-card__thumb">
-                        <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80" alt="Honda Civic"/>
-                    </div>
-                    <div class="ct-car-card__body">
-                        <div class="ct-car-tags">
-                            <span class="ct-tag-item">Số tự động</span>
-                            <span class="ct-tag-item">Xăng</span>
-                        </div>
-                        <h3 class="ct-car-name">Honda Civic RS</h3>
-                        <div class="ct-car-meta">
-                            <span class="ct-car-rating"><i class="fa-solid fa-star"></i> 4.8</span>
-                            <span class="ct-car-trips">• 65 chuyến</span>
-                        </div>
-                        <hr class="ct-card-divider"/>
-                        <div class="ct-car-price-row">
-                            <span class="ct-car-location"><i class="fa-solid fa-location-dot"></i> Sơn Trà, Đà Nẵng</span>
-                            <div class="ct-car-price">
-                                <strong>950.000đ</strong><span>/ngày</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-lg-4 col-md-6">
-                <div class="ct-car-card">
-                    <div class="ct-car-card__thumb">
-                        <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=600&q=80" alt="Xpander"/>
-                        <span class="ct-car-badge ct-car-badge--green">Giao xe tận nơi</span>
-                    </div>
-                    <div class="ct-car-card__body">
-                        <div class="ct-car-tags">
-                            <span class="ct-tag-item">7 Chỗ</span>
-                            <span class="ct-tag-item">Số tự động</span>
-                        </div>
-                        <h3 class="ct-car-name">Mitsubishi Xpander 2022</h3>
-                        <div class="ct-car-meta">
-                            <span class="ct-car-rating"><i class="fa-solid fa-star"></i> 4.9</span>
-                            <span class="ct-car-trips">• 94 chuyến</span>
-                        </div>
-                        <hr class="ct-card-divider"/>
-                        <div class="ct-car-price-row">
-                            <span class="ct-car-location"><i class="fa-solid fa-location-dot"></i> Ngũ Hành Sơn, ĐN</span>
-                            <div class="ct-car-price">
-                                <strong>1.000.000đ</strong><span>/ngày</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="col-12 text-center py-5" th:if="${cars == null or cars.isEmpty()}">
+                <p class="text-muted">Chưa có xe nào để hiển thị.</p>
             </div>
         </div>
     </div>

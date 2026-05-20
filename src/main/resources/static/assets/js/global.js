@@ -1,7 +1,3 @@
-/**
- * global.js – DriveEasy
- * Chạy trên mọi trang: navbar scroll effect, active link
- */
 (function () {
     'use strict';
 
