@@ -1,9 +1,6 @@
-/* =====================================================
-   home.css  –  Carto Redesign (Mioto Style)
-   ===================================================== */
-
-   :root {
-    --brand-primary: #5FCF86;    /* Xanh lá đặc trưng của xe cộ hiện đại */
+:root {
+    --brand-primary: #5FCF86;
+    /* Xanh lá đặc trưng của xe cộ hiện đại */
     --brand-hover: #4EBA74;
     --text-main: #18181B;
     --text-muted: #71717A;
@@ -17,14 +14,15 @@
 /* ── 1. JUMBOTRON & HERO CONFIG ────────────────────── */
 .ct-jumbotron {
     position: relative;
-    padding-bottom: 80px; /* Tạo khoảng trống chân cho thanh search nổi đè lên */
+    padding-bottom: 80px;
+    /* Tạo khoảng trống chân cho thanh search nổi đè lên */
     margin-bottom: 40px;
 }
 
 .ct-jumbotron__bg {
     position: absolute;
     inset: 0;
-    bottom: 80px; 
+    bottom: 80px;
     overflow: hidden;
     z-index: -1;
 }
@@ -232,6 +230,7 @@
     font-size: 0.95rem;
     transition: opacity 0.2s;
 }
+
 .ct-link-more:hover {
     opacity: 0.85;
 }
@@ -312,8 +311,13 @@
     color: #FFFFFF;
 }
 
-.ct-car-badge--green { background: #10B981; }
-.ct-car-badge--purple { background: #8B5CF6; }
+.ct-car-badge--green {
+    background: #10B981;
+}
+
+.ct-car-badge--purple {
+    background: #8B5CF6;
+}
 
 .ct-car-card__body {
     padding: 16px;
@@ -375,7 +379,6 @@
 .ct-car-location {
     font-size: 0.78rem;
     color: var(--text-muted);
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 130px;
@@ -456,14 +459,197 @@
         flex-direction: column;
         align-items: stretch;
     }
+
     .ct-field-divider {
         display: none;
     }
+
     .ct-search-btn {
         width: 100%;
         margin-top: 8px;
     }
+
     .ct-hero-title {
         font-size: 2.2rem;
     }
+}
+
+/* ── 8. CAR CARD — CẬP NHẬT (seats tag + địa chỉ đầy đủ + click toàn thẻ) ── */
+
+/* Wrapper <a> bao ngoài thẻ: bỏ underline, giữ màu chữ bình thường */
+.ct-car-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
+}
+
+/* Tag số chỗ ngồi: dùng màu xanh brand nhạt để phân biệt với tag trắng */
+.ct-tag-seats {
+    background: rgba(95, 207, 134, 0.12);
+    color: var(--brand-hover);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ct-tag-seats i {
+    font-size: 0.65rem;
+}
+
+/* Khu vực footer dưới thẻ: địa chỉ + giá xếp theo cột thay vì row
+   để địa chỉ có đủ chỗ hiển thị đầy đủ, không bị cắt */
+.ct-car-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Địa chỉ: bỏ white-space nowrap và text-overflow ellipsis,
+   cho phép xuống dòng tự nhiên — địa chỉ hiển thị đầy đủ */
+.ct-car-location {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+    line-height: 1.4;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    max-width: none;
+}
+
+.ct-car-location i {
+    color: #EF4444;
+    flex-shrink: 0;
+    /* icon pin không bị thu nhỏ khi text dài */
+    margin-top: 2px;
+}
+
+/* Giá: căn phải trong footer column */
+.ct-car-price {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+}
+
+/* Khu vực/vùng (region) bên cạnh rating */
+.ct-car-region {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+}
+
+/* ── NEW CAR CARD STYLES (MATCHING SCREENSHOT UI) ── */
+.ct-car-card {
+    border-radius: 12px;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+.ct-car-card__thumb {
+    border-radius: 12px 12px 0 0;
+    overflow: hidden;
+    position: relative;
+    height: 220px;
+}
+.thumb-badge-flash {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(0, 0, 0, 0.5);
+    color: #FBBF24;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    z-index: 2;
+}
+.thumb-badge-heart {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(0, 0, 0, 0.4);
+    color: #FFFFFF;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    z-index: 2;
+}
+.ct-car-features-pill {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.feature-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid #E5E7EB;
+    border-radius: 50px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    color: #4B5563;
+    background: #FFFFFF;
+}
+.ct-car-name {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #111827;
+}
+.ct-car-specs {
+    display: flex;
+    justify-content: flex-start;
+    gap: 16px;
+    align-items: center;
+    color: #6B7280;
+    font-size: 0.85rem;
+    margin-top: 8px;
+}
+.spec-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.spec-item i {
+    font-size: 0.9rem;
+}
+.ct-car-location {
+    font-size: 0.85rem;
+    color: #6B7280;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.ct-card-divider {
+    border-color: #E5E7EB;
+    margin: 16px 0;
+    opacity: 1;
+}
+.ct-car-price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.ct-car-rating-trips {
+    font-size: 0.9rem;
+    color: #4B5563;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.price-highlight {
+    font-size: 1.3rem;
+    color: #10B981;
+    font-weight: 800;
+}
+.price-unit {
+    font-size: 0.85rem;
+    color: #6B7280;
 }

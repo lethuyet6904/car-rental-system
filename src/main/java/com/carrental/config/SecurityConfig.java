@@ -24,7 +24,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
+            // Bật CSRF protection để chống tấn công giả mạo (đặc biệt quan trọng với Web MVC/Thymeleaf)
+            // .csrf() được bật mặc định, ở đây ta có thể dùng mặc định
+            // Tuy nhiên, vì chúng ta đang dùng JWT qua Cookie song song với API (nếu có),
+            // việc bật CSRF bắt buộc mọi form POST phải có token CSRF.
+            // Spring Security tự động chèn token vào các thẻ <form th:action=...> của Thymeleaf.
             // Cho phép tạo session khi cần (navbar dùng session.user để hiển thị)
             // JWT vẫn là cơ chế auth chính thông qua filter
             .sessionManagement(session ->
@@ -40,6 +44,7 @@ public class SecurityConfig {
                     "/auth/forgot-password",
                     "/auth/logout",
                     "/assets/**",
+                    "/owner/owner-registration",  
                     "/error"
                 ).permitAll()
 

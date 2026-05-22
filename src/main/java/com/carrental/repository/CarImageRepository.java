@@ -9,4 +9,5 @@ import java.util.List;
 public interface CarImageRepository extends JpaRepository<CarImage, Long> {
     List<CarImage> findByCarCarIdOrderBySortOrderAsc(Long carId);
     void deleteByCarCarId(Long carId);
+    List<CarImage> findByCarCarIdIn(List<Long> carIds);
 }

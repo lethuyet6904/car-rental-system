@@ -1,8 +1,8 @@
 package com.carrental.controller;
 
-import com.carrental.dto.LoginRequest;
-import com.carrental.dto.RegisterRequest;
-import com.carrental.dto.ForgotPasswordRequest;
+import com.carrental.dto.request.ForgotPasswordRequest;
+import com.carrental.dto.request.LoginRequest;
+import com.carrental.dto.request.RegisterRequest;
 import com.carrental.entity.User;
 import com.carrental.security.JwtTokenProvider;
 import com.carrental.service.UserService;
