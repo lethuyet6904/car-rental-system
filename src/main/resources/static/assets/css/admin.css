@@ -97,7 +97,7 @@ body { background: var(--content-bg); }
   font-size: 12px; font-weight: 600;
 }
 
-.admin-content { flex: 1; padding: 24px; }
+.admin-content { flex: 1; padding: 24px; overflow-y:auto;}
 
 /* ── Cards ── */
 .admin-card {
@@ -157,9 +157,17 @@ body { background: var(--content-bg); }
   border: none; border-radius: 7px; color: #fff; font-size: 12px; cursor: pointer;
 }
 .filter-bar .btn-clear {
-  height: 34px; padding: 0 12px; background: #fff;
-  border: 1px solid var(--border-color); border-radius: 7px;
-  color: #6b7280; font-size: 12px; cursor: pointer;
+  height: 34px; 
+  padding: 0 12px; 
+  background: #fff;
+  border: 1px solid var(--border-color); 
+  border-radius: 7px;
+  color: #6b7280; 
+  font-size: 12px; 
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none; 
 }
 
 /* ── Pagination ── */

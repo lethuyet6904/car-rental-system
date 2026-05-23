@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/admin-layout :: adminHead('Duyệt xe đăng mới')}"></head>
+<body>
+<div class="admin-wrapper">
+
+  <th:block th:replace="~{fragments/admin-layout :: sidebar('cars')}"></th:block>
+
+  <div class="admin-body">
+    <th:block th:replace="~{fragments/admin-layout :: topbar(
+        'Duyệt xe đăng mới',
+        'Admin / <span>Xe đăng mới</span>')}">
+    </th:block>
+
+    <div class="admin-content">
+
+      <div th:if="${successMessage}" class="alert-success-admin">
+        <i class="bi bi-check-circle-fill"></i>
+        <span th:text="${successMessage}"></span>
+      </div>
+
+      <div class="admin-card">
+        <div style="font-size:14px;font-weight:600;margin-bottom:16px;color:#111827">
+          Danh sách xe
+        </div>
+
+        <!-- Filter -->
+        <form th:action="@{/admin/cars}" method="get">
+          <div class="filter-bar">
+            <select name="status">
+              <option value="" th:selected="${status == null or status == ''}">Trạng thái</option>
+              <option value="Pending"   th:selected="${status == 'Pending'}">Chờ duyệt</option>
+              <option value="Available" th:selected="${status == 'Available'}">Có sẵn</option>
+              <option value="Rejected"  th:selected="${status == 'Rejected'}">Đã từ chối</option>
+            </select>
+            <input type="text" name="keyword"
+                   placeholder="Tìm theo tên xe, biển số…"
+                   th:value="${keyword}"/>
+            <button type="submit" class="btn-search">
+              <i class="bi bi-search"></i> Tìm kiếm
+            </button>
+            <a th:href="@{/admin/cars}" class="btn-clear">Xóa lọc</a>
+          </div>
+        </form>
+
+        <!-- Table -->
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th style="width:40px">STT</th>
+              <th style="width:60px">Ảnh xe</th>
+              <th>Tên xe</th>
+              <th>Biển số</th>
+              <th>Chủ xe</th>
+              <th>Ngày đăng</th>
+              <th>Trạng thái</th>
+              <th style="width:70px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:if="${#lists.isEmpty(cars.content)}">
+              <td colspan="8" class="empty-state">
+                <i class="bi bi-car-front" style="font-size:24px;display:block;margin-bottom:8px"></i>
+                Không có xe nào
+              </td>
+            </tr>
+            <tr th:each="c, iter : ${cars.content}">
+              <td style="color:#9ca3af"
+                  th:text="${cars.number * 10 + iter.index + 1}"></td>
+              <td>
+                <div th:if="${c.firstImageUrl != null}">
+                  <img th:src="${c.firstImageUrl}"
+                       style="width:48px;height:34px;object-fit:cover;
+                              border-radius:5px;border:1px solid #e5e7eb"
+                       alt="ảnh xe"/>
+                </div>
+                <div th:if="${c.firstImageUrl == null}"
+                     class="img-box"
+                     style="width:48px;height:34px;border-radius:5px;font-size:10px">
+                  <i class="bi bi-image"></i>
+                </div>
+              </td>
+              <td>
+                <div style="font-weight:500" th:text="${c.modelName}"></div>
+                <div class="text-muted-small"
+                     th:text="${c.typeName + ' · ' + c.brandName}"></div>
+              </td>
+              <td th:text="${c.licensePlate}"></td>
+              <td th:text="${c.ownerName}"></td>
+              <td style="color:#6b7280"
+                  th:text="${#temporals.format(c.createdAt,'dd/MM/yyyy')}"></td>
+              <td>
+                <span th:class="${c.status.name() == 'Active' ? 'badge-approved' :
+                                  c.status.name() == 'Rejected'  ? 'badge-rejected' : 'badge-pending'}"
+                      th:text="${c.status.name() == 'Active' ? 'Có sẵn' :
+                                 c.status.name() == 'Rejected'  ? 'Đã từ chối' : 'Chờ duyệt'}">
+                </span>
+              </td>
+              <td>
+                <a th:href="@{/admin/cars/{id}(id=${c.carId})}"
+                   style="font-size:12px;color:#7F77DD;text-decoration:none;
+                          border:1px solid #7F77DD;padding:3px 10px;border-radius:6px">
+                  Xem
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <th:block th:replace="~{fragments/admin-layout :: pagination(
+            ${cars}, '/admin/cars', ${extraParams})}">
+        </th:block>
+      </div>
+
+    </div>
+  </div>
+</div>
+<th:block th:replace="~{fragments/admin-layout :: scripts}"></th:block>
+</body>
+</html>
