@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/admin-layout :: adminHead('Danh sách người dùng')}"></head>
+<body>
+<div class="admin-wrapper">
+
+  <!-- Sidebar -->
+  <th:block th:replace="~{fragments/admin-layout :: sidebar('users')}"></th:block>
+
+  <!-- Main -->
+  <div class="admin-body">
+    <th:block th:replace="~{fragments/admin-layout :: topbar(
+        'Danh sách người dùng',
+        'Admin / <span>Người dùng</span>')}">
+    </th:block>
+
+    <div class="admin-content">
+
+      <!-- Toast -->
+      <div th:if="${successMessage}" class="alert-success-admin">
+        <i class="bi bi-check-circle-fill"></i>
+        <span th:text="${successMessage}"></span>
+      </div>
+      <div th:if="${errorMessage}" class="alert-danger-admin">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <span th:text="${errorMessage}"></span>
+      </div>
+
+      <div class="admin-card">
+
+        <!-- Filter bar -->
+        <form th:action="@{/admin/users}" method="get">
+          <div class="filter-bar">
+            <!-- Vai trò -->
+            <select name="role">
+              <option value="" th:selected="${role == null or role == ''}">Vai trò</option>
+              <option th:each="r : ${roles}"
+                      th:value="${r.name()}"
+                      th:text="${r.name()}"
+                      th:selected="${r.name() == role}">
+              </option>
+            </select>
+
+            <!-- Trạng thái -->
+            <select name="status">
+              <option value="" th:selected="${status == null or status == ''}">Trạng thái</option>
+              <option th:each="s : ${statuses}"
+                      th:value="${s.name()}"
+                      th:text="${s.name() == 'Active' ? 'Đang hoạt động' : 'Bị khóa'}"
+                      th:selected="${s.name() == status}">
+              </option>
+            </select>
+
+            <!-- Search -->
+            <input type="text" name="keyword"
+                   placeholder="Tìm theo tên, SĐT, email…"
+                   th:value="${keyword}"/>
+            <button type="submit" class="btn-search">
+              <i class="bi bi-search"></i> Tìm kiếm
+            </button>
+            <a th:href="@{/admin/users}" class="btn-clear">Xóa lọc</a>
+          </div>
+        </form>
+
+        <!-- Table -->
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th style="width:40px">STT</th>
+              <th>Họ tên</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Trạng thái</th>
+              <th style="width:80px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Empty state -->
+            <tr th:if="${#lists.isEmpty(users.content)}">
+              <td colspan="6" style="text-align:center;padding:32px;color:#9ca3af">
+                <i class="bi bi-inbox" style="font-size:24px;display:block;margin-bottom:8px"></i>
+                Không tìm thấy người dùng phù hợp
+              </td>
+            </tr>
+            <!-- Rows -->
+            <tr th:each="u, iter : ${users.content}">
+              <td style="color:#9ca3af"
+                  th:text="${users.number * 10 + iter.index + 1}">1</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <!-- Avatar chữ cái -->
+                  <div style="width:28px;height:28px;border-radius:50%;background:#ede9fe;
+                               color:#5b21b6;display:flex;align-items:center;justify-content:center;
+                               font-size:10px;font-weight:600;flex-shrink:0"
+                       th:text="${#strings.substring(u.fullName, 0, 1)}">N</div>
+                  <span th:text="${u.fullName}">Nguyễn Anh</span>
+                </div>
+              </td>
+              <td th:text="${u.email != null ? u.email : '—'}">email</td>
+              <td>
+                <span th:class="${'badge-' + #strings.toLowerCase(u.role.name())}"
+                      th:text="${u.role.name()}">Customer</span>
+              </td>
+              <td>
+                <span th:class="${u.status.name() == 'Active' ? 'badge-active' : 'badge-locked'}"
+                      th:text="${u.status.name() == 'Active' ? 'Đang hoạt động' : 'Bị khóa'}">
+                </span>
+              </td>
+              <td>
+                <a th:href="@{/admin/users/{id}(id=${u.userId})}"
+                   style="font-size:12px;color:#7F77DD;text-decoration:none;
+                          border:1px solid #7F77DD;padding:3px 10px;border-radius:6px">
+                  Xem
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <th:block th:replace="~{fragments/admin-layout :: pagination(
+            ${users},
+            '/admin/users',
+            ${extraParams})}">
+        </th:block>
+
+      </div><!-- /card -->
+    </div><!-- /content -->
+  </div><!-- /body -->
+</div>
+
+<th:block th:replace="~{fragments/admin-layout :: scripts}"></th:block>
+</body>
+</html>
