@@ -3,7 +3,11 @@ package com.carrental.repository;
 import com.carrental.entity.OwnerRegistration;
 import com.carrental.enums.VerificationStatus;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -23,4 +27,18 @@ public interface OwnerRegistrationRepository extends JpaRepository<OwnerRegistra
 
     // Lấy đơn mới nhất của user
     Optional<OwnerRegistration> findTopByUserUserIdOrderBySubmittedAtDesc(Long userId);
+    
+ // Admin: filter theo status + keyword (tên, SĐT)
+    @Query("""
+            SELECT r FROM OwnerRegistration r
+            JOIN r.user u
+            WHERE (:status  IS NULL OR r.status = :status)
+              AND (:keyword IS NULL
+                   OR u.phone LIKE CONCAT('%', :keyword, '%')
+                   OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+            """)
+    Page<OwnerRegistration> findByFilters(
+            @Param("status")  VerificationStatus status,
+            @Param("keyword") String keyword,
+            Pageable pageable);
 }

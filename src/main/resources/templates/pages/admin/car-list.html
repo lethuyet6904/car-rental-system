@@ -30,7 +30,7 @@
             <select name="status">
               <option value="" th:selected="${status == null or status == ''}">Trạng thái</option>
               <option value="Pending"   th:selected="${status == 'Pending'}">Chờ duyệt</option>
-              <option value="Available" th:selected="${status == 'Available'}">Có sẵn</option>
+              <option value="Active" th:selected="${status == 'Available'}">Có sẵn</option>
               <option value="Rejected"  th:selected="${status == 'Rejected'}">Đã từ chối</option>
             </select>
             <input type="text" name="keyword"

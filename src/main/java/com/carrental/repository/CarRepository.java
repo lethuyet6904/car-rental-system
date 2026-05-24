@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CarRepository extends JpaRepository<Car, Long> {
@@ -32,7 +33,26 @@ public interface CarRepository extends JpaRepository<Car, Long> {
             @Param("fuel") com.carrental.enums.FuelType fuel,
             @Param("transmission") com.carrental.enums.TransmissionType transmission,
             Pageable pageable);
+    
+ // Admin filter theo status + keyword (tên xe, biển số, tên chủ xe)
+    @EntityGraph(attributePaths = {"owner", "brand", "carType", "region"})
+    @Query("""
+            SELECT c FROM Car c
+            WHERE (:status  IS NULL OR c.status = :status)
+              AND (:keyword IS NULL
+                   OR LOWER(c.modelName)    LIKE LOWER(CONCAT('%', :keyword, '%'))
+                   OR LOWER(c.licensePlate) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                   OR LOWER(c.owner.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+            """)
+    Page<Car> findByFilters(
+            @Param("status")  CarStatus status,
+            @Param("keyword") String keyword,
+            Pageable pageable);
 
+    // Lấy detail kèm đầy đủ relations
+    @Query("SELECT c FROM Car c JOIN FETCH c.owner JOIN FETCH c.brand JOIN FETCH c.carType JOIN FETCH c.region WHERE c.carId = :carId")
+    Optional<Car> findWithDetailsById(@Param("carId") Long carId);
+    
     List<Car> findByOwner(User owner);
     
     long countByStatus(CarStatus status);

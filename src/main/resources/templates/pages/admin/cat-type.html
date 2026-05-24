@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/admin-layout :: adminHead('Quản lý loại xe')}"></head>
+<body>
+<div class="admin-wrapper">
+
+  <th:block th:replace="~{fragments/admin-layout :: sidebar('cat-type')}"></th:block>
+
+  <div class="admin-body">
+    <th:block th:replace="~{fragments/admin-layout :: topbar(
+        'Quản lý loại xe',
+        'Admin / Danh mục / <span>Loại xe</span>')}">
+    </th:block>
+
+    <div class="admin-content">
+
+      <!-- Toast -->
+      <div th:if="${successMessage}" class="alert-success-admin">
+        <i class="bi bi-check-circle-fill"></i>
+        <span th:text="${successMessage}"></span>
+      </div>
+      <div th:if="${errorMessage}" class="alert-danger-admin">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <span th:text="${errorMessage}"></span>
+      </div>
+
+      <div class="admin-card">
+
+        <!-- Header + search + nút thêm -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div style="font-size:14px;font-weight:600;color:#111827">Danh sách loại xe</div>
+          <div style="display:flex;gap:8px;align-items:center">
+			<form th:action="@{/admin/categories/car-types}" method="get" class="filter-bar"
+			      style="margin-bottom:0">
+			  <input type="text" name="keyword" th:value="${keyword}"
+			         placeholder="Tìm theo tên…"/>
+			  <button type="submit" class="btn-search">
+			    <i class="bi bi-search"></i> Tìm kiếm
+			  </button>
+			  
+			</form>
+            <button type="button" class="btn-admin-primary"
+                    data-bs-toggle="modal" data-bs-target="#addTypeModal">
+              <i class="bi bi-plus-lg"></i> Thêm loại xe
+            </button>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th style="width:40px">STT</th>
+              <th>Loại xe</th>
+              <th>Số xe</th>
+              <th>Trạng thái</th>
+              <th style="width:90px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:if="${#lists.isEmpty(types)}">
+              <td colspan="5" class="empty-state">Chưa có loại xe nào</td>
+            </tr>
+            <tr th:each="t, iter : ${types}">
+              <td style="color:#9ca3af" th:text="${iter.index + 1}"></td>
+              <td>
+                <div style="font-weight:500" th:text="${t.name}"></div>
+                <div class="text-muted-small" th:text="${t.description}"></div>
+              </td>
+              <td th:text="${t.carCount}"></td>
+              <td>
+                <span th:class="${t.status == 'Active' ? 'badge-approved' : 'badge-none'}"
+                      th:text="${t.status == 'Active' ? 'Đang dùng' : 'Ẩn'}">
+                </span>
+              </td>
+              <td>
+                <div style="display:flex;gap:6px">
+                  <!-- Nút sửa -->
+                  <button type="button"
+                          class="btn btn-sm btn-outline-secondary"
+                          data-bs-toggle="modal"
+                          data-bs-target="#editTypeModal"
+                          th:data-id="${t.id}"
+                          th:data-name="${t.name}"
+                          th:data-description="${t.description}"
+                          th:data-status="${t.status}"
+                          onclick="fillEditTypeModal(this)">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <!-- Nút xóa -->
+                  <button type="button"
+                          class="btn btn-sm btn-outline-danger"
+                          data-bs-toggle="modal"
+                          data-bs-target="#deleteTypeModal"
+                          th:data-id="${t.id}"
+                          th:data-name="${t.name}"
+                          onclick="fillDeleteTypeModal(this)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Thêm loại xe -->
+<div class="modal fade" id="addTypeModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form th:action="@{/admin/categories/car-types/add}" method="post">
+        <div class="modal-header">
+          <h6 class="modal-title">Thêm loại xe</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label" style="font-size:13px;font-weight:500">
+              Tên loại xe <span style="color:#ef4444">*</span>
+            </label>
+            <input type="text" name="name" class="form-control form-control-sm"
+                   placeholder="Ví dụ: Coupe, Convertible…" required/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" style="font-size:13px;font-weight:500">Mô tả</label>
+            <input type="text" name="description" class="form-control form-control-sm"
+                   placeholder="Mô tả ngắn về loại xe…"/>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm"
+                  data-bs-dismiss="modal">Hủy</button>
+          <button type="submit" class="btn btn-primary btn-sm">Thêm</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Chỉnh sửa loại xe -->
+<div class="modal fade" id="editTypeModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form id="editTypeForm" method="post">
+		<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <div class="modal-header">
+          <h6 class="modal-title">Chỉnh sửa loại xe</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label" style="font-size:13px;font-weight:500">
+              Tên loại xe <span style="color:#ef4444">*</span>
+            </label>
+            <input type="text" id="editTypeName" name="name"
+                   class="form-control form-control-sm" required/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" style="font-size:13px;font-weight:500">Mô tả</label>
+            <input type="text" id="editTypeDesc" name="description"
+                   class="form-control form-control-sm"/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" style="font-size:13px;font-weight:500">Trạng thái</label>
+            <select id="editTypeStatus" name="status" class="form-select form-select-sm">
+              <option value="Active">Đang dùng</option>
+              <option value="Hidden">Ẩn</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm"
+                  data-bs-dismiss="modal">Hủy</button>
+          <button type="submit" class="btn btn-primary btn-sm">Lưu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Xóa loại xe -->
+<div class="modal fade" id="deleteTypeModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form id="deleteTypeForm" method="post">
+		<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <div class="modal-header">
+          <h6 class="modal-title">Xác nhận xóa loại xe</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" style="font-size:13px;color:#374151;text-align:center;padding:20px">
+          Bạn có chắc muốn xóa loại xe
+          <strong><span id="deleteTypeName"></span></strong> không?
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-secondary btn-sm"
+                  data-bs-dismiss="modal">Hủy</button>
+          <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<th:block th:replace="~{fragments/admin-layout :: scripts}"></th:block>
+<script>
+function fillEditTypeModal(btn) {
+  document.getElementById('editTypeForm').action =
+    '/admin/categories/car-types/' + btn.dataset.id + '/edit';
+  document.getElementById('editTypeName').value   = btn.dataset.name;
+  document.getElementById('editTypeDesc').value   = btn.dataset.description || '';
+  document.getElementById('editTypeStatus').value = btn.dataset.status;
+}
+function fillDeleteTypeModal(btn) {
+  document.getElementById('deleteTypeForm').action =
+    '/admin/categories/car-types/' + btn.dataset.id + '/delete';
+  document.getElementById('deleteTypeName').textContent = btn.dataset.name;
+}
+</script>
+</body>
+</html>

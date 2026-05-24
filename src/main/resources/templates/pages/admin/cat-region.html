@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/admin-layout :: adminHead('Quản lý khu vực')}"></head>
+<body>
+<div class="admin-wrapper">
+
+  <th:block th:replace="~{fragments/admin-layout :: sidebar('cat-region')}"></th:block>
+
+  <div class="admin-body">
+    <th:block th:replace="~{fragments/admin-layout :: topbar(
+        'Quản lý khu vực',
+        'Admin / Danh mục / <span>Khu vực</span>')}">
+    </th:block>
+
+    <div class="admin-content">
+
+      <div th:if="${successMessage}" class="alert-success-admin">
+        <i class="bi bi-check-circle-fill"></i>
+        <span th:text="${successMessage}"></span>
+      </div>
+
+      <div class="admin-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div style="font-size:14px;font-weight:600;color:#111827">Danh sách khu vực</div>
+          <div style="display:flex;gap:8px;align-items:center">
+			<form th:action="@{/admin/categories/regions}" method="get" class="filter-bar"
+			      style="margin-bottom:0">
+			  <input type="text" name="keyword" th:value="${keyword}"
+			         placeholder="Tìm theo tên khu vực…"/>
+			  <button type="submit" class="btn-search">
+			    <i class="bi bi-search"></i> Tìm kiếm
+			  </button>
+			  
+			</form>
+            <button type="button" class="btn-admin-primary"
+                    data-bs-toggle="modal" data-bs-target="#addRegionModal">
+              <i class="bi bi-plus-lg"></i> Thêm khu vực
+            </button>
+          </div>
+        </div>
+
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th style="width:40px">STT</th>
+              <th>Tên khu vực</th>
+              <th>Số xe đang hoạt động</th>
+              <th>Trạng thái</th>
+              <th style="width:90px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:if="${#lists.isEmpty(regions)}">
+              <td colspan="5" class="empty-state">Chưa có khu vực nào</td>
+            </tr>
+            <tr th:each="r, iter : ${regions}">
+              <td style="color:#9ca3af" th:text="${iter.index + 1}"></td>
+              <td style="font-weight:500" th:text="${r.name}"></td>
+              <td th:text="${r.activeCarCount}"></td>
+              <td>
+                <span th:class="${r.status == 'Active' ? 'badge-approved' : 'badge-none'}"
+                      th:text="${r.status == 'Active' ? 'Đang hoạt động' : 'Ẩn'}">
+                </span>
+              </td>
+              <td>
+                <div style="display:flex;gap:6px">
+                  <button type="button" class="btn btn-sm btn-outline-secondary"
+                          data-bs-toggle="modal" data-bs-target="#editRegionModal"
+                          th:data-id="${r.id}" th:data-name="${r.name}"
+                          th:data-status="${r.status}"
+                          onclick="fillEditRegionModal(this)">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-danger"
+                          data-bs-toggle="modal" data-bs-target="#deleteRegionModal"
+                          th:data-id="${r.id}" th:data-name="${r.name}"
+                          onclick="fillDeleteRegionModal(this)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Thêm khu vực -->
+<div class="modal fade" id="addRegionModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form th:action="@{/admin/categories/regions/add}" method="post">
+        <div class="modal-header">
+          <h6 class="modal-title">Thêm khu vực</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label" style="font-size:13px;font-weight:500">
+              Tên khu vực <span style="color:#ef4444">*</span>
+            </label>
+            <input type="text" name="name" class="form-control form-control-sm"
+                   placeholder="Ví dụ: Huế, Vũng Tàu…" required/>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm"
+                  data-bs-dismiss="modal">Hủy</button>
+          <button type="submit" class="btn btn-primary btn-sm">Thêm</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Chỉnh sửa khu vực -->
+<div class="modal fade" id="editRegionModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form id="editRegionForm" method="post">
+		<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <div class="modal-header">
+          <h6 class="modal-title">Chỉnh sửa khu vực</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label" style="font-size:13px;font-weight:500">
+              Tên khu vực <span style="color:#ef4444">*</span>
+            </label>
+            <input type="text" id="editRegionName" name="name"
+                   class="form-control form-control-sm" required/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" style="font-size:13px;font-weight:500">Trạng thái</label>
+            <select id="editRegionStatus" name="status" class="form-select form-select-sm">
+              <option value="Active">Đang hoạt động</option>
+              <option value="Hidden">Ẩn</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm"
+                  data-bs-dismiss="modal">Hủy</button>
+          <button type="submit" class="btn btn-primary btn-sm">Lưu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Xóa khu vực -->
+<div class="modal fade" id="deleteRegionModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form id="deleteRegionForm" method="post">
+		<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <div class="modal-header">
+          <h6 class="modal-title">Xác nhận xóa khu vực</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" style="font-size:13px;color:#374151;text-align:center;padding:20px">
+          Bạn có chắc muốn xóa khu vực
+          <strong><span id="deleteRegionName"></span></strong> không?
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-secondary btn-sm"
+                  data-bs-dismiss="modal">Hủy</button>
+          <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<th:block th:replace="~{fragments/admin-layout :: scripts}"></th:block>
+<script>
+function fillEditRegionModal(btn) {
+  document.getElementById('editRegionForm').action =
+    '/admin/categories/regions/' + btn.dataset.id + '/edit';
+  document.getElementById('editRegionName').value   = btn.dataset.name;
+  document.getElementById('editRegionStatus').value = btn.dataset.status;
+}
+function fillDeleteRegionModal(btn) {
+  document.getElementById('deleteRegionForm').action =
+    '/admin/categories/regions/' + btn.dataset.id + '/delete';
+  document.getElementById('deleteRegionName').textContent = btn.dataset.name;
+}
+</script>
+</body>
+</html>

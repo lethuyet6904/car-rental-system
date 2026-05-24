@@ -12,6 +12,9 @@ public interface IdentityVerificationRepository extends JpaRepository<IdentityVe
 
     // Tìm hồ sơ xác minh mới nhất của user
     Optional<IdentityVerification> findTopByUserUserIdOrderBySubmittedAtDesc(Long userId);
+    
+    // Lấy tất cả hồ sơ xác minh của 1 user (có thể có nhiều nếu bị reject rồi nộp lại)
+    List<IdentityVerification> findByUser_UserId(Long userId);
 
     // Admin: xem danh sách hồ sơ theo status
     List<IdentityVerification> findByStatus(VerificationStatus status);

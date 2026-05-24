@@ -1,8 +1,8 @@
 package com.carrental.service.impl;
 
 import com.carrental.dto.request.LockAccountRequest;
-import com.carrental.dto.response.UserListResponse;
-import com.carrental.dto.response.UserDetailResponse;
+import com.carrental.dto.response.AdminUserDetailResponse;
+import com.carrental.dto.response.AdminUserListResponse;
 import com.carrental.entity.IdentityVerification;
 import com.carrental.entity.OwnerRegistration;
 import com.carrental.entity.User;
@@ -31,17 +31,17 @@ public class AdminUserServiceImpl implements AdminUserService {
     private final IdentityVerificationRepository identityVerificationRepository;
 
     @Override
-    public Page<UserListResponse> getUserList(String keyword, UserRole role, UserStatus status, Pageable pageable) {
+    public Page<AdminUserListResponse> getUserList(String keyword, UserRole role, UserStatus status, Pageable pageable) {
         String kw = (keyword != null && !keyword.isBlank()) ? keyword.trim() : null;
-        return userRepository.searchUsers(kw, role, status, pageable).map(UserListResponse::from);
+        return userRepository.searchUsers(kw, role, status, pageable).map(AdminUserListResponse::from);
     }
 
     @Override
-    public UserDetailResponse getUserDetail(Long userId) {
+    public AdminUserDetailResponse getUserDetail(Long userId) {
         User user = findUserOrThrow(userId);
-        var identity = identityVerificationRepository.findTopByUserUserIdOrderBySubmittedAtDesc(userId).orElse(null);
-        var ownerReg = ownerRegistrationRepository.findTopByUserUserIdOrderBySubmittedAtDesc(userId).orElse(null);
-        return UserDetailResponse.from(user, identity, ownerReg);
+        IdentityVerification identity = identityVerificationRepository.findTopByUserUserIdOrderBySubmittedAtDesc(userId).orElse(null);
+        OwnerRegistration ownerReg = ownerRegistrationRepository.findTopByUserUserIdOrderBySubmittedAtDesc(userId).orElse(null);
+        return AdminUserDetailResponse.from(user, identity, ownerReg);
     }
 
     @Override
@@ -73,52 +73,11 @@ public class AdminUserServiceImpl implements AdminUserService {
         
         userRepository.save(user);
     }
-
-    @Override
-    @Transactional
-    public void approveOwnerRegistration(Long registrationId) {
-        OwnerRegistration reg = ownerRegistrationRepository.findById(registrationId)
-                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy đơn đăng ký"));
-
-        if (!VerificationStatus.Pending.equals(reg.getStatus())) {
-            throw new RuntimeException("Đơn này đã được xử lý rồi");
-        }
-
-        // Duyệt đơn
-        reg.setStatus(VerificationStatus.Approved);
-        reg.setReviewedAt(LocalDateTime.now());
-        
-        ownerRegistrationRepository.save(reg);
-
-        // Nâng role user lên Owner
-        User user = reg.getUser();
-        user.setRole(UserRole.Owner);
-        
-        userRepository.save(user);
-    }
-
-    @Override
-    @Transactional
-    public void rejectOwnerRegistration(Long registrationId, String rejectReason) {
-        OwnerRegistration reg = ownerRegistrationRepository.findById(registrationId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Không tìm thấy đơn đăng ký"));
-
-        if (!VerificationStatus.Pending.equals(reg.getStatus())) {
-            throw new IllegalStateException("Đơn đã được xử lý rồi");
-        }
-        
-        reg.setStatus(VerificationStatus.Rejected);
-        reg.setRejectReason(rejectReason);
-        reg.setReviewedAt(LocalDateTime.now());
-        
-        ownerRegistrationRepository.save(reg);
-    }
     
     @Override
     @Transactional
     public void approveIdentityVerification(Long verificationId) {
-    	IdentityVerification identity =
+    	IdentityVerification identity = 
                 identityVerificationRepository.findById(verificationId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Không tìm thấy hồ sơ xác minh"));

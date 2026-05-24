@@ -78,6 +78,18 @@
 
 <div th:fragment="pagination(page, baseUrl, extraParams)" class="admin-pagination"
      th:if="${page.totalPages > 1}">
+
+  <!-- Đầu -->
+  <a th:if="${!page.first}"
+     th:href="${baseUrl + '?page=0' + extraParams}"
+     title="Trang đầu">
+    <i class="bi bi-chevron-double-left" style="font-size:11px"></i>
+  </a>
+  <span th:if="${page.first}" class="disabled">
+    <i class="bi bi-chevron-double-left" style="font-size:11px"></i>
+  </span>
+
+  <!-- Trước -->
   <a th:if="${!page.first}"
      th:href="${baseUrl + '?page=' + (page.number - 1) + extraParams}">
     <i class="bi bi-chevron-left" style="font-size:11px"></i>
@@ -86,6 +98,7 @@
     <i class="bi bi-chevron-left" style="font-size:11px"></i>
   </span>
 
+  <!-- Số trang -->
   <th:block th:each="i : ${#numbers.sequence(
       T(java.lang.Math).max(0, page.number - 2),
       T(java.lang.Math).min(page.totalPages - 1, page.number + 2))}">
@@ -96,6 +109,7 @@
           th:text="${i + 1}">1</span>
   </th:block>
 
+  <!-- Sau -->
   <a th:if="${!page.last}"
      th:href="${baseUrl + '?page=' + (page.number + 1) + extraParams}">
     <i class="bi bi-chevron-right" style="font-size:11px"></i>
@@ -103,6 +117,17 @@
   <span th:if="${page.last}" class="disabled">
     <i class="bi bi-chevron-right" style="font-size:11px"></i>
   </span>
+
+  <!-- Cuối -->
+  <a th:if="${!page.last}"
+     th:href="${baseUrl + '?page=' + (page.totalPages - 1) + extraParams}"
+     title="Trang cuối">
+    <i class="bi bi-chevron-double-right" style="font-size:11px"></i>
+  </a>
+  <span th:if="${page.last}" class="disabled">
+    <i class="bi bi-chevron-double-right" style="font-size:11px"></i>
+  </span>
+
 </div>
 
 <div th:fragment="scripts">

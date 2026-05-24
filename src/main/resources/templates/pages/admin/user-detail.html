@@ -113,6 +113,15 @@
             </span>
           </span>
         </div>
+		
+		<div class="detail-row"
+		     th:if="${user.identityStatus != null
+		             and user.identityStatus.name() == 'Rejected'
+		             and user.identityRejectReason != null}">
+		  <span class="detail-label">Lý do từ chối xác minh</span>
+		  <span class="detail-value" style="color:#b91c1c"
+		        th:text="${user.identityRejectReason}"></span>
+		</div>
 
         <!-- CCCD/GPLX — chỉ hiện khi đã xác minh -->
         <th:block th:if="${user.identityStatus != null and user.identityStatus.name() == 'Approved'}">
@@ -144,14 +153,12 @@
           </button>
 
           <!-- Mở khóa — chỉ khi Locked -->
-          <form th:if="${user.status.name() == 'Locked'}"
-                th:action="@{/admin/users/{id}/unlock(id=${user.userId})}"
-                method="post" style="display:inline">
-            <button type="submit" class="btn btn-success btn-sm"
-                    onclick="return confirm('Xác nhận mở khóa tài khoản này?')">
-              <i class="bi bi-unlock"></i> Mở khóa tài khoản
-            </button>
-          </form>
+		  <button th:if="${user.status.name() == 'Locked'}"
+		          type="button"
+		          class="btn btn-success btn-sm"
+		          data-bs-toggle="modal" data-bs-target="#unlockModal">
+		    <i class="bi bi-unlock"></i> Mở khóa tài khoản
+		  </button>
 
           <!-- Duyệt xác minh danh tính — chỉ khi Pending -->
           <a th:if="${user.identityStatus != null and user.identityStatus.name() == 'Pending'}"
@@ -162,8 +169,6 @@
 
         </div>
       </div>
-
-      
 
     </div>
   </div>
@@ -199,6 +204,38 @@
                   data-bs-dismiss="modal">Hủy</button>
           <button type="submit" class="btn btn-warning btn-sm">
             <i class="bi bi-lock"></i> Xác nhận khóa
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Mở khóa tài khoản -->
+<div class="modal fade" id="unlockModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form th:action="@{/admin/users/{id}/unlock(id=${user != null ? user.userId : 0})}"
+            method="post">
+        <div class="modal-header">
+          <h6 class="modal-title"><i class="bi bi-unlock"></i> Mở khóa tài khoản</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:13px;color:#6b7280;margin:0">
+            Xác nhận mở khóa tài khoản của
+            <strong th:text="${user != null ? user.fullName : ''}"></strong>
+            (<span th:text="${user != null ? user.phone : ''}"></span>)?
+          </p>
+          <p style="font-size:12px;color:#9ca3af;margin-top:8px;margin-bottom:0">
+            Người dùng sẽ có thể đăng nhập và sử dụng hệ thống trở lại.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm"
+                  data-bs-dismiss="modal">Hủy</button>
+          <button type="submit" class="btn btn-success btn-sm">
+            <i class="bi bi-unlock"></i> Xác nhận mở khóa
           </button>
         </div>
       </form>
