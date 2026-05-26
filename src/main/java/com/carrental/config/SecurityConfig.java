@@ -44,6 +44,7 @@ public class SecurityConfig {
                     "/auth/forgot-password",
                     "/auth/logout",
                     "/assets/**",
+                    "/cars/**",
                     "/owner/owner-registration",  
                     "/error"
                 ).permitAll()

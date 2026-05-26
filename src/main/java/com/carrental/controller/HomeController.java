@@ -2,7 +2,9 @@ package com.carrental.controller;
 
 import com.carrental.dto.response.CarListResponse;
 import com.carrental.entity.User;
+import com.carrental.entity.Region;
 import com.carrental.service.CarService;
+import com.carrental.service.RegionService;
 import com.carrental.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,12 @@ public class HomeController {
     private final UserService userService;
     private final CarService carService;
 
+    // THÊM MỚI: Inject RegionService để lấy danh sách region cho dropdown tìm kiếm
+    // Vì dùng @RequiredArgsConstructor, Lombok sẽ tự thêm field này vào constructor.
+    // Spring Boot nhìn thấy constructor cần 3 tham số (UserService, CarService, RegionService)
+    // → tự động inject cả 3 vào.
+    private final RegionService regionService;
+
     @GetMapping("/")
     public String home(Model model, HttpServletRequest request) {
 
@@ -41,7 +49,23 @@ public class HomeController {
             }
         }
 
-        // Hiển thị 8 xe nổi bật trên trang chủ (trang đầu tiên, sắp xếp mặc định)
+        // ═══════════════════════════════════════════════════════════════
+        // THÊM MỚI: Lấy danh sách Region active → đẩy vào model
+        // ═══════════════════════════════════════════════════════════════
+        // Thymeleaf sẽ dùng biến "regions" trong jumbotron.html
+        // để render dropdown <li th:each="region : ${regions}">
+        //
+        // LUỒNG DỮ LIỆU:
+        //   HomeController
+        //     → regionService.getActiveRegions()
+        //       → regionRepository.findByStatus(Active)
+        //         → SQL: SELECT * FROM Region WHERE status = 'Active'
+        //     → model.addAttribute("regions", regions)
+        //     → Thymeleaf render dropdown trong jumbotron.html
+        java.util.List<Region> regions = regionService.getActiveRegions();
+        model.addAttribute("regions", regions);
+
+        // Hiển thị 4 xe nổi bật trên trang chủ (trang đầu tiên, sắp xếp mặc định)
         Page<CarListResponse> carPage = carService.searchActiveCars(null, null, null, null, PageRequest.of(0, 4));
         model.addAttribute("cars", carPage.getContent());
 

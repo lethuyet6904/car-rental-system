@@ -5,6 +5,8 @@ import com.carrental.dto.response.CarListResponse;
 import com.carrental.entity.Car;
 import com.carrental.entity.CarImage;
 import com.carrental.enums.CarStatus;
+import com.carrental.enums.FuelType;
+import com.carrental.enums.TransmissionType;
 import com.carrental.repository.CarImageRepository;
 import com.carrental.repository.CarRepository;
 import com.carrental.service.CarService;
@@ -33,27 +35,28 @@ public class CarServiceImpl implements CarService {
      * Truyền null để bỏ qua filter đó.
      *
      * Dùng batch-load ảnh để tránh N+1 query:
-     *   1 query lấy danh sách xe (phân trang)
-     *   1 query lấy tất cả ảnh của những xe đó
-     *   Ghép kết quả trong bộ nhớ
+     * 1 query lấy danh sách xe (phân trang)
+     * 1 query lấy tất cả ảnh của những xe đó
+     * Ghép kết quả trong bộ nhớ
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<CarListResponse> searchActiveCars(String city, Long regionId, String fuelStr, String transmissionStr, Pageable pageable) {
+    public Page<CarListResponse> searchActiveCars(String city, Long regionId, String fuelStr, String transmissionStr,
+            Pageable pageable) {
 
-        com.carrental.enums.FuelType fuel = null;
+        FuelType fuel = null;
         if (fuelStr != null && !fuelStr.trim().isEmpty()) {
             try {
-                fuel = com.carrental.enums.FuelType.valueOf(fuelStr);
+                fuel = FuelType.valueOf(fuelStr);
             } catch (IllegalArgumentException e) {
                 // Ignore invalid
             }
         }
 
-        com.carrental.enums.TransmissionType transmission = null;
+        TransmissionType transmission = null;
         if (transmissionStr != null && !transmissionStr.trim().isEmpty()) {
             try {
-                transmission = com.carrental.enums.TransmissionType.valueOf(transmissionStr);
+                transmission = TransmissionType.valueOf(transmissionStr);
             } catch (IllegalArgumentException e) {
                 // Ignore invalid
             }
@@ -83,8 +86,7 @@ public class CarServiceImpl implements CarService {
         List<CarListResponse> responses = carPage.getContent().stream()
                 .map(car -> CarListResponse.from(
                         car,
-                        imagesByCarId.getOrDefault(car.getCarId(), Collections.emptyList())
-                ))
+                        imagesByCarId.getOrDefault(car.getCarId(), Collections.emptyList())))
                 .toList();
 
         return new PageImpl<>(responses, pageable, carPage.getTotalElements());

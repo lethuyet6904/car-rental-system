@@ -170,15 +170,21 @@ public class AuthController {
     // ====================== ĐĂNG XUẤT ======================
     @GetMapping("/logout")
     public String logout(HttpServletRequest httpRequest, HttpServletResponse response) {
-    	// Xóa cookie JWT_TOKEN bằng cách set maxAge = 0
-        Cookie cookie = new Cookie("JWT_TOKEN", null);
+    	// Xóa cookie JWT_TOKEN bằng cách set maxAge = 0, dùng "" thay vì null để tránh lỗi browser/server
+        Cookie cookie = new Cookie("JWT_TOKEN", "");
         cookie.setHttpOnly(true);
         cookie.setPath("/");
         cookie.setMaxAge(0); // ← maxAge = 0 → browser xóa cookie ngay
         response.addCookie(cookie);
         
-        // Xóa session
-        httpRequest.getSession().invalidate();
+        // Xóa session một cách an toàn
+        jakarta.servlet.http.HttpSession session = httpRequest.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        
+        // Xóa SecurityContext
+        SecurityContextHolder.clearContext();
         
         return "redirect:/auth/login?logout=true";
     }

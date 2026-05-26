@@ -41,7 +41,7 @@
 }
 
 .ct-jumbotron__inner {
-    padding: 100px 0 140px 0;
+    padding: 70px 0 100px 0;
 }
 
 .ct-hero-badge {
@@ -88,7 +88,7 @@
 
 .ct-search-card {
     background: var(--bg-card);
-    padding: 24px;
+    padding: 16px 20px;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
     border: 1px solid #F4F4F5;
@@ -97,9 +97,9 @@
 .ct-search-tabs {
     display: flex;
     gap: 12px;
-    margin-bottom: 20px;
+    margin-bottom: 14px;
     border-bottom: 1px solid #E4E4E7;
-    padding-bottom: 12px;
+    padding-bottom: 10px;
 }
 
 .ct-search-tab {
@@ -133,28 +133,29 @@
 .ct-search-fields {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     background: #F4F4F5;
-    padding: 10px 16px;
+    padding: 6px 12px;
     border-radius: var(--radius-md);
 }
 
 .ct-field {
     display: flex;
     flex-direction: column;
-    padding: 4px 8px;
+    padding: 3px 6px;
     flex: 1;
     min-width: 0;
 }
 
 .ct-field__label {
-    font-size: 0.78rem;
+    font-size: 0.72rem;
     font-weight: 700;
     color: var(--text-muted);
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
+    white-space: nowrap;
 }
 
 .ct-field__label i {
@@ -185,12 +186,13 @@
     background: var(--brand-primary);
     color: #FFFFFF;
     border: none;
-    padding: 14px 28px;
+    padding: 10px 22px;
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 0.9rem;
     border-radius: var(--radius-md);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .ct-search-btn:hover {
@@ -546,12 +548,14 @@
     border: 1px solid #E5E7EB;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
+
 .ct-car-card__thumb {
     border-radius: 12px 12px 0 0;
     overflow: hidden;
     position: relative;
     height: 220px;
 }
+
 .thumb-badge-flash {
     position: absolute;
     top: 12px;
@@ -567,6 +571,7 @@
     font-size: 0.9rem;
     z-index: 2;
 }
+
 .thumb-badge-heart {
     position: absolute;
     top: 12px;
@@ -582,11 +587,13 @@
     font-size: 1.1rem;
     z-index: 2;
 }
+
 .ct-car-features-pill {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
 }
+
 .feature-pill {
     display: inline-flex;
     align-items: center;
@@ -598,11 +605,13 @@
     color: #4B5563;
     background: #FFFFFF;
 }
+
 .ct-car-name {
     font-size: 1.1rem;
     font-weight: 800;
     color: #111827;
 }
+
 .ct-car-specs {
     display: flex;
     justify-content: flex-start;
@@ -612,14 +621,17 @@
     font-size: 0.85rem;
     margin-top: 8px;
 }
+
 .spec-item {
     display: flex;
     align-items: center;
     gap: 6px;
 }
+
 .spec-item i {
     font-size: 0.9rem;
 }
+
 .ct-car-location {
     font-size: 0.85rem;
     color: #6B7280;
@@ -627,16 +639,19 @@
     align-items: center;
     gap: 6px;
 }
+
 .ct-card-divider {
     border-color: #E5E7EB;
     margin: 16px 0;
     opacity: 1;
 }
+
 .ct-car-price-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
+
 .ct-car-rating-trips {
     font-size: 0.9rem;
     color: #4B5563;
@@ -644,12 +659,114 @@
     align-items: center;
     gap: 4px;
 }
+
 .price-highlight {
     font-size: 1.3rem;
     color: #10B981;
     font-weight: 800;
 }
+
 .price-unit {
     font-size: 0.85rem;
     color: #6B7280;
+}
+
+/* ── 9. FLATPICKR CUSTOM THEME (MIOTO STYLE) ── */
+
+/* Cải thiện giao diện popup lịch tổng thể */
+.flatpickr-calendar {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    border-radius: 16px !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14) !important;
+    border: 1px solid #E5E7EB !important;
+    padding: 12px !important;
+    /* Mở rộng để chứa 2 tháng cùng lúc */
+    width: auto !important;
+}
+
+/* Tiêu đề tháng (ví dụ: "Tháng năm" / "Tháng sáu") */
+.flatpickr-months .flatpickr-month {
+    border-radius: 8px;
+}
+
+.flatpickr-current-month {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+}
+
+/* Ngày trong lịch */
+.flatpickr-day {
+    border-radius: 8px !important;
+    font-size: 0.88rem !important;
+}
+
+/* Ngày được chọn (màu xanh lá cây thương hiệu) */
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.selected.inRange,
+.flatpickr-day.startRange.inRange,
+.flatpickr-day.endRange.inRange,
+.flatpickr-day.selected:focus,
+.flatpickr-day.startRange:focus,
+.flatpickr-day.endRange:focus,
+.flatpickr-day.selected:hover,
+.flatpickr-day.startRange:hover,
+.flatpickr-day.endRange:hover {
+    background: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+    color: white !important;
+}
+
+/* Dải ngày được chọn (giữa start và end) */
+.flatpickr-day.inRange {
+    background: rgba(95, 207, 134, 0.15) !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Phần chọn giờ bên dưới lịch */
+.flatpickr-time {
+    border-top: 1px solid #F3F4F6 !important;
+    margin-top: 8px !important;
+    padding-top: 8px !important;
+}
+
+.flatpickr-time input {
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    color: #111827 !important;
+}
+
+.numInputWrapper:hover {
+    background: rgba(95, 207, 134, 0.08) !important;
+}
+
+/* Nút Xác nhận (Confirm) */
+.flatpickr-confirm {
+    background: var(--brand-primary) !important;
+    color: white !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    padding: 11px 24px !important;
+    border-radius: 10px !important;
+    margin: 10px 12px 12px !important;
+    transition: all 0.2s ease !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    letter-spacing: 0.01em !important;
+    cursor: pointer !important;
+}
+
+.flatpickr-confirm:hover {
+    background: var(--brand-hover) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Nút bị disable khi chưa chọn đủ 2 ngày */
+.flatpickr-confirm[disabled],
+.flatpickr-confirm[disabled]:hover {
+    background: #E5E7EB !important;
+    color: #9CA3AF !important;
+    cursor: not-allowed !important;
+    transform: none !important;
 }

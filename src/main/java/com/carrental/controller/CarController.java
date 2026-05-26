@@ -2,7 +2,9 @@ package com.carrental.controller;
 
 import com.carrental.dto.response.CarDetailResponse;
 import com.carrental.dto.response.CarListResponse;
+import com.carrental.entity.Region;
 import com.carrental.service.CarService;
+import com.carrental.service.RegionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,10 +22,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class CarController {
 
     private final CarService carService;
+    private final RegionService regionService;
 
     @GetMapping({"", "/search"})
     public String searchCars(
             @RequestParam(name = "city", required = false) String city,
+            @RequestParam(name = "regionId", required = false) Long regionId,
+            @RequestParam(name = "pickUpDate", required = false) String pickUpDate,
+            @RequestParam(name = "returnDate", required = false) String returnDate,
             @RequestParam(name = "fuel", required = false) String fuel,
             @RequestParam(name = "transmission", required = false) String transmission,
             @RequestParam(name = "page", defaultValue = "0") int page,
@@ -34,7 +40,11 @@ public class CarController {
         Pageable pageable = PageRequest.of(page, size);
 
         // Gọi hàm gộp từ Service
-        Page<CarListResponse> carPage = carService.searchActiveCars(city, null, fuel, transmission, pageable);
+        Page<CarListResponse> carPage = carService.searchActiveCars(city, regionId, fuel, transmission, pageable);
+
+        // Lấy danh sách regions từ DB cho dropdown trên trang car-list
+        java.util.List<Region> regions = regionService.getActiveRegions();
+        model.addAttribute("regions", regions);
 
         // Trả về danh sách xe cho vòng lặp th:each trong HTML
         model.addAttribute("cars", carPage.getContent());
@@ -42,6 +52,9 @@ public class CarController {
         // Trả về toàn bộ object Page để sau này bạn làm nút "Trang sau", "Trang trước"
         model.addAttribute("pageInfo", carPage);
         model.addAttribute("selectedCity", city);
+        model.addAttribute("selectedRegionId", regionId);
+        model.addAttribute("selectedPickUpDate", pickUpDate);
+        model.addAttribute("selectedReturnDate", returnDate);
         model.addAttribute("selectedFuel", fuel);
         model.addAttribute("selectedTransmission", transmission);
 
