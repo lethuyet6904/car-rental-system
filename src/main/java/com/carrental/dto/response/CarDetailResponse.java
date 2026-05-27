@@ -57,6 +57,7 @@
 	        this.imageUrls = images.stream()
 	                .sorted(Comparator.comparingInt(CarImage::getSortOrder))
 	                .map(CarImage::getImageUrl)
+	                .map(url -> url.startsWith("http") || url.startsWith("/") ? url : "/assets/images/cars/" + url)
 	                .collect(Collectors.toList());
 	    }
 	}
