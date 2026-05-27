@@ -13,7 +13,7 @@
   <link rel="stylesheet" th:href="@{/assets/css/admin.css}"/>
 </head>
 
-<nav th:fragment="sidebar(activeMenu)" class="admin-sidebar">
+<nav th:fragment="sidebar(activeMenu)" class="admin-sidebar" style="overflow:hidden;display:flex;flex-direction:column">
   <div class="sidebar-logo">🚗 <span>Car</span>Rental</div>
 
   <div class="nav-group-label">Tổng quan</div>
@@ -63,6 +63,13 @@
      th:classappend="${activeMenu == 'complaints'} ? ' active' : ''">
     <i class="bi bi-exclamation-triangle"></i> Danh sách khiếu nại
   </a>
+  
+  <div style="margin-top:auto;padding:16px 0 8px">
+        <a th:href="@{/}" class="sidebar-link" style="color:#9ca3af">
+          <i class="bi bi-house"></i> Về trang chủ
+        </a>
+    </div>
+  
 </nav>
 
 <div th:fragment="topbar(title, breadcrumb)" class="admin-topbar">
@@ -78,6 +85,17 @@
 
 <div th:fragment="pagination(page, baseUrl, extraParams)" class="admin-pagination"
      th:if="${page.totalPages > 1}">
+	 
+	 <!-- Đầu -->
+	   <a th:if="${!page.first}"
+	      th:href="${baseUrl + '?page=0' + extraParams}"
+	      title="Trang đầu">
+	     <i class="bi bi-chevron-double-left" style="font-size:11px"></i>
+	   </a>
+	   <span th:if="${page.first}" class="disabled">
+	     <i class="bi bi-chevron-double-left" style="font-size:11px"></i>
+	   </span>
+	 
   <a th:if="${!page.first}"
      th:href="${baseUrl + '?page=' + (page.number - 1) + extraParams}">
     <i class="bi bi-chevron-left" style="font-size:11px"></i>
@@ -103,6 +121,16 @@
   <span th:if="${page.last}" class="disabled">
     <i class="bi bi-chevron-right" style="font-size:11px"></i>
   </span>
+  
+  <!-- Cuối -->
+	<a th:if="${!page.last}"
+	   th:href="${baseUrl + '?page=' + (page.totalPages - 1) + extraParams}"
+	   title="Trang cuối">
+	  <i class="bi bi-chevron-double-right" style="font-size:11px"></i>
+	</a>
+	<span th:if="${page.last}" class="disabled">
+	  <i class="bi bi-chevron-double-right" style="font-size:11px"></i>
+	</span>
 </div>
 
 <div th:fragment="scripts">

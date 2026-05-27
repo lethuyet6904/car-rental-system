@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/admin-layout :: adminHead('Danh sách đơn thuê')}"></head>
+<body>
+<div class="admin-wrapper">
+
+  <th:block th:replace="~{fragments/admin-layout :: sidebar('orders')}"></th:block>
+
+  <div class="admin-body">
+    <th:block th:replace="~{fragments/admin-layout :: topbar(
+        'Danh sách đơn thuê',
+        'Admin / <span>Đơn thuê</span>')}">
+    </th:block>
+
+    <div class="admin-content">
+
+      <div class="admin-card">
+        <div style="font-size:14px;font-weight:600;margin-bottom:16px;color:#111827">
+          Danh sách đơn thuê
+        </div>
+
+        <form th:action="@{/admin/orders}" method="get">
+          <div class="filter-bar">
+            <select name="timeRange">
+              <option value="" th:selected="${timeRange == null or timeRange == ''}">Thời gian</option>
+              <option value="thisMonth" th:selected="${timeRange == 'thisMonth'}">Tháng này</option>
+              <option value="3months"  th:selected="${timeRange == '3months'}">3 tháng gần đây</option>
+              <option value="6months"  th:selected="${timeRange == '6months'}">6 tháng gần đây</option>
+            </select>
+            <select name="status">
+              <option value="" th:selected="${status == null or status == ''}">Trạng thái</option>
+              <option th:each="s : ${statuses}"
+                      th:value="${s.name()}"
+                      th:selected="${s.name() == status}"
+                      th:text="${s.name() == 'Pending'    ? 'Chờ xác nhận'  :
+                                 s.name() == 'Confirmed'  ? 'Đã xác nhận'   :
+                                 s.name() == 'InProgress' ? 'Đang thuê'      :
+                                 s.name() == 'Completed'  ? 'Hoàn thành'    :
+                                 s.name() == 'Cancelled'  ? 'Đã hủy'        : 'Đã từ chối'}">
+              </option>
+            </select>
+            <input type="text" name="keyword"
+                   placeholder="Tìm theo mã đơn, tên xe, khách hàng…"
+                   th:value="${keyword}"/>
+            <button type="submit" class="btn-search">
+              <i class="bi bi-search"></i> Tìm kiếm
+            </button>
+            <a th:href="@{/admin/orders}" class="btn-clear">Xóa lọc</a>
+          </div>
+        </form>
+
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th style="width:40px">STT</th>
+              <th style="width:60px">Ảnh xe</th>
+              <th>Tên xe</th>
+              <th>Khách hàng</th>
+              <th>Ngày nhận</th>
+              <th>Ngày trả</th>
+              <th>Tổng tiền</th>
+              <th>Đánh giá</th>
+              <th>Trạng thái</th>
+              <th style="width:70px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:if="${#lists.isEmpty(orders.content)}">
+              <td colspan="10" class="empty-state">
+                <i class="bi bi-file-text" style="font-size:24px;display:block;margin-bottom:8px"></i>
+                Không có đơn thuê nào
+              </td>
+            </tr>
+            <tr th:each="o, iter : ${orders.content}">
+              <td style="color:#9ca3af"
+                  th:text="${orders.number * 10 + iter.index + 1}"></td>
+              <td>
+                <div th:if="${o.firstImageUrl != null}">
+                  <img th:src="@{'/assets/images/cars/' + ${o.firstImageUrl}}"
+                       style="width:48px;height:34px;object-fit:cover;
+                              border-radius:5px;border:1px solid #e5e7eb"
+                       alt="ảnh xe"/>
+                </div>
+                <div th:if="${o.firstImageUrl == null}"
+                     class="img-box"
+                     style="width:48px;height:34px;border-radius:5px;font-size:10px">
+                  <i class="bi bi-image"></i>
+                </div>
+              </td>
+              <td>
+                <div style="font-weight:500" th:text="${o.carName}"></div>
+                <div class="text-muted-small"
+                     th:text="${'#' + o.orderId}"
+                     style="font-family:monospace"></div>
+              </td>
+              <td th:text="${o.customerName}"></td>
+              <td style="color:#6b7280"
+                  th:text="${#temporals.format(o.pickupDate,'dd/MM/yyyy')}"></td>
+              <td style="color:#6b7280"
+                  th:text="${#temporals.format(o.returnDate,'dd/MM/yyyy')}"></td>
+              <td style="font-weight:500;color:#534AB7"
+                  th:text="${#numbers.formatDecimal(o.totalAmount,0,'COMMA',0,'POINT') + ' ₫'}">
+              </td>
+              <td>
+                <span th:if="${o.rating != null}"
+                      style="color:#f59e0b;font-size:13px;font-weight:500">
+                  <i class="bi bi-star-fill"></i>
+                  <span th:text="${o.rating}"></span>
+                </span>
+                <span th:if="${o.rating == null}"
+                      style="color:#d1d5db;font-size:12px">—</span>
+              </td>
+              <td>
+                <span th:class="${o.status.name() == 'Completed'  ? 'badge-approved'  :
+                                  o.status.name() == 'Cancelled'  ? 'badge-rejected'  :
+                                  o.status.name() == 'Rejected'   ? 'badge-rejected'  :
+                                  o.status.name() == 'InProgress' ? 'badge-none'      :
+                                  o.status.name() == 'Confirmed'  ? 'badge-confirmed'   : 'badge-pending'}"
+                      th:text="${o.status.name() == 'Pending'    ? 'Chờ xác nhận'  :
+                                 o.status.name() == 'Confirmed'  ? 'Đã xác nhận'   :
+                                 o.status.name() == 'InProgress' ? 'Đang thuê'      :
+                                 o.status.name() == 'Completed'  ? 'Hoàn thành'    :
+                                 o.status.name() == 'Cancelled'  ? 'Đã hủy'        : 'Đã từ chối'}">
+                </span>
+              </td>
+              <td>
+                <a th:href="@{/admin/orders/{id}(id=${o.orderId})}"
+                   style="font-size:12px;color:#7F77DD;text-decoration:none;
+                          border:1px solid #7F77DD;padding:3px 10px;border-radius:6px">
+                  Xem
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <th:block th:replace="~{fragments/admin-layout :: pagination(
+            ${orders}, '/admin/orders', ${extraParams})}">
+        </th:block>
+      </div>
+
+    </div>
+  </div>
+</div>
+<th:block th:replace="~{fragments/admin-layout :: scripts}"></th:block>
+</body>
+</html>

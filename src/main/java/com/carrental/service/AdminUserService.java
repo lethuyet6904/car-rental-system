@@ -21,8 +21,8 @@ public interface AdminUserService {
     void unlockAccount(Long userId);
     
  	// Duyệt xác minh CCCD/GPLX
-    void approveIdentityVerification(Long verificationId);
+    void approveIdentityVerification(Long userId);
 
     // Từ chối xác minh CCCD/GPLX
-    void rejectIdentityVerification(Long verificationId, String rejectReason);
+    void rejectIdentityVerification(Long userId, String reason);
 }

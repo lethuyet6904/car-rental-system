@@ -54,9 +54,10 @@ public class AdminCarController {
     }
 
     @GetMapping("/{id}")
-    public String detail(@PathVariable Long id, Model model) {
+    public String detail(@PathVariable Long id, @RequestParam(defaultValue = "0") int returnPage, Model model) {
         AdminCarDetailResponse car = adminCarService.getCarDetail(id);
         model.addAttribute("car", car);
+        model.addAttribute("returnPage", returnPage);
         return "pages/admin/car-detail";
     }
 

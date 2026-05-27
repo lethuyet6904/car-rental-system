@@ -54,10 +54,11 @@
 	    }
 	
 	    @GetMapping("/{id}")
-	    public String detail(@PathVariable Long id, Model model) {
+	    public String detail(@PathVariable Long id, @RequestParam(defaultValue = "0") int returnPage, Model model) {
 	        AdminOwnerRequestDetailResponse request =
 	                adminOwnerRequestService.getRequestDetail(id);
 	        model.addAttribute("request", request);
+	        model.addAttribute("returnPage", returnPage);
 	        return "pages/admin/owner-request-detail";
 	    }
 	

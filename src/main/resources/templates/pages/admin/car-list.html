@@ -69,7 +69,7 @@
                   th:text="${cars.number * 10 + iter.index + 1}"></td>
               <td>
                 <div th:if="${c.firstImageUrl != null}">
-                  <img th:src="${c.firstImageUrl}"
+                  <img th:src="@{'/assets/images/cars/' + ${c.firstImageUrl}}}"
                        style="width:48px;height:34px;object-fit:cover;
                               border-radius:5px;border:1px solid #e5e7eb"
                        alt="ảnh xe"/>

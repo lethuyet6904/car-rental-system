@@ -76,11 +76,12 @@ public class AdminUserServiceImpl implements AdminUserService {
     
     @Override
     @Transactional
-    public void approveIdentityVerification(Long verificationId) {
-    	IdentityVerification identity = 
-                identityVerificationRepository.findById(verificationId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Không tìm thấy hồ sơ xác minh"));
+    public void approveIdentityVerification(Long userId) {
+        IdentityVerification identity =
+                identityVerificationRepository
+                        .findTopByUserUserIdOrderBySubmittedAtDesc(userId)
+                        .orElseThrow(() -> new EntityNotFoundException(
+                                "Không tìm thấy hồ sơ xác minh"));
 
         if (!VerificationStatus.Pending.equals(identity.getStatus())) {
             throw new IllegalStateException("Hồ sơ đã được xử lý rồi");
@@ -88,17 +89,17 @@ public class AdminUserServiceImpl implements AdminUserService {
 
         identity.setStatus(VerificationStatus.Approved);
         identity.setReviewedAt(LocalDateTime.now());
-
         identityVerificationRepository.save(identity);
     }
-    
+
     @Override
     @Transactional
-    public void rejectIdentityVerification(Long verificationId, String reason) {
-    	IdentityVerification identity =
-                identityVerificationRepository.findById(verificationId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Không tìm thấy hồ sơ xác minh"));
+    public void rejectIdentityVerification(Long userId, String reason) {
+        IdentityVerification identity =
+                identityVerificationRepository
+                        .findTopByUserUserIdOrderBySubmittedAtDesc(userId)
+                        .orElseThrow(() -> new EntityNotFoundException(
+                                "Không tìm thấy hồ sơ xác minh"));
 
         if (!VerificationStatus.Pending.equals(identity.getStatus())) {
             throw new IllegalStateException("Hồ sơ đã được xử lý rồi");
@@ -107,7 +108,6 @@ public class AdminUserServiceImpl implements AdminUserService {
         identity.setStatus(VerificationStatus.Rejected);
         identity.setRejectReason(reason);
         identity.setReviewedAt(LocalDateTime.now());
-
         identityVerificationRepository.save(identity);
     }
 
