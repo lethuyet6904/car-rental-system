@@ -37,7 +37,7 @@
           <span class="detail-label">Ngày nộp</span>
           <span class="detail-value">
             <!-- Mock: dùng createdAt tạm, thay bằng identity.submittedAt sau -->
-            <span th:text="${#temporals.format(user.identitySubmittedAt, 'dd/MM/yyyy HH:mm')}">
+            <span th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy HH:mm')}">
               20/05/2025 09:10
             </span>
           </span>

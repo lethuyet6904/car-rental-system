@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Xác minh danh tính', ~{::link})}">
+    <link rel="stylesheet" th:href="@{/assets/css/verification.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-5">
+                    
+                    <!-- Header -->
+                    <div class="text-center mb-4">
+                        <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill mb-3">
+                            <i class="fa-solid fa-shield-halved"></i> Bảo mật & An toàn
+                        </span>
+                        <h2 class="fw-bold mb-2">Xác Minh Danh Tính</h2>
+                        <p class="text-muted">
+                            Vì an toàn của cộng đồng, vui lòng xác minh danh tính trước khi thuê xe
+                        </p>
+                    </div>
+
+                    <!-- Alerts -->
+                    <div th:if="${success}" class="alert alert-success">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span th:text="${success}"></span>
+                    </div>
+                    <div th:if="${error}" class="alert alert-danger">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <span th:text="${error}"></span>
+                    </div>
+
+                    <!-- Pending State -->
+                    <div th:if="${pending != null and pending}" class="alert alert-warning">
+                        <i class="fa-solid fa-clock"></i>
+                        <div>
+                            <strong>Hồ sơ của bạn đang được xử lý!</strong><br>
+                            Ngày gửi: <span th:text="${submittedAt != null ? #temporals.format(submittedAt, 'dd/MM/yyyy HH:mm') : ''}"></span><br>
+                            Vui lòng chờ admin duyệt. Kết quả sẽ được gửi qua email.
+                        </div>
+                        <a th:href="@{/}" class="btn btn-outline-warning mt-3">Về trang chủ</a>
+                    </div>
+
+                    <!-- Rejected State -->
+                    <div th:if="${rejected != null and rejected}" class="alert alert-danger">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <div>
+                            <strong>Hồ sơ của bạn đã bị từ chối!</strong><br>
+                            Lý do: <span th:text="${rejectReason}"></span><br>
+                            Vui lòng nộp lại hồ sơ với thông tin chính xác.
+                        </div>
+                    </div>
+
+                    <!-- Form (chỉ hiển thị khi chưa có hồ sơ pending/rejected hoặc bị reject) -->
+                    <div th:if="${pending == null or !pending}">
+                        <form th:action="@{/verification/identity}" method="post" enctype="multipart/form-data" th:object="${verificationRequest}">
+
+                            <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                                <div>
+                                    <p th:each="err : ${#fields.errors('*')}" th:text="${err}" style="margin:0 0 4px 0;"></p>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin user -->
+                            <div class="bg-light p-3 rounded-3 mb-4">
+                                <h6 class="mb-3"><i class="fa-solid fa-user"></i> Thông tin tài khoản</h6>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <span class="text-muted small">Họ tên:</span><br>
+                                        <strong th:text="${user != null ? user.fullName : ''}"></strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="text-muted small">Số điện thoại:</span><br>
+                                        <strong th:text="${user != null ? user.phone : ''}"></strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CCCD Section -->
+                            <h5 class="fw-semibold mb-3 pb-2 border-bottom">
+                                <i class="fa-solid fa-id-card"></i> Căn cước công dân / CMND
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-medium">Số CCCD/CMND <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" th:field="*{nationalId}" 
+                                       placeholder="Nhập số CCCD/CMND (9-12 số)" required>
+                            </div>
+
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium">Ảnh CCCD mặt trước <span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control" name="nationalIdFrontImage" accept="image/*" required>
+                                    <small class="text-muted">Chụp rõ số CCCD</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium">Ảnh CCCD mặt sau <span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control" name="nationalIdBackImage" accept="image/*" required>
+                                    <small class="text-muted">Chụp rõ mã QR (nếu có)</small>
+                                </div>
+                            </div>
+
+                            <!-- GPLX Section -->
+                            <h5 class="fw-semibold mb-3 pb-2 border-bottom mt-4">
+                                <i class="fa-solid fa-motorcycle"></i> Giấy phép lái xe
+                            </h5>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-medium">Số GPLX <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" th:field="*{licenseNumber}" 
+                                       placeholder="Nhập số GPLX (B2, C, ...)" required>
+                            </div>
+
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium">Ảnh GPLX mặt trước <span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control" name="frontImage" accept="image/*" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium">Ảnh GPLX mặt sau <span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control" name="backImage" accept="image/*" required>
+                                </div>
+                            </div>
+
+                            <!-- Note -->
+                            <div class="alert alert-info py-2 mb-4">
+                                <i class="fa-solid fa-circle-info"></i>
+                                <small>Thông tin của bạn được bảo mật tuyệt đối và chỉ dùng để xác minh danh tính.</small>
+                            </div>
+
+                            <button type="submit" class="btn btn-success w-100 py-2 fw-semibold">
+                                <i class="fa-solid fa-paper-plane"></i> Gửi hồ sơ xác minh
+                            </button>
+                        </form>
+
+                        <p class="text-center mt-4">
+                            <a th:href="@{/}" class="text-decoration-none">← Bỏ qua và về trang chủ</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

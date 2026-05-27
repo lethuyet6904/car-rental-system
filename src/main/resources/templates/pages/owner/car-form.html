@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${carRequest.carId == null ? 'Thêm xe mới' : 'Chỉnh sửa xe'}, ~{::link})}">
+    <link rel="stylesheet" th:href="@{/assets/css/owner.css}"/>
+</head>
+<body class="bg-light">
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container-fluid" style="padding-top: 80px;">
+    <div class="row">
+
+        <nav class="col-md-3 col-lg-2 d-md-block bg-white border-end sidebar" style="min-height: calc(100vh - 80px);">
+            <div class="position-sticky pt-4 px-2">
+                <div class="px-3 mb-3 text-muted fw-bold small text-uppercase tracking-wider">Bảng điều khiển</div>
+                
+                <ul class="nav flex-column gap-1">
+                    <li class="nav-item">
+                        <a class="nav-link rounded-3 py-2.5 px-3 d-flex align-items-center gap-3 fw-medium text-secondary hover-bg-light" 
+                           th:href="@{/owner/dashboard}">
+                            <i class="fa-solid fa-chart-line fs-5"></i> <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link rounded-3 py-2.5 px-3 d-flex align-items-center gap-3 fw-medium text-primary bg-primary bg-opacity-10" 
+                           th:href="@{/owner/cars}">
+                            <i class="fa-solid fa-car-rear fs-5"></i> <span>Quản lý xe</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link rounded-3 py-2.5 px-3 d-flex align-items-center gap-3 fw-medium text-secondary hover-bg-light" 
+                           th:href="@{/owner/orders}">
+                            <i class="fa-solid fa-list-check fs-5"></i> <span>Quản lý đơn hàng</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item" th:if="${session.user != null and session.user.role.name() == 'Customer'}">
+                        <hr class="my-3 text-muted opacity-20" />
+                        <a class="nav-link rounded-3 py-2.5 px-3 d-flex align-items-center gap-3 fw-medium text-success hover-bg-light" 
+                           th:href="@{/owner/owner-registration}">
+                            <i class="fa-solid fa-user-plus fs-5"></i> <span>Đăng ký làm chủ xe</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-4 pb-5">
+
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb small">
+                    <li class="breadcrumb-item"><a th:href="@{/owner/dashboard}" class="text-decoration-none text-muted">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/owner/cars}" class="text-decoration-none text-muted">Quản lý xe</a></li>
+                    <li class="breadcrumb-item active text-dark fw-medium" aria-current="page"
+                        th:text="${carRequest.carId == null ? 'Thêm xe mới' : 'Chỉnh sửa xe'}"></li>
+                </ol>
+            </nav>
+
+            <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                <div class="me-3 bg-dark bg-opacity-5 rounded-3 p-3 text-dark">
+                    <i class="fa-solid fa-car-side fa-lg"></i>
+                </div>
+                <div>
+                    <h1 class="h3 fw-bold mb-0 text-dark" style="font-family: 'Outfit', sans-serif;"
+                        th:text="${carRequest.carId == null ? 'Đăng ký thêm xe mới' : 'Chỉnh sửa thông tin xe'}"></h1>
+                    <small class="text-muted">Vui lòng cung cấp thông tin chính xác để hệ thống duyệt nhanh chóng</small>
+                </div>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger border-0 shadow-sm rounded-3 alert-dismissible fade show mb-4" role="alert">
+                <i class="fa-solid fa-circle-exclamation me-2"></i>
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${success}" class="alert alert-success border-0 shadow-sm rounded-3 alert-dismissible fade show mb-4" role="alert">
+                <i class="fa-solid fa-circle-check me-2"></i>
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <form th:action="${carRequest.carId == null ? '/owner/cars/create' : '/owner/cars/' + carRequest.carId + '/edit'}"
+                  method="post"
+                  enctype="multipart/form-data"
+                  th:object="${carRequest}"
+                  novalidate>
+
+                <div class="row g-4">
+
+                    <div class="col-lg-8">
+
+                        <div class="card border-0 shadow-sm rounded-4 mb-4">
+                            <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-2">
+                                <h5 class="mb-0 fw-bold text-dark" style="font-family: 'Outfit', sans-serif;">
+                                    <i class="fa-solid fa-circle-info text-primary me-2 fs-5"></i>Thông tin cơ bản
+                                </h5>
+                            </div>
+                            <div class="card-body p-4">
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold text-secondary small text-uppercase">Tên dòng xe <span class="text-danger">*</span></label>
+                                    <input type="text"
+                                           class="form-control form-control-lg fs-6 rounded-3"
+                                           th:field="*{modelName}"
+                                           th:classappend="${#fields.hasErrors('modelName')} ? 'is-invalid'"
+                                           placeholder="VD: VinFast VF8 Plus, Toyota Camry 2024..."/>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('modelName')}" th:errors="*{modelName}"></div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold text-secondary small text-uppercase">Biển kiểm soát <span class="text-danger">*</span></label>
+                                    <input type="text"
+                                           class="form-control form-control-lg fs-6 rounded-3"
+                                           th:field="*{licensePlate}"
+                                           th:classappend="${#fields.hasErrors('licensePlate')} ? 'is-invalid'"
+                                           placeholder="VD: 43A-12345"
+                                           style="text-transform:uppercase; letter-spacing: 1px; font-weight: 600;"/>
+                                    <div class="form-text small text-muted">Định dạng chuẩn: 43A-123.45 hoặc 43A-12345</div>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('licensePlate')}" th:errors="*{licensePlate}"></div>
+                                </div>
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-secondary small text-uppercase">Hãng sản xuất <span class="text-danger">*</span></label>
+                                        <select class="form-select form-control-lg fs-6 rounded-3"
+                                                th:field="*{brandId}"
+                                                th:classappend="${#fields.hasErrors('brandId')} ? 'is-invalid'">
+                                            <option value="">-- Chọn hãng xe --</option>
+                                            <option th:each="brand : ${brands}" th:value="${brand.brandId}" th:text="${brand.brandName}"></option>
+                                        </select>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('brandId')}" th:errors="*{brandId}"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-secondary small text-uppercase">Phân khúc / Loại xe <span class="text-danger">*</span></label>
+                                        <select class="form-select form-control-lg fs-6 rounded-3"
+                                                th:field="*{carTypeId}"
+                                                th:classappend="${#fields.hasErrors('carTypeId')} ? 'is-invalid'">
+                                            <option value="">-- Chọn loại xe --</option>
+                                            <option th:each="type : ${carTypes}" th:value="${type.carTypeId}" th:text="${type.typeName}"></option>
+                                        </select>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('carTypeId')}" th:errors="*{carTypeId}"></div>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-secondary small text-uppercase">Năm sản xuất <span class="text-danger">*</span></label>
+                                        <input type="number"
+                                               class="form-control form-control-lg fs-6 rounded-3"
+                                               th:field="*{yearOfManufacture}"
+                                               th:classappend="${#fields.hasErrors('yearOfManufacture')} ? 'is-invalid'"
+                                               min="1990" max="2030" placeholder="2024"/>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('yearOfManufacture')}" th:errors="*{yearOfManufacture}"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-secondary small text-uppercase">Số ghế ngồi <span class="text-danger">*</span></label>
+                                        <select class="form-select form-control-lg fs-6 rounded-3"
+                                                th:field="*{seats}"
+                                                th:classappend="${#fields.hasErrors('seats')} ? 'is-invalid'">
+                                            <option value="">-- Chọn số ghế --</option>
+                                            <option value="2">2 chỗ</option>
+                                            <option value="4">4 chỗ</option>
+                                            <option value="5">5 chỗ</option>
+                                            <option value="7">7 chỗ</option>
+                                            <option value="9">9 chỗ</option>
+                                        </select>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('seats')}" th:errors="*{seats}"></div>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-secondary small text-uppercase">Loại nhiên liệu <span class="text-danger">*</span></label>
+                                        <select class="form-select form-control-lg fs-6 rounded-3"
+                                                th:field="*{fuel}"
+                                                th:classappend="${#fields.hasErrors('fuel')} ? 'is-invalid'">
+                                            <option value="">-- Chọn nhiên liệu --</option>
+                                            <option value="Gasoline">⛽ Xăng</option>
+                                            <option value="Diesel">🛢️ Dầu (Diesel)</option>
+                                            <option value="Electric">⚡ Điện</option>
+                                        </select>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('fuel')}" th:errors="*{fuel}"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-secondary small text-uppercase">Hộp số <span class="text-danger">*</span></label>
+                                        <select class="form-select form-control-lg fs-6 rounded-3"
+                                                th:field="*{transmission}"
+                                                th:classappend="${#fields.hasErrors('transmission')} ? 'is-invalid'">
+                                            <option value="">-- Chọn hộp số --</option>
+                                            <option value="Automatic">Số tự động</option>
+                                            <option value="Manual">Số sàn</option>
+                                        </select>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('transmission')}" th:errors="*{transmission}"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="card border-0 shadow-sm rounded-4 mb-4">
+                            <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-2">
+                                <h5 class="mb-0 fw-bold text-dark" style="font-family: 'Outfit', sans-serif;">
+                                    <i class="fa-solid fa-location-dot text-danger me-2 fs-5"></i>Vị trí & Giá thuê
+                                </h5>
+                            </div>
+                            <div class="card-body p-4">
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold text-secondary small text-uppercase">Khu vực hoạt động <span class="text-danger">*</span></label>
+                                    <select class="form-select form-control-lg fs-6 rounded-3"
+                                            th:field="*{regionId}"
+                                            th:classappend="${#fields.hasErrors('regionId')} ? 'is-invalid'">
+                                        <option value="">-- Chọn thành phố / khu vực --</option>
+                                        <option th:each="region : ${regions}" th:value="${region.regionId}" th:text="${region.regionName}"></option>
+                                    </select>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('regionId')}" th:errors="*{regionId}"></div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold text-secondary small text-uppercase">Địa chỉ giao nhận xe cố định <span class="text-danger">*</span></label>
+                                    <input type="text"
+                                           class="form-control form-control-lg fs-6 rounded-3"
+                                           th:field="*{pickupLocation}"
+                                           th:classappend="${#fields.hasErrors('pickupLocation')} ? 'is-invalid'"
+                                           placeholder="VD: 123 Nguyễn Văn Linh, Phước Ninh, Hải Châu"/>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('pickupLocation')}" th:errors="*{pickupLocation}"></div>
+                                </div>
+
+                                <div class="mb-0">
+                                    <label class="form-label fw-semibold text-secondary small text-uppercase">Giá thuê mong muốn / ngày <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="number"
+                                               class="form-control form-control-lg fs-6 rounded-start-3"
+                                               th:field="*{pricePerDay}"
+                                               th:classappend="${#fields.hasErrors('pricePerDay')} ? 'is-invalid'"
+                                               min="100000" max="10000000" step="50000" placeholder="800000"/>
+                                        <span class="input-group-text bg-light rounded-end-3 fw-bold text-secondary">₫ / ngày</span>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('pricePerDay')}" th:errors="*{pricePerDay}"></div>
+                                    </div>
+                                    <div class="form-text small text-muted">Hệ thống khuyến nghị: 600,000đ - 1,500,000đ tùy dòng xe.</div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="card border-0 shadow-sm rounded-4 mb-4">
+                            <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-2">
+                                <h5 class="mb-0 fw-bold text-dark" style="font-family: 'Outfit', sans-serif;">
+                                    <i class="fa-solid fa-list-check text-success me-2 fs-5"></i>Tiện ích tích hợp & Mô tả
+                                </h5>
+                            </div>
+                            <div class="card-body p-4">
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold text-secondary small text-uppercase d-block mb-3">Trang bị công nghệ / Tiện nghi</label>
+                                    <div class="row g-3" id="featuresCheckboxes">
+                                        <div class="col-6 col-md-4" th:each="feat : ${ {'GPS', 'Camera360', 'Sunroof', 'Bluetooth', 'Backup Camera', 'USB Charging', 'Android Auto', 'Dashcam', 'Child Seat', 'ETC'} }">
+                                            <div class="form-check custom-checkbox-card p-2 rounded-3 border ps-4">
+                                                <input class="form-check-input feature-cb ms-0 me-2 mt-1"
+                                                       type="checkbox"
+                                                       th:id="${'feat_' + feat}"
+                                                       th:value="${feat}"
+                                                       th:checked="${carRequest.features != null and carRequest.features.contains(feat)}"/>
+                                                <label class="form-check-label small fw-medium text-dark cursor-pointer"
+                                                       th:for="${'feat_' + feat}" th:text="${feat}"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="featuresHidden" th:field="*{features}"/>
+                                </div>
+
+                                <div class="mb-0">
+                                    <label class="form-label fw-semibold text-secondary small text-uppercase">Thông tin bổ sung / Quy định nhận xe</label>
+                                    <textarea class="form-control rounded-3"
+                                              th:field="*{description}"
+                                              th:classappend="${#fields.hasErrors('description')} ? 'is-invalid'"
+                                              rows="4" placeholder="Mô tả kỹ các yêu cầu như: Giữ CCCD, không hút thuốc trên xe, vệ sinh sạch sẽ trước khi bàn giao trả xe..."></textarea>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div><div class="col-lg-4">
+
+                        <div class="card border-0 shadow-sm rounded-4 mb-4 sticky-lg-top" style="top: 100px; z-index: 10;">
+                            <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-2">
+                                <h5 class="mb-0 fw-bold text-dark" style="font-family: 'Outfit', sans-serif;">
+                                    <i class="fa-solid fa-images text-warning me-2 fs-5"></i>Thư viện ảnh xe
+                                </h5>
+                            </div>
+                            <div class="card-body p-4">
+
+                                <div th:if="${carImages != null and not #lists.isEmpty(carImages)}" class="mb-4">
+                                    <label class="form-label fw-semibold text-muted small text-uppercase mb-2">Ảnh hiện có trên App</label>
+                                    <div class="row g-2" id="existingImages">
+                                        <div class="col-6" th:each="img : ${carImages}">
+                                            <div class="position-relative rounded-3 overflow-hidden border">
+                                                <img th:src="${img.imageUrl}" class="img-fluid" style="width:100%; height:85px; object-fit:cover;" alt="Car view"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-light border rounded-3 p-2 mt-2 mb-0 small text-muted">
+                                        <i class="fa-solid fa-lightbulb text-warning me-1"></i>Tải bộ ảnh mới lên sẽ thay thế hoàn toàn bộ ảnh cũ này.
+                                    </div>
+                                </div>
+
+                                <div class="mb-0">
+                                    <label class="form-label fw-semibold text-secondary small text-uppercase mb-2"
+                                           th:text="${carImages != null and not #lists.isEmpty(carImages)} ? 'Thay thế bằng loạt ảnh mới' : 'Tải ảnh thực tế của xe'">
+                                    </label>
+
+                                    <div class="upload-area border-2 border-dashed rounded-4 p-4 text-center bg-light"
+                                         id="uploadArea"
+                                         style="cursor:pointer; border-color: #ced4da !important; transition: all .2s ease-in-out;">
+                                        <i class="fa-solid fa-cloud-arrow-up fa-2x text-primary opacity-75 mb-2"></i>
+                                        <p class="mb-1 small fw-bold text-dark">Kéo và thả file ảnh xe</p>
+                                        <p class="mb-3 text-muted x-small" style="font-size:11px">Định dạng JPG, PNG, WEBP tối đa 5MB</p>
+                                        <input type="file" id="imagesInput" name="images" multiple accept="image/*" class="d-none"/>
+                                        <button type="button" class="btn btn-dark btn-sm rounded-3 px-3" onclick="document.getElementById('imagesInput').click()">
+                                            Browse Files
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div id="previewContainer" class="row g-2 mt-3 p-2 bg-light rounded-3" style="display:none !important;"></div>
+
+                            </div>
+                        </div>
+
+                        <div class="card border-0 shadow-sm rounded-4">
+                            <div class="card-body p-4">
+                                <div class="p-3 bg-warning bg-opacity-10 border-0 rounded-3 text-warning mb-4 small">
+                                    <i class="fa-solid fa-user-shield me-2"></i><strong>Quy trình kiểm duyệt:</strong> Sau khi nhấn gửi thông tin, đội ngũ vận hành Carto sẽ kiểm duyệt pháp lý xe trong vòng 12h-24h trước khi kích hoạt hiển thị công khai.
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary btn-lg fs-6 fw-bold rounded-3 py-2.5 shadow-sm">
+                                        <i class="fa-solid fa-paper-plane me-2"></i>
+                                        <span th:text="${carRequest.carId == null ? 'Đăng ký gửi duyệt' : 'Cập nhật thay đổi'}"></span>
+                                    </button>
+                                    <a th:href="@{/owner/cars}" class="btn btn-outline-secondary btn-lg fs-6 rounded-3 py-2.5 border">
+                                        Hủy & Quay lại
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div></div></form>
+
+        </main>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ── ĐỒNG BỘ CHECKBOX CHUYỂN THÀNH CHUỖI STRING NỐI NHAU BẰNG DẤU PHẨY ──────────────────────
+    function syncFeatures() {
+        const checked = [...document.querySelectorAll('.feature-cb:checked')]
+                            .map(cb => cb.value);
+        document.getElementById('featuresHidden').value = checked.join(',');
+    }
+    document.querySelectorAll('.feature-cb').forEach(cb => {
+        cb.addEventListener('change', syncFeatures);
+    });
+    syncFeatures(); // Trích xuất đồng bộ trạng thái ban đầu
+
+    // ── XỬ LÝ PREVIEW HIỂN THỊ LOẠT ẢNH MỚI CHỌN ─────────────────────────────────────
+    const imagesInput     = document.getElementById('imagesInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const uploadArea      = document.getElementById('uploadArea');
+
+    imagesInput.addEventListener('change', function () {
+        previewContainer.innerHTML = '';
+
+        if (this.files.length === 0) {
+            previewContainer.style.setAttribute('style', 'display:none !important');
+            return;
+        }
+
+        previewContainer.removeAttribute('style');
+
+        if (this.files.length > 10) {
+            alert('Hệ thống chỉ hỗ trợ tối đa 10 hình ảnh cho mỗi xe!');
+            this.value = '';
+            previewContainer.style.setAttribute('style', 'display:none !important');
+            return;
+        }
+
+        [...this.files].forEach((file, idx) => {
+            if (!file.type.startsWith('image/')) return;
+            if (file.size > 5 * 1024 * 1024) {
+                alert(`File "${file.name}" quá lớn (>5MB). Hãy nén dung lượng ảnh trước khi up.`);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = e => {
+                const col = document.createElement('div');
+                col.className = 'col-4 position-relative mb-1';
+                col.innerHTML = `
+                    <div class="rounded border overflow-hidden position-relative shadow-sm bg-white" style="height:70px;">
+                        <img src="${e.target.result}" class="w-100 h-100" style="object-fit:cover;" alt="Preview"/>
+                        ${idx === 0 ? '<span class="badge bg-primary position-absolute bottom-0 start-0 w-100 rounded-0 text-center" style="font-size:9px; padding:2px 0;">Ảnh bìa</span>' : ''}
+                    </div>
+                `;
+                previewContainer.appendChild(col);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+
+    // ── HIỆU ỨNG KÉO THẢ TỆP TIN VÀO OVAL ZONE ───────────────────────────────────
+    uploadArea.addEventListener('dragover', e => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#0d6efd';
+        uploadArea.style.background  = '#e9ecef';
+    });
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.style.borderColor = '#ced4da';
+        uploadArea.style.background  = '#f8f9fa';
+    });
+    uploadArea.addEventListener('drop', e => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#ced4da';
+        uploadArea.style.background  = '#f8f9fa';
+
+        const dt = e.dataTransfer;
+        if (dt && dt.files.length > 0) {
+            imagesInput.files = dt.files;
+            imagesInput.dispatchEvent(new Event('change'));
+        }
+    });
+
+    // ── FIX BUG LỖI KHỞI TẠO BIỂN SỐ VIẾT HOA TỰ ĐỘNG ────────────────────────────────────────
+    const plateInput = document.querySelector('input[name="licensePlate"]');
+    if (plateInput) {
+        plateInput.addEventListener('input', function () {
+            const startCursor = this.selectionStart;
+            this.value = this.value.toUpperCase();
+            this.setSelectionRange(startCursor, startCursor);
+        });
+    }
+</script>
+</body>
+</html>

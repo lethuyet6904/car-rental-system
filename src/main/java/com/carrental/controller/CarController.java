@@ -2,19 +2,17 @@ package com.carrental.controller;
 
 import com.carrental.dto.response.CarDetailResponse;
 import com.carrental.dto.response.CarListResponse;
-import com.carrental.entity.Region;
 import com.carrental.service.CarService;
-import com.carrental.service.RegionService;
+import com.carrental.service.IdentityVerificationService;  // THÊM IMPORT
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/cars")
@@ -22,43 +20,26 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class CarController {
 
     private final CarService carService;
-    private final RegionService regionService;
+    private final IdentityVerificationService identityVerificationService;  // THÊM VÀO
 
     @GetMapping({"", "/search"})
     public String searchCars(
             @RequestParam(name = "city", required = false) String city,
-            @RequestParam(name = "regionId", required = false) Long regionId,
-            @RequestParam(name = "pickUpDate", required = false) String pickUpDate,
-            @RequestParam(name = "returnDate", required = false) String returnDate,
             @RequestParam(name = "fuel", required = false) String fuel,
             @RequestParam(name = "transmission", required = false) String transmission,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "12") int size,
             Model model) {
 
-        // Tạo đối tượng Pageable
         Pageable pageable = PageRequest.of(page, size);
+        Page<CarListResponse> carPage = carService.searchActiveCars(city, null, fuel, transmission, pageable);
 
-        // Gọi hàm gộp từ Service
-        Page<CarListResponse> carPage = carService.searchActiveCars(city, regionId, fuel, transmission, pageable);
-
-        // Lấy danh sách regions từ DB cho dropdown trên trang car-list
-        java.util.List<Region> regions = regionService.getActiveRegions();
-        model.addAttribute("regions", regions);
-
-        // Trả về danh sách xe cho vòng lặp th:each trong HTML
         model.addAttribute("cars", carPage.getContent());
-
-        // Trả về toàn bộ object Page để sau này bạn làm nút "Trang sau", "Trang trước"
         model.addAttribute("pageInfo", carPage);
         model.addAttribute("selectedCity", city);
-        model.addAttribute("selectedRegionId", regionId);
-        model.addAttribute("selectedPickUpDate", pickUpDate);
-        model.addAttribute("selectedReturnDate", returnDate);
         model.addAttribute("selectedFuel", fuel);
         model.addAttribute("selectedTransmission", transmission);
 
-        // Trả về trang danh sách xe
         return "pages/cars/car-list";
     }
 
@@ -66,6 +47,21 @@ public class CarController {
     public String carDetail(@PathVariable("id") Long id, Model model) {
         CarDetailResponse car = carService.getCarById(id);
         model.addAttribute("car", car);
+        
+        // THÊM: Kiểm tra xem user đã xác minh danh tính chưa (để hiển thị thông báo khi đặt xe)
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isVerified = false;
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            try {
+                // Lấy userId từ phone (cần có UserService, có thể inject thêm)
+                // Hoặc tạm thời bỏ qua, sẽ check trong booking controller
+                isVerified = true; // placeholder
+            } catch (Exception e) {
+                isVerified = false;
+            }
+        }
+        model.addAttribute("isVerified", isVerified);
+        
         return "pages/cars/car-detail";
     }
 }

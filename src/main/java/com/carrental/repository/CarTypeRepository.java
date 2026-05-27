@@ -3,10 +3,10 @@ package com.carrental.repository;
 import com.carrental.entity.CarType;
 import com.carrental.enums.CategoryStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 @Repository
 public interface CarTypeRepository extends JpaRepository<CarType, Long> {

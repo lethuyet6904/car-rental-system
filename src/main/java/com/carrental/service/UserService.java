@@ -1,7 +1,10 @@
 package com.carrental.service;
 
+import java.util.List;
+
 import com.carrental.dto.request.OwnerRegistrationRequest;
 import com.carrental.dto.request.RegisterRequest;
+import com.carrental.entity.RentalOrder;
 import com.carrental.entity.User;
 
 public interface UserService {
@@ -12,4 +15,10 @@ public interface UserService {
     User findByPhone(String phone);
 
     void applyForOwner(Long userId, OwnerRegistrationRequest request);
+    
+    // THÊM PHƯƠNG THỨC MỚI
+    User getUserWithIdentity(Long userId);
+    User updateUser(User user);                    // ← THÊM
+    
+    List<RentalOrder> getOrdersByCustomer(Long customerId);
 }

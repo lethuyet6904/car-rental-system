@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Thanh toán phần còn lại', ~{::link})}">
+    <link rel="stylesheet" th:href="@{/assets/css/payment.css}"/>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="payment-page">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold">Hoàn tất thanh toán</h2>
+                    <p class="text-muted">Vui lòng thanh toán phần còn lại để hoàn tất chuyến thuê</p>
+                </div>
+
+                <!-- Alert -->
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fa-solid fa-circle-exclamation"></i> <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+
+                        <!-- Thông tin đơn -->
+                        <div class="order-summary mb-4">
+                            <h5 class="mb-3">Chi tiết đơn hàng #<span th:text="${order.orderId}"></span></h5>
+                            <div class="info-row">
+                                <span>Xe:</span>
+                                <span th:text="${order.car.modelName} + ' - ' + ${order.car.licensePlate}"></span>
+                            </div>
+                            <div class="info-row">
+                                <span>Thời gian thuê:</span>
+                                <span th:text="${#temporals.format(order.pickupDate, 'dd/MM/yyyy')} + ' → ' + ${#temporals.format(order.returnDate, 'dd/MM/yyyy')}"></span>
+                            </div>
+                            <div class="info-row">
+                                <span>Tổng tiền thuê:</span>
+                                <span th:text="${#numbers.formatInteger(order.totalAmount, 0, 'COMMA')} + 'đ'"></span>
+                            </div>
+                            <div class="info-row">
+                                <span>Đã đặt cọc (30%):</span>
+                                <span class="text-success" th:text="${#numbers.formatInteger(order.depositAmount, 0, 'COMMA')} + 'đ'"></span>
+                            </div>
+                            <div th:if="${extraFee != null and extraFee > 0}" class="info-row highlight">
+                                <span>Phụ thu (hư hỏng/phát sinh):</span>
+                                <span class="text-danger" th:text="${#numbers.formatInteger(extraFee, 0, 'COMMA')} + 'đ'"></span>
+                            </div>
+                            <hr>
+                            <div class="info-row total">
+                                <span class="fw-bold fs-5">Còn lại cần thanh toán:</span>
+                                <span class="fw-bold fs-4 text-primary" th:text="${#numbers.formatInteger(remainingAmount, 0, 'COMMA')} + 'đ'"></span>
+                            </div>
+                            <div th:if="${damages != null}" class="alert alert-warning mt-3">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                <strong>Ghi chú hư hỏng:</strong> <span th:text="${damages}"></span>
+                            </div>
+                        </div>
+
+                        <!-- Phương thức thanh toán -->
+                        <h5 class="mb-3"><i class="fa-solid fa-credit-card"></i> Chọn phương thức thanh toán</h5>
+                        
+                        <form th:action="@{/payment/process-final}" method="post">
+                            <input type="hidden" name="orderId" th:value="${order.orderId}"/>
+                            <input type="hidden" name="extraFee" th:value="${extraFee}"/>
+                            <input type="hidden" name="damages" th:value="${damages}"/>
+
+                            <!-- Momo -->
+                            <div class="payment-method" onclick="selectMethod('Momo')">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" 
+                                           id="momo" value="Momo" required>
+                                    <label class="form-check-label" for="momo">
+                                        <img th:src="@{/assets/images/momo-logo.png}" alt="Momo" height="30" class="me-2">
+                                        Ví Momo
+                                    </label>
+                                </div>
+                                <div class="method-desc">
+                                    <small class="text-muted">Thanh toán nhanh qua ứng dụng Momo</small>
+                                </div>
+                            </div>
+
+                            <!-- Bank Transfer -->
+                            <div class="payment-method" onclick="selectMethod('BankTransfer')">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" 
+                                           id="bankTransfer" value="BankTransfer">
+                                    <label class="form-check-label" for="bankTransfer">
+                                        <i class="fa-solid fa-building-columns fs-5 me-2"></i>
+                                        Chuyển khoản ngân hàng
+                                    </label>
+                                </div>
+                                <div class="method-desc">
+                                    <small class="text-muted">Chuyển khoản qua ngân hàng nội địa</small>
+                                </div>
+                            </div>
+
+                            <!-- Cash -->
+                            <div class="payment-method" onclick="selectMethod('Cash')">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" 
+                                           id="cash" value="Cash">
+                                    <label class="form-check-label" for="cash">
+                                        <i class="fa-solid fa-money-bill-wave fs-5 me-2"></i>
+                                        Tiền mặt khi trả xe
+                                    </label>
+                                </div>
+                                <div class="method-desc">
+                                    <small class="text-muted">Thanh toán trực tiếp bằng tiền mặt khi trả xe</small>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <div class="bank-info" id="bankInfo" style="display: none;">
+                                <div class="alert alert-info">
+                                    <i class="fa-solid fa-circle-info"></i>
+                                    <strong>Thông tin chuyển khoản:</strong><br>
+                                    Ngân hàng: <strong>Vietcombank</strong><br>
+                                    Số tài khoản: <strong>1234567890</strong><br>
+                                    Chủ tài khoản: <strong>CARTO RENTAL COMPANY</strong><br>
+                                    Nội dung: <strong class="text-primary">FINAL_[orderId]</strong>
+                                </div>
+                            </div>
+
+                            <div class="momo-info" id="momoInfo" style="display: none;">
+                                <div class="alert alert-success">
+                                    <i class="fa-solid fa-qrcode"></i>
+                                    <strong>Quét mã QR Momo để thanh toán:</strong><br>
+                                    <div class="text-center mt-2">
+                                        <img th:src="@{/assets/images/momo-qr-placeholder.png}" alt="Momo QR" style="max-width: 200px;">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-success w-100 py-3 mt-3 fw-semibold">
+                                <i class="fa-solid fa-lock"></i> Xác nhận thanh toán
+                            </button>
+                        </form>
+
+                        <p class="text-center text-muted small mt-3">
+                            <i class="fa-solid fa-shield-halved"></i> Thông tin thanh toán được bảo mật tuyệt đối
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function selectMethod(method) {
+        const bankInfo = document.getElementById('bankInfo');
+        const momoInfo = document.getElementById('momoInfo');
+        
+        bankInfo.style.display = 'none';
+        momoInfo.style.display = 'none';
+        
+        if (method === 'BankTransfer') {
+            bankInfo.style.display = 'block';
+        } else if (method === 'Momo') {
+            momoInfo.style.display = 'block';
+        }
+    }
+    
+    document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            selectMethod(this.value);
+        });
+    });
+</script>
+</body>
+</html>

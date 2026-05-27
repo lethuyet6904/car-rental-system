@@ -1,11 +1,11 @@
-package com.carrental.dto.request;
-
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-
-@Data
-public class RejectRequest {
-
-    @NotBlank(message = "Lý do từ chối không được để trống")
-    private String reason;
-}
+	package com.carrental.dto.request;
+	
+	import jakarta.validation.constraints.NotBlank;
+	import lombok.Data;
+	
+	@Data
+	public class RejectRequest {
+	
+	    @NotBlank(message = "Lý do từ chối không được để trống")
+	    private String reason;
+	}

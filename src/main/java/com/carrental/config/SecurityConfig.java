@@ -24,13 +24,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            // Bật CSRF protection để chống tấn công giả mạo (đặc biệt quan trọng với Web MVC/Thymeleaf)
-            // .csrf() được bật mặc định, ở đây ta có thể dùng mặc định
-            // Tuy nhiên, vì chúng ta đang dùng JWT qua Cookie song song với API (nếu có),
-            // việc bật CSRF bắt buộc mọi form POST phải có token CSRF.
-            // Spring Security tự động chèn token vào các thẻ <form th:action=...> của Thymeleaf.
-            // Cho phép tạo session khi cần (navbar dùng session.user để hiển thị)
-            // JWT vẫn là cơ chế auth chính thông qua filter
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .authorizeHttpRequests(auth -> auth
@@ -44,45 +37,51 @@ public class SecurityConfig {
                     "/auth/forgot-password",
                     "/auth/logout",
                     "/assets/**",
-                    "/cars/**",
-                    "/owner/owner-registration",  
-                    "/error"
+                    "/error",
+                    "/uploads/**"
+                    // LƯU Ý: BỎ /verification/** và /owner/owner-registration khỏi permitAll
+                    // Các route đó cần đăng nhập, được cấu hình riêng bên dưới
                 ).permitAll()
 
                 // ── ADMIN ONLY ── Chỉ role Admin
                 .requestMatchers("/admin/**").hasRole("Admin")
 
                 // ── OWNER ONLY ── Chỉ role Owner
-                .requestMatchers("/owner/**").hasRole("Owner")
+                // Lưu ý: /owner/owner-registration cho Customer truy cập (để đăng ký lên Owner)
+                // nên không đặt toàn bộ /owner/** vào hasRole("Owner")
+                .requestMatchers("/owner/dashboard").hasRole("Owner")
+                .requestMatchers("/owner/cars/**").hasRole("Owner")
+                .requestMatchers("/owner/orders/**").hasRole("Owner")
 
-                // ── CUSTOMER ── Customer và Owner đều vào được
+                // ── CUSTOMER & OWNER ── Cả hai role đều vào được
                 .requestMatchers("/customer/**").hasAnyRole("Customer", "Owner")
+
+                // Trang đăng ký làm chủ xe: Customer mới cần vào, Owner đã là chủ rồi
+                .requestMatchers("/owner/owner-registration").hasAnyRole("Customer", "Owner")
+
+                // Trang xác minh danh tính: Customer và Owner đều cần vào
+                .requestMatchers("/verification/**").hasAnyRole("Customer", "Owner")
 
                 // Còn lại phải đăng nhập
                 .anyRequest().authenticated()
             )
-            // Khi chưa đăng nhập mà vào trang cần auth → redirect về login
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint((request, response, authException) ->
                     response.sendRedirect("/auth/login"))
-                // Khi đã đăng nhập nhưng không đủ quyền → redirect về 403
                 .accessDeniedHandler((request, response, accessDeniedException) ->
                     response.sendRedirect("/error/403"))
             )
-            // Thêm JWT filter vào TRƯỚC filter mặc định của Spring Security
             .addFilterBefore(jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // BCrypt để hash password — KHÔNG bao giờ lưu plain text
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // AuthenticationManager dùng trong AuthService khi xử lý login
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration config) throws Exception {

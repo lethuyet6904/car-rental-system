@@ -199,8 +199,9 @@
                             <span>Thành tiền</span>
                             <span th:text="${#numbers.formatInteger(car.pricePerDay, 0, 'COMMA') + 'đ'}">800.000đ</span>
                         </div>
-
-                        <button class="cd-btn-book"> CHỌN THUÊ</button>
+<a th:href="@{/booking/{id}(id=${car.carId})}" class="cd-btn-book">
+    CHỌN THUÊ
+</a>
                     </div>
                 </div>
             </div>

@@ -1,0 +1,109 @@
+/* Payment Page Styles */
+.payment-page {
+    min-height: calc(100vh - 76px);
+    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+}
+
+.payment-method {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.payment-method:hover {
+    border-color: #10b981;
+    background-color: #f0fdf4;
+}
+
+.payment-method.active {
+    border-color: #10b981;
+    background-color: #f0fdf4;
+}
+
+.payment-method .form-check {
+    margin-bottom: 8px;
+}
+
+.payment-method .method-desc {
+    margin-left: 28px;
+}
+
+.order-info {
+    padding: 8px 0;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dashed #e9ecef;
+}
+
+.info-row.highlight {
+    background-color: #fef3c7;
+    margin: 0 -16px;
+    padding: 12px 16px;
+    border-radius: 8px;
+}
+
+.info-row.total {
+    border-bottom: none;
+    margin-top: 8px;
+}
+
+.info-label {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.info-value {
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.bank-info, .momo-info {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.success-icon {
+    animation: scaleUp 0.5s ease;
+}
+
+@keyframes scaleUp {
+    from {
+        transform: scale(0);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .payment-page {
+        min-height: calc(100vh - 56px);
+    }
+    
+    .info-row {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .info-row.total {
+        flex-direction: row;
+    }
+}

@@ -31,31 +31,47 @@
             </ul>
 
             <div class="ct-navbar__actions d-flex align-items-center gap-3">
-                
+
+                <!-- Chưa đăng nhập -->
                 <th:block th:if="${session.user == null}">
                     <a th:href="@{/auth/register}" class="ct-btn-nav text-decoration-none d-none d-sm-inline-block text-dark fw-bold me-2">Đăng ký</a>
                     <a th:href="@{/auth/login}" class="ct-btn-primary text-decoration-none">Đăng nhập</a>
                 </th:block>
 
+                <!-- Đã đăng nhập -->
                 <th:block th:if="${session.user != null}">
                     <div class="dropdown">
-                        <button class="ct-user-dropdown-btn" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="ct-user-dropdown-btn" type="button" id="userMenu" 
+                                data-bs-toggle="dropdown" aria-expanded="false">
                             <div class="ct-user-avatar">
                                 <i class="fa-solid fa-user-tie"></i>
                             </div>
-                            <span class="ct-user-name d-none d-md-inline" th:text="${session.user.fullName}">Tài khoản</span>
+                            <span class="ct-user-name d-none d-md-inline" th:text="${session.user.fullName} ?: ${session.user.phone}"></span>
                             <i class="fa-solid fa-chevron-down ct-chevron"></i>
                         </button>
-                        
+
                         <ul class="dropdown-menu dropdown-menu-end ct-dropdown-menu" aria-labelledby="userMenu">
-                            <th:block th:if="${session.user.role.name() == 'Customer' or session.user.role.name() == 'Owner'}">
+
+                            <!-- ==================== CUSTOMER ==================== -->
+                            <th:block th:if="${session.user.role.name() == 'Customer'}">
                                 <li>
-                                    <a class="dropdown-item ct-dropdown-item" th:href="@{/customer/rentals}">
-                                        <i class="fa-solid fa-rectangle-list"></i> Chuyến đi của tôi
+                                    <a class="dropdown-item ct-dropdown-item" th:href="@{/customer/profile}">
+                                        <i class="fa-solid fa-user"></i> Thông tin cá nhân
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item ct-dropdown-item" th:href="@{/verification/identity}">
+                                        <i class="fa-solid fa-id-card"></i> Định danh tài khoản
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item ct-dropdown-item" th:href="@{/booking/my-orders}">
+                                        <i class="fa-solid fa-list-check"></i> Đơn hàng của tôi
                                     </a>
                                 </li>
                             </th:block>
 
+                            <!-- ==================== OWNER ==================== -->
                             <th:block th:if="${session.user.role.name() == 'Owner'}">
                                 <li><hr class="ct-dropdown-divider"/></li>
                                 <li>
@@ -65,25 +81,28 @@
                                 </li>
                                 <li>
                                     <a class="dropdown-item ct-dropdown-item" th:href="@{/owner/cars}">
-                                        <i class="fa-solid fa-car-rear"></i> Quản lý danh sách xe
+                                        <i class="fa-solid fa-car-rear"></i> Quản lý xe
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item ct-dropdown-item" th:href="@{/owner/orders}">
+                                        <i class="fa-solid fa-truck"></i> Quản lý đơn hàng
                                     </a>
                                 </li>
                             </th:block>
 
+                            <!-- ==================== ADMIN ==================== -->
                             <th:block th:if="${session.user.role.name() == 'Admin'}">
                                 <li>
                                     <a class="dropdown-item ct-dropdown-item text-danger" th:href="@{/admin/dashboard}">
                                         <i class="fa-solid fa-chart-line"></i> Quản trị hệ thống
                                     </a>
                                 </li>
-                                <li>
-                                    <a class="dropdown-item ct-dropdown-item" th:href="@{/admin/users}">
-                                        <i class="fa-solid fa-users-gear"></i> Quản lý thành viên
-                                    </a>
-                                </li>
                             </th:block>
 
                             <li><hr class="ct-dropdown-divider"/></li>
+
+                            <!-- Đăng xuất -->
                             <li>
                                 <a class="dropdown-item ct-dropdown-item ct-dropdown-item--danger" th:href="@{/auth/logout}">
                                     <i class="fa-solid fa-power-off"></i> Đăng xuất

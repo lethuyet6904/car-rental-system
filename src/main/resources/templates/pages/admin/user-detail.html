@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/admin-layout :: adminHead('Chi tiết người dùng')}"></head>
+<head th:replace="~{fragments/admin-layout :: adminHead('Xác minh danh tính')}"></head>
 <body>
 <div class="admin-wrapper">
 
@@ -8,202 +8,170 @@
 
   <div class="admin-body">
     <th:block th:replace="~{fragments/admin-layout :: topbar(
-        'Chi tiết người dùng',
-        'Admin / <a href=&quot;/admin/users&quot; style=&quot;color:#7F77DD;text-decoration:none&quot;>Người dùng</a> / <span>' + ${user != null ? user.fullName : ''} + '</span>')}">
+        'Xác minh danh tính',
+        'Admin / <a href=&quot;/admin/users&quot; style=&quot;color:#7F77DD;text-decoration:none&quot;>Người dùng</a> / <span>Xác minh danh tính</span>')}">
     </th:block>
 
     <div class="admin-content">
 
-      <!-- Back -->
       <div style="margin-bottom:16px">
-        <a th:href="@{/admin/users}"
+        <a th:href="@{/admin/users/{id}(id=${user != null ? user.userId : 0})}"
            style="font-size:13px;color:#6b7280;text-decoration:none">
-          <i class="bi bi-arrow-left"></i> Quay lại danh sách
+          <i class="bi bi-arrow-left"></i> Quay lại
         </a>
       </div>
 
       <!-- Toast -->
-      <div th:if="${successMessage}" class="alert-success-admin">
-        <i class="bi bi-check-circle-fill"></i>
-        <span th:text="${successMessage}"></span>
-      </div>
       <div th:if="${errorMessage}" class="alert-danger-admin">
         <i class="bi bi-exclamation-circle-fill"></i>
         <span th:text="${errorMessage}"></span>
       </div>
-		
-      <!-- Card thông tin người dùng -->
-      <div class="admin-card" style="max-width:600px" th:if="${user != null}">
+
+      <div class="admin-card" style="max-width:560px" th:if="${user != null}">
         <div style="text-align:center;font-weight:700;font-size:13px;
                     letter-spacing:.05em;margin-bottom:20px;color:#374151">
-          THÔNG TIN NGƯỜI DÙNG
+          XÁC MINH DANH TÍNH
         </div>
 
-        <!-- Avatar + tên -->
-        <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
-          <img th:if="${user.avatar != null}"
-               th:src="${user.avatar}"
-               style="width:52px;height:52px;border-radius:50%;object-fit:cover;
-                      border:2px solid #e5e7eb" alt="avatar"/>
-          <div th:if="${user.avatar == null}"
-               style="width:52px;height:52px;border-radius:50%;background:#ede9fe;
-                      color:#5b21b6;display:flex;align-items:center;justify-content:center;
-                      font-size:20px;font-weight:600;border:2px solid #e5e7eb">
-            <span th:text="${#strings.substring(user.fullName, 0, 1)}">N</span>
+        <div class="detail-row">
+          <span class="detail-label">Ngày nộp</span>
+          <span class="detail-value">
+            <!-- Mock: dùng createdAt tạm, thay bằng identity.submittedAt sau -->
+            <span th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy HH:mm')}">
+              20/05/2025 09:10
+            </span>
+          </span>
+        </div>
+
+        <!-- Thông tin CCCD -->
+        <div style="font-weight:600;font-size:12px;margin:14px 0 8px;color:#374151">
+          Thông tin CCCD
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Họ và tên</span>
+          <span class="detail-value" th:text="${user.fullName}"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Số CCCD</span>
+          <span class="detail-value"
+                th:text="${user.nationalId != null ? user.nationalId : '(mock) 079 101 987 654'}">
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Ngày sinh</span>
+          <span class="detail-value">(mock) 15/08/1995</span>
+        </div>
+
+        <div style="font-size:12px;color:#6b7280;margin:12px 0 6px">Ảnh CCCD</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div th:if="${user.nationalIdFrontImage != null}">
+            <img th:src="${user.nationalIdFrontImage}"
+                 style="width:100%;border-radius:8px;border:1px solid #e5e7eb" alt="CCCD mặt trước"/>
           </div>
-          <div>
-            <div style="font-weight:600;font-size:15px;color:#111827"
-                 th:text="${user.fullName}">Nguyễn Anh</div>
-            <div style="font-size:12px;color:#9ca3af;margin-top:2px">
-              Ngày đăng ký:
-              <span th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy')}">
-                10/01/2025
-              </span>
+          <div th:if="${user.nationalIdFrontImage == null}"
+               class="img-box" style="height:110px">
+            <div style="text-align:center">
+              <i class="bi bi-card-image" style="font-size:24px;display:block;margin-bottom:4px"></i>
+              Mặt trước
+            </div>
+          </div>
+          <div th:if="${user.nationalIdBackImage != null}">
+            <img th:src="${user.nationalIdBackImage}"
+                 style="width:100%;border-radius:8px;border:1px solid #e5e7eb" alt="CCCD mặt sau"/>
+          </div>
+          <div th:if="${user.nationalIdBackImage == null}"
+               class="img-box" style="height:110px">
+            <div style="text-align:center">
+              <i class="bi bi-card-image" style="font-size:24px;display:block;margin-bottom:4px"></i>
+              Mặt sau
             </div>
           </div>
         </div>
 
-        <!-- Thông tin chi tiết -->
+        <!-- Thông tin GPLX -->
+        <div style="font-weight:600;font-size:12px;margin:16px 0 8px;color:#374151">
+          Thông tin GPLX
+        </div>
         <div class="detail-row">
-          <span class="detail-label">Email</span>
+          <span class="detail-label">Số GPLX</span>
           <span class="detail-value"
-                th:text="${user.email != null ? user.email : '—'}"></span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Số điện thoại</span>
-          <span class="detail-value" th:text="${user.phone}"></span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Địa chỉ</span>
-          <span class="detail-value"
-                th:text="${user.address != null ? user.address : '—'}"></span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Vai trò</span>
-          <span class="detail-value">
-            <span th:class="${'badge-' + #strings.toLowerCase(user.role.name())}"
-                  th:text="${user.role.name()}"></span>
-          </span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Trạng thái</span>
-          <span class="detail-value">
-            <span th:class="${user.status.name() == 'Active' ? 'badge-active' : 'badge-locked'}"
-                  th:text="${user.status.name() == 'Active' ? 'Đang hoạt động' : 'Bị khóa'}">
-            </span>
+                th:text="${user.licenseNumber != null ? user.licenseNumber : '(mock) GP-2023-112233'}">
           </span>
         </div>
 
-        <!-- Lý do khóa — chỉ hiện khi bị khóa -->
-        <div class="detail-row" th:if="${user.lockReason != null}">
-          <span class="detail-label">Lý do khóa</span>
-          <span class="detail-value" style="color:#b91c1c"
-                th:text="${user.lockReason}"></span>
-        </div>
-
-        <div class="detail-row">
-          <span class="detail-label">Trạng thái xác minh danh tính</span>
-          <span class="detail-value">
-            <span th:if="${user.identityStatus == null}" class="badge-none">Chưa xác minh</span>
-            <span th:if="${user.identityStatus != null}"
-                  th:class="${user.identityStatus.name() == 'Approved' ? 'badge-approved' :
-                              user.identityStatus.name() == 'Rejected' ? 'badge-rejected' : 'badge-pending'}"
-                  th:text="${user.identityStatus.name() == 'Approved' ? 'Đã xác minh' :
-                              user.identityStatus.name() == 'Rejected' ? 'Đã từ chối' : 'Chờ xác minh'}">
-            </span>
-          </span>
-        </div>
-		
-		<div class="detail-row"
-		     th:if="${user.identityStatus != null
-		             and user.identityStatus.name() == 'Rejected'
-		             and user.identityRejectReason != null}">
-		  <span class="detail-label">Lý do từ chối xác minh</span>
-		  <span class="detail-value" style="color:#b91c1c"
-		        th:text="${user.identityRejectReason}"></span>
-		</div>
-
-        <!-- CCCD/GPLX — chỉ hiện khi đã xác minh -->
-        <th:block th:if="${user.identityStatus != null and user.identityStatus.name() == 'Approved'}">
-          <div class="detail-row">
-            <span class="detail-label">Số căn cước công dân</span>
-            <span class="detail-value" th:text="${user.nationalId}"></span>
+        <div style="font-size:12px;color:#6b7280;margin:12px 0 6px">Ảnh GPLX</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div th:if="${user.licenseFrontImage != null}">
+            <img th:src="${user.licenseFrontImage}"
+                 style="width:100%;border-radius:8px;border:1px solid #e5e7eb" alt="GPLX mặt trước"/>
           </div>
-          <div class="detail-row">
-            <span class="detail-label">Số giấy phép lái xe</span>
-            <span class="detail-value" th:text="${user.licenseNumber}"></span>
+          <div th:if="${user.licenseFrontImage == null}"
+               class="img-box" style="height:110px">
+            <div style="text-align:center">
+              <i class="bi bi-card-image" style="font-size:24px;display:block;margin-bottom:4px"></i>
+              Mặt trước
+            </div>
           </div>
-        </th:block>
+          <div th:if="${user.licenseBackImage != null}">
+            <img th:src="${user.licenseBackImage}"
+                 style="width:100%;border-radius:8px;border:1px solid #e5e7eb" alt="GPLX mặt sau"/>
+          </div>
+          <div th:if="${user.licenseBackImage == null}"
+               class="img-box" style="height:110px">
+            <div style="text-align:center">
+              <i class="bi bi-card-image" style="font-size:24px;display:block;margin-bottom:4px"></i>
+              Mặt sau
+            </div>
+          </div>
+        </div>
 
-        <!-- Ghi chú khi chưa xác minh -->
-        <div th:if="${user.identityStatus == null or user.identityStatus.name() == 'Pending'}"
-             style="font-size:11px;color:#9ca3af;font-style:italic;padding:6px 0">
-          * Số CCCD và Số GPLX chỉ hiển thị sau khi xác minh thành công
+        <!-- Note kiểm tra -->
+        <div class="note-box">
+          <i class="bi bi-info-circle"></i>
+          Vui lòng kiểm tra họ tên trên CCCD và GPLX phải trùng khớp nhau
         </div>
 
         <!-- Action buttons -->
-        <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
-
-          <!-- Khóa TK — chỉ khi Active và không phải Admin -->
-          <button th:if="${user.status.name() == 'Active' and user.role.name() != 'Admin'}"
-                  type="button"
-                  class="btn btn-warning btn-sm"
-                  data-bs-toggle="modal" data-bs-target="#lockModal">
-            <i class="bi bi-lock"></i> Khóa tài khoản
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:20px">
+          <button type="button" class="btn btn-success"
+                  data-bs-toggle="modal" data-bs-target="#approveModal">
+            <i class="bi bi-check-lg"></i> Duyệt
           </button>
-
-          <!-- Mở khóa — chỉ khi Locked -->
-		  <button th:if="${user.status.name() == 'Locked'}"
-		          type="button"
-		          class="btn btn-success btn-sm"
-		          data-bs-toggle="modal" data-bs-target="#unlockModal">
-		    <i class="bi bi-unlock"></i> Mở khóa tài khoản
-		  </button>
-
-          <!-- Duyệt xác minh danh tính — chỉ khi Pending -->
-          <a th:if="${user.identityStatus != null and user.identityStatus.name() == 'Pending'}"
-             th:href="@{/admin/users/{id}/identity(id=${user.userId})}"
-             class="btn btn-primary btn-sm">
-            <i class="bi bi-card-checklist"></i> Duyệt xác minh danh tính
-          </a>
-
+          <button type="button" class="btn btn-danger"
+                  data-bs-toggle="modal" data-bs-target="#rejectModal">
+            <i class="bi bi-x-lg"></i> Từ chối
+          </button>
         </div>
       </div>
+
+      
 
     </div>
   </div>
 </div>
 
-<!-- Modal: Khóa tài khoản -->
-<div class="modal fade" id="lockModal" tabindex="-1">
+<!-- Modal: Duyệt xác minh -->
+<div class="modal fade" id="approveModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <form th:action="@{/admin/users/{id}/lock(id=${user != null ? user.userId : 0})}"
+      <form th:action="@{/admin/users/{id}/identity/approve(id=${user != null ? user.userId : 0})}"
             method="post">
         <div class="modal-header">
-          <h6 class="modal-title"><i class="bi bi-lock"></i> Khóa tài khoản</h6>
+          <h6 class="modal-title">
+            <i class="bi bi-card-checklist"></i> Duyệt xác minh danh tính
+          </h6>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-body">
-          <p style="font-size:13px;color:#6b7280;margin-bottom:12px">
-            Khóa tài khoản của
-            <strong th:text="${user != null ? user.fullName : ''}"></strong>
-            (<span th:text="${user != null ? user.phone : ''}"></span>)
-          </p>
-          <div class="mb-3">
-            <label class="form-label" style="font-size:13px">
-              Lý do khóa <span style="color:#ef4444">*</span>
-            </label>
-            <textarea name="reason" class="form-control form-control-sm"
-                      rows="3" placeholder="Nhập lý do khóa tài khoản…"
-                      required></textarea>
-          </div>
+        <div class="modal-body" style="font-size:13px;color:#374151">
+          Xác nhận thông tin CCCD và GPLX của
+          <strong th:text="${user != null ? user.fullName : ''}"></strong>
+          hợp lệ?
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-sm"
                   data-bs-dismiss="modal">Hủy</button>
-          <button type="submit" class="btn btn-warning btn-sm">
-            <i class="bi bi-lock"></i> Xác nhận khóa
+          <button type="submit" class="btn btn-success btn-sm">
+            <i class="bi bi-check-lg"></i> Xác nhận duyệt
           </button>
         </div>
       </form>
@@ -211,31 +179,35 @@
   </div>
 </div>
 
-<!-- Modal: Mở khóa tài khoản -->
-<div class="modal fade" id="unlockModal" tabindex="-1">
+<!-- Modal: Từ chối xác minh -->
+<div class="modal fade" id="rejectModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <form th:action="@{/admin/users/{id}/unlock(id=${user != null ? user.userId : 0})}"
+      <form th:action="@{/admin/users/{id}/identity/reject(id=${user != null ? user.userId : 0})}"
             method="post">
         <div class="modal-header">
-          <h6 class="modal-title"><i class="bi bi-unlock"></i> Mở khóa tài khoản</h6>
+          <h6 class="modal-title">Từ chối xác minh danh tính</h6>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <p style="font-size:13px;color:#6b7280;margin:0">
-            Xác nhận mở khóa tài khoản của
+          <p style="font-size:13px;color:#6b7280;margin-bottom:12px">
+            Từ chối hồ sơ xác minh danh tính của
             <strong th:text="${user != null ? user.fullName : ''}"></strong>
-            (<span th:text="${user != null ? user.phone : ''}"></span>)?
           </p>
-          <p style="font-size:12px;color:#9ca3af;margin-top:8px;margin-bottom:0">
-            Người dùng sẽ có thể đăng nhập và sử dụng hệ thống trở lại.
-          </p>
+          <div class="mb-3">
+            <label class="form-label" style="font-size:13px">
+              Lý do từ chối <span style="color:#ef4444">*</span>
+            </label>
+            <textarea name="rejectReason" class="form-control form-control-sm"
+                      rows="3" placeholder="Ảnh không rõ ràng, thông tin không khớp…"
+                      required></textarea>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-sm"
                   data-bs-dismiss="modal">Hủy</button>
-          <button type="submit" class="btn btn-success btn-sm">
-            <i class="bi bi-unlock"></i> Xác nhận mở khóa
+          <button type="submit" class="btn btn-danger btn-sm">
+            <i class="bi bi-x-lg"></i> Xác nhận từ chối
           </button>
         </div>
       </form>

@@ -32,4 +32,4 @@ public class AdminController {
 
         return "pages/admin/dashboard";
     }
-}
+}	

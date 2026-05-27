@@ -1,0 +1,50 @@
+.ct-verification-page {
+    min-height: calc(100vh - 200px);
+    padding: 60px 0;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+}
+
+.ct-verification-card {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+
+.ct-verification-badge {
+    display: inline-block;
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+
+.ct-verification-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 12px;
+}
+
+.ct-verification-subtitle {
+    color: #666;
+    font-size: 15px;
+}
+
+.ct-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a2e;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.ct-info-box {
+    background: #f8f9fa;
+    border-radius: 16px;
+    padding: 16px 20px;
+}
+
