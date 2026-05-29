@@ -8,19 +8,19 @@
 
   <div class="admin-body">
     <th:block th:replace="~{fragments/admin-layout :: topbar(
-        'Dashboard',
-        'Admin / <span>Dashboard</span>')}">
+        'Dashboard', 'Admin / <span>Dashboard</span>')}">
     </th:block>
 
     <div class="admin-content">
 
-      <!-- KPI Cards -->
+      <!-- ROW 1: 4 KPI Cards -->
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px">
 
         <a th:href="@{/admin/users}" style="text-decoration:none">
-          <div class="admin-card" style="display:flex;align-items:center;gap:14px;cursor:pointer">
+          <div class="admin-card" style="display:flex;align-items:center;gap:14px">
             <div style="width:44px;height:44px;border-radius:10px;background:#ede9fe;
-                        display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">👥</div>
+                        display:flex;align-items:center;justify-content:center;
+                        font-size:20px;flex-shrink:0">👥</div>
             <div>
               <div style="font-size:11px;color:#6b7280;margin-bottom:2px">Tổng người dùng</div>
               <div style="font-size:22px;font-weight:700;color:#111827"
@@ -30,9 +30,10 @@
         </a>
 
         <a th:href="@{/admin/cars}" style="text-decoration:none">
-          <div class="admin-card" style="display:flex;align-items:center;gap:14px;cursor:pointer">
+          <div class="admin-card" style="display:flex;align-items:center;gap:14px">
             <div style="width:44px;height:44px;border-radius:10px;background:#dbeafe;
-                        display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🚗</div>
+                        display:flex;align-items:center;justify-content:center;
+                        font-size:20px;flex-shrink:0">🚗</div>
             <div>
               <div style="font-size:11px;color:#6b7280;margin-bottom:2px">Tổng xe hoạt động</div>
               <div style="font-size:22px;font-weight:700;color:#111827"
@@ -42,9 +43,10 @@
         </a>
 
         <a th:href="@{/admin/orders}" style="text-decoration:none">
-          <div class="admin-card" style="display:flex;align-items:center;gap:14px;cursor:pointer">
+          <div class="admin-card" style="display:flex;align-items:center;gap:14px">
             <div style="width:44px;height:44px;border-radius:10px;background:#dcfce7;
-                        display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📋</div>
+                        display:flex;align-items:center;justify-content:center;
+                        font-size:20px;flex-shrink:0">📋</div>
             <div>
               <div style="font-size:11px;color:#6b7280;margin-bottom:2px">Tổng đơn thuê</div>
               <div style="font-size:22px;font-weight:700;color:#111827"
@@ -55,87 +57,136 @@
 
         <div class="admin-card" style="display:flex;align-items:center;gap:14px">
           <div style="width:44px;height:44px;border-radius:10px;background:#fef9c3;
-                      display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">💰</div>
+                      display:flex;align-items:center;justify-content:center;
+                      font-size:20px;flex-shrink:0">💰</div>
           <div>
             <div style="font-size:11px;color:#6b7280;margin-bottom:2px">Tổng doanh thu</div>
-            <div style="font-size:16px;font-weight:700;color:#15803d"
+            <div style="font-size:15px;font-weight:700;color:#15803d"
                  th:text="${#numbers.formatDecimal(stats.totalRevenue,0,'COMMA',0,'POINT') + ' ₫'}">0 ₫</div>
           </div>
         </div>
 
       </div>
 
-      <!-- Alert Badges -->
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px">
+      <!-- ROW 2: 2 Alert Badges -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
 
-        <a th:href="@{/admin/complaints}" style="text-decoration:none">
-          <div class="admin-card" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer">
+        <a th:href="@{/admin/complaints(status='Pending')}" style="text-decoration:none">
+          <div class="admin-card" style="display:flex;align-items:center;
+                                         justify-content:space-between">
             <div style="display:flex;align-items:center;gap:12px">
-              <div style="width:38px;height:38px;border-radius:9px;background:#fee2e2;
-                          display:flex;align-items:center;justify-content:center;font-size:16px">⚠️</div>
-              <span style="font-size:13px;color:#374151">Khiếu nại chờ xử lý</span>
+              <div style="width:40px;height:40px;border-radius:9px;background:#fee2e2;
+                          display:flex;align-items:center;justify-content:center;font-size:18px">⚠️</div>
+              <span style="font-size:14px;font-weight:500;color:#374151">Khiếu nại chờ xử lý</span>
             </div>
-            <span style="font-size:20px;font-weight:700"
-                  th:class="${stats.pendingComplaints > 0 ? 'badge-rejected' : 'badge-approved'}"
+            <span th:class="${stats.pendingComplaints > 0 ? 'badge-rejected' : 'badge-approved'}"
+                  style="font-size:18px;font-weight:700;padding:4px 14px"
                   th:text="${stats.pendingComplaints}">0</span>
           </div>
         </a>
 
         <a th:href="@{/admin/cars(status='Pending')}" style="text-decoration:none">
-          <div class="admin-card" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer">
+          <div class="admin-card" style="display:flex;align-items:center;
+                                         justify-content:space-between">
             <div style="display:flex;align-items:center;gap:12px">
-              <div style="width:38px;height:38px;border-radius:9px;background:#fef3c7;
-                          display:flex;align-items:center;justify-content:center;font-size:16px">🚗</div>
-              <span style="font-size:13px;color:#374151">Xe chờ duyệt</span>
+              <div style="width:40px;height:40px;border-radius:9px;background:#fef3c7;
+                          display:flex;align-items:center;justify-content:center;font-size:18px">🚗</div>
+              <span style="font-size:14px;font-weight:500;color:#374151">Xe chờ duyệt</span>
             </div>
-            <span style="font-size:20px;font-weight:700"
-                  th:class="${stats.pendingCars > 0 ? 'badge-pending' : 'badge-approved'}"
+            <span th:class="${stats.pendingCars > 0 ? 'badge-pending' : 'badge-approved'}"
+                  style="font-size:18px;font-weight:700;padding:4px 14px"
                   th:text="${stats.pendingCars}">0</span>
-          </div>
-        </a>
-
-        <a th:href="@{/admin/owner-requests(status='Pending')}" style="text-decoration:none">
-          <div class="admin-card" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer">
-            <div style="display:flex;align-items:center;gap:12px">
-              <div style="width:38px;height:38px;border-radius:9px;background:#ede9fe;
-                          display:flex;align-items:center;justify-content:center;font-size:16px">✅</div>
-              <span style="font-size:13px;color:#374151">Yêu cầu chủ xe</span>
-            </div>
-            <span style="font-size:20px;font-weight:700"
-                  th:class="${stats.pendingOwners > 0 ? 'badge-pending' : 'badge-approved'}"
-                  th:text="${stats.pendingOwners}">0</span>
           </div>
         </a>
 
       </div>
 
-      <!-- Charts + Top lists -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <!-- ROW 3: Charts -->
+      <div class="admin-card" style="margin-bottom:16px">
 
-        <!-- Biểu đồ trạng thái đơn (Pie) -->
-        <div class="admin-card">
-          <div style="font-size:13px;font-weight:600;margin-bottom:16px;color:#374151">
-            Trạng thái đơn thuê
-          </div>
-          <canvas id="orderStatusChart" height="200"></canvas>
+        <!-- Filter thời gian — góc phải trên -->
+        <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+          <form th:action="@{/admin/dashboard}" method="get"
+                style="display:flex;gap:6px;align-items:center">
+            <span style="font-size:12px;color:#6b7280;margin-right:4px">Lọc thời gian:</span>
+			<button type="submit" name="period" value="all"
+			                    th:class="${period == 'all' or period == null} ? 'btn-admin-primary' : 'btn-clear'"
+			                    style="padding:4px 12px;font-size:12px">Tất cả</button>
+            <button type="submit" name="period" value="year"
+                    th:class="${period == 'year'} ? 'btn-admin-primary' : 'btn-clear'"
+                    style="padding:4px 12px;font-size:12px">Năm này</button>
+          </form>
         </div>
 
-        <!-- Top 5 xe -->
+        <!-- Charts: col-8 Combined + col-4 Pie -->
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;align-items:start">
+
+		  <!-- LEFT: Combined Chart (Bar + Line) -->
+		  <div>
+		    <div style="font-size:12px;color:#6b7280;margin-bottom:10px">
+		      Doanh thu &amp; Đơn thuê
+		    </div>
+		    <div style="position:relative; height:260px; overflow-x:auto">
+		      <canvas id="combinedChart"></canvas>
+		    </div>
+		  </div>
+
+          <!-- RIGHT: Pie Chart -->
+          <div>
+            <div style="font-size:12px;color:#6b7280;margin-bottom:10px">Trạng thái đơn</div>
+			<div style="position:relative; height:260px; overflow-x:auto">
+            	<canvas id="pieChart" height="180"></canvas>
+			</div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:12px;color:#6b7280">
+                  <span style="display:inline-block;width:10px;height:10px;
+                               border-radius:50%;background:#10b981;margin-right:5px"></span>
+                  Hoàn thành
+                </span>
+                <span class="badge-approved" th:text="${stats.completedOrders}">0</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:12px;color:#6b7280">
+                  <span style="display:inline-block;width:10px;height:10px;
+                               border-radius:50%;background:#ef4444;margin-right:5px"></span>
+                  Đã hủy
+                </span>
+                <span class="badge-rejected" th:text="${stats.cancelledOrders}">0</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:12px;color:#6b7280">
+                  <span style="display:inline-block;width:10px;height:10px;
+                               border-radius:50%;background:#7F77DD;margin-right:5px"></span>
+                  Đang thuê
+                </span>
+                <span class="badge-none" th:text="${stats.inProgressOrders}">0</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ROW 4: Top xe + Top khu vực -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+        <!-- Top xe -->
         <div class="admin-card">
           <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:#374151">
-            Top 5 xe được thuê nhiều nhất
+            Top xe được thuê nhiều nhất
           </div>
           <div th:if="${#lists.isEmpty(stats.topCars)}"
-               style="font-size:12px;color:#9ca3af;font-style:italic">
+               style="font-size:12px;color:#9ca3af;font-style:italic;padding:12px 0">
             Chưa có dữ liệu
           </div>
           <div th:each="car, iter : ${stats.topCars}"
                style="display:flex;align-items:center;justify-content:space-between;
-                      padding:8px 0;border-bottom:1px solid #f3f4f6">
+                      padding:9px 0;border-bottom:1px solid #f3f4f6">
             <div style="display:flex;align-items:center;gap:10px">
               <div style="width:24px;height:24px;border-radius:50%;background:#ede9fe;
                            color:#5b21b6;display:flex;align-items:center;justify-content:center;
-                           font-size:11px;font-weight:600"
+                           font-size:11px;font-weight:600;flex-shrink:0"
                    th:text="${iter.index + 1}"></div>
               <div>
                 <div style="font-size:13px;font-weight:500" th:text="${car.modelName}"></div>
@@ -146,47 +197,26 @@
           </div>
         </div>
 
-        <!-- Top 5 khu vực -->
+        <!-- Top khu vực -->
         <div class="admin-card">
           <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:#374151">
-            Top 5 khu vực hoạt động
+            Top khu vực hoạt động
           </div>
           <div th:if="${#lists.isEmpty(stats.topRegions)}"
-               style="font-size:12px;color:#9ca3af;font-style:italic">
+               style="font-size:12px;color:#9ca3af;font-style:italic;padding:12px 0">
             Chưa có dữ liệu
           </div>
           <div th:each="region, iter : ${stats.topRegions}"
                style="display:flex;align-items:center;justify-content:space-between;
-                      padding:8px 0;border-bottom:1px solid #f3f4f6">
+                      padding:9px 0;border-bottom:1px solid #f3f4f6">
             <div style="display:flex;align-items:center;gap:10px">
               <div style="width:24px;height:24px;border-radius:50%;background:#dbeafe;
                            color:#1d4ed8;display:flex;align-items:center;justify-content:center;
-                           font-size:11px;font-weight:600"
+                           font-size:11px;font-weight:600;flex-shrink:0"
                    th:text="${iter.index + 1}"></div>
               <span style="font-size:13px" th:text="${region.regionName}"></span>
             </div>
             <span class="badge-none" th:text="${region.orderCount + ' đơn'}"></span>
-          </div>
-        </div>
-
-        <!-- Thống kê nhanh đơn thuê -->
-        <div class="admin-card">
-          <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:#374151">
-            Thống kê đơn thuê
-          </div>
-          <div style="display:flex;flex-direction:column;gap:12px">
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <span style="font-size:13px;color:#6b7280">Đang thuê</span>
-              <span class="badge-none" th:text="${stats.inProgressOrders}"></span>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <span style="font-size:13px;color:#6b7280">Hoàn thành</span>
-              <span class="badge-approved" th:text="${stats.completedOrders}"></span>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <span style="font-size:13px;color:#6b7280">Đã hủy</span>
-              <span class="badge-rejected" th:text="${stats.cancelledOrders}"></span>
-            </div>
           </div>
         </div>
 
@@ -199,25 +229,89 @@
 <th:block th:replace="~{fragments/admin-layout :: scripts}"></th:block>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script th:inline="javascript">
-  const completed  = [[${stats.completedOrders}]];
-  const cancelled  = [[${stats.cancelledOrders}]];
-  const inProgress = [[${stats.inProgressOrders}]];
+  // --- DỮ LIỆU COMBINED CHART ---
+  const labels = /*[[${stats.chartLabels}]]*/ [];
+  const orderData = /*[[${stats.orderCountData}]]*/ [];
+  const revenueData = /*[[${stats.revenueData}]]*/ [];
 
-  new Chart(document.getElementById('orderStatusChart'), {
-    type: 'pie',
+  // 1. Vẽ biểu đồ kết hợp (Bar + Line)
+  const ctxCombined = document.getElementById('combinedChart').getContext('2d');
+  new Chart(ctxCombined, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          type: 'bar',
+          label: 'Số đơn thuê',
+          data: orderData,
+          backgroundColor: '#7F77DD',
+          yAxisID: 'yOrders'
+        },
+        {
+          type: 'line',
+          label: 'Doanh thu (VNĐ)',
+          data: revenueData,
+          borderColor: '#ef4444',
+          backgroundColor: 'rgba(239, 68, 68, 0.2)',
+          borderWidth: 2,
+          tension: 0.3, 
+          yAxisID: 'yRevenue'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+	  maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+		yOrders: {
+		  type: 'linear',
+		  display: true,
+		  position: 'left',
+		  title: { display: true, text: 'Số lượng đơn' },
+		  beginAtZero: true,
+		  max: 100,
+		  ticks: {
+		    precision: 0   
+		  }
+		},
+        yRevenue: {
+		  type: 'linear',
+		  display: true,
+		  position: 'right',
+		  title: { display: true, text: 'Doanh thu (VNĐ)' },
+		  beginAtZero: true,
+		  max: 100000000,
+		  grid: { drawOnChartArea: false }
+        }
+      }
+    }
+  });
+
+  // --- DỮ LIỆU PIE CHART ---
+  const completed = /*[[${stats.completedOrders}]]*/ 0;
+  const cancelled = /*[[${stats.cancelledOrders}]]*/ 0;
+  const inProgress = /*[[${stats.inProgressOrders}]]*/ 0;
+
+  // 2. Vẽ biểu đồ tròn (Doughnut)
+  const ctxPie = document.getElementById('pieChart').getContext('2d');
+  new Chart(ctxPie, {
+    type: 'doughnut', 
     data: {
       labels: ['Hoàn thành', 'Đã hủy', 'Đang thuê'],
       datasets: [{
         data: [completed, cancelled, inProgress],
-        backgroundColor: ['#10b981', '#ef4444', '#7F77DD'],
-        borderWidth: 2,
-        borderColor: '#fff'
+        backgroundColor: ['#10b981', '#ef4444', '#7F77DD'], // Xanh lá, Đỏ, Tím
+        borderWidth: 0
       }]
     },
     options: {
       responsive: true,
+	  maintainAspectRatio: false,
+      cutout: '65%', // Tạo khoảng trống ở giữa cho đẹp
       plugins: {
-        legend: { position: 'bottom', labels: { font: { size: 12 } } }
+        legend: { display: false } // Ẩn chú thích mặc định vì đã có list chú thích HTML bên dưới
       }
     }
   });

@@ -65,11 +65,7 @@
             <span class="detail-value"
                   th:text="${#temporals.format(order.returnTime,'HH:mm')}"></span>
           </div>
-          <div class="detail-row">
-            <span class="detail-label">Số ngày thuê</span>
-            <span class="detail-value"
-                  th:text="${order.totalDays + ' ngày'}"></span>
-          </div>
+          
           <div class="detail-row">
             <span class="detail-label">Hình thức nhận xe</span>
             <span class="detail-value"
@@ -81,7 +77,7 @@
             <span class="detail-label">Địa chỉ nhận xe</span>
             <span class="detail-value" th:text="${order.deliveryAddress}"></span>
           </div>
-          <div class="detail-row" th:if="${order.note != null}">
+          <div class="detail-row">
             <span class="detail-label">Ghi chú cho chủ xe</span>
             <span class="detail-value" th:text="${order.note}"></span>
           </div>
@@ -192,7 +188,11 @@
                   th:text="${#numbers.formatDecimal(order.pricePerDay,0,'COMMA',0,'POINT') + ' ₫'}">
             </span>
           </div>
-		  
+		  <div class="detail-row">
+              <span class="detail-label">Số ngày thuê</span>
+              <span class="detail-value"
+                    th:text="${order.totalDays + ' ngày'}"></span>
+            </div>
 		  <div class="detail-row">
 		    <span class="detail-label">Tiền cọc (30%)</span>
 		    <span class="detail-value"

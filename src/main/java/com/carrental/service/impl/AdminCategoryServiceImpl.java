@@ -87,12 +87,13 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
 
     @Override
     @Transactional
-    public void addBrand(String name) {
+    public void addBrand(String name, String logoUrl) {
         if (brandRepository.existsByBrandName(name.trim())) {
             throw new IllegalArgumentException("Hãng xe \"" + name.trim() + "\" đã tồn tại");
         }
         Brand brand = Brand.builder()
                 .brandName(name.trim())
+                .logo(logoUrl)
                 .status(CategoryStatus.Active)
                 .build();
         brandRepository.save(brand);
@@ -100,11 +101,26 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
 
     @Override
     @Transactional
-    public void editBrand(Long id, String name, String status) {
+    public void editBrand(Long id, String name, String status, String logoUrl) {
+        // 1. Tìm hãng xe từ DB
         Brand brand = brandRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy hãng xe id=" + id));
-        brand.setBrandName(name.trim());
-        brand.setStatus(CategoryStatus.valueOf(status));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy hãng xe"));
+        
+        // 2. Kiểm tra trùng tên (nếu người dùng đổi sang tên khác)
+        if (!brand.getBrandName().equals(name) && brandRepository.existsByBrandName(name)) {
+            throw new RuntimeException("Tên hãng xe đã tồn tại");
+        }
+        
+        // 3. CẬP NHẬT DỮ LIỆU (Đây là bước có thể bạn đang thiếu)
+        brand.setBrandName(name); // <-- Bắt buộc phải có dòng này để đổi tên
+        brand.setStatus(CategoryStatus.valueOf(status)); // Cập nhật trạng thái
+        
+        // 4. Nếu có ảnh mới thì cập nhật ảnh
+        if (logoUrl != null && !logoUrl.isBlank()) {
+            brand.setLogo(logoUrl); // (Hoặc setLogoUrl tùy thuộc vào tên field trong Entity của bạn)
+        }
+        
+        // 5. Lưu xuống DB
         brandRepository.save(brand);
     }
 

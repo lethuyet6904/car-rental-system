@@ -57,12 +57,10 @@
             <tr th:each="b, iter : ${brands}">
               <td style="color:#9ca3af" th:text="${iter.index + 1}"></td>
               <td>
-                <img th:if="${b.logoUrl != null}" th:src="${b.logoUrl}"
-                     style="width:40px;height:28px;object-fit:contain" alt="logo"/>
-                <div th:if="${b.logoUrl == null}" class="img-box"
-                     style="width:40px;height:28px;border-radius:4px;font-size:9px">
-                  <i class="bi bi-image"></i>
-                </div>
+				<img th:src="@{'/uploads/brands/' + ${b.logoUrl}}" 
+				     alt="logo" 
+				     style="width: 45px; height: 45px; object-fit: contain;" 
+				     onerror="this.style.display='none'" />
               </td>
               <td style="font-weight:500" th:text="${b.name}"></td>
               <td th:text="${b.carCount}"></td>
@@ -77,6 +75,7 @@
                           data-bs-toggle="modal" data-bs-target="#editBrandModal"
                           th:data-id="${b.id}" th:data-name="${b.name}"
                           th:data-status="${b.status}"
+						  th:data-logo="${b.logoUrl}"
                           onclick="fillEditBrandModal(this)">
                     <i class="bi bi-pencil"></i>
                   </button>
@@ -101,7 +100,7 @@
 <div class="modal fade" id="addBrandModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <form th:action="@{/admin/categories/brands/add}" method="post">
+      <form th:action="@{/admin/categories/brands/add}" method="post" enctype="multipart/form-data">
         <div class="modal-header">
           <h6 class="modal-title">Thêm hãng xe</h6>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -141,7 +140,7 @@
 <div class="modal fade" id="editBrandModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <form id="editBrandForm" method="post">
+      <form id="editBrandForm" method="post" enctype="multipart/form-data">
 		<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
         <div class="modal-header">
           <h6 class="modal-title">Chỉnh sửa hãng xe</h6>
@@ -155,15 +154,22 @@
             <input type="text" id="editBrandName" name="name"
                    class="form-control form-control-sm" required/>
           </div>
-          <div class="mb-3">
-            <label class="form-label" style="font-size:13px;font-weight:500">Logo</label>
-            <div class="img-box" style="height:70px;cursor:pointer;border-style:dashed">
-              <div style="text-align:center">
-                <i class="bi bi-upload" style="font-size:18px;display:block;margin-bottom:4px"></i>
-                Tải ảnh mới
-              </div>
-            </div>
-          </div>
+		  <div class="mb-3">
+		              <label class="form-label" style="font-size:13px;font-weight:500">Logo</label>
+					  <div style="margin-bottom: 10px; text-align: center;">
+					      <img id="editLogoPreview" src="" alt="preview" 
+					           style="max-height: 80px; display: none; object-fit: contain; border: 1px solid #e5e7eb; border-radius: 4px; padding: 4px;" />
+					    </div>
+		              <div class="img-box" style="height:70px;cursor:pointer;border-style:dashed"
+		                   onclick="document.getElementById('editLogoInput').click()">
+		                <div style="text-align:center">
+		                  <i class="bi bi-upload" style="font-size:18px;display:block;margin-bottom:4px"></i>
+		                  Tải ảnh mới
+		                </div>
+		              </div>
+		              <input type="file" id="editLogoInput" name="logo"
+		                     accept="image/*" style="display:none" onchange="previewEditLogo(event)"/>
+		            </div>
           <div class="mb-3">
             <label class="form-label" style="font-size:13px;font-weight:500">Trạng thái</label>
             <select id="editBrandStatus" name="status" class="form-select form-select-sm">
@@ -208,12 +214,43 @@
 
 <th:block th:replace="~{fragments/admin-layout :: scripts}"></th:block>
 <script>
-function fillEditBrandModal(btn) {
-  document.getElementById('editBrandForm').action =
-    '/admin/categories/brands/' + btn.dataset.id + '/edit';
-  document.getElementById('editBrandName').value   = btn.dataset.name;
-  document.getElementById('editBrandStatus').value = btn.dataset.status;
-}
+	function fillEditBrandModal(btn) {
+	  // Đổ data text
+	  document.getElementById('editBrandForm').action = '/admin/categories/brands/' + btn.dataset.id + '/edit';
+	  document.getElementById('editBrandName').value   = btn.dataset.name;
+	  document.getElementById('editBrandStatus').value = btn.dataset.status;
+
+	  // Xử lý hiển thị ảnh hiện tại
+	  const logoUrl = btn.dataset.logo;
+	  const previewImg = document.getElementById('editLogoPreview');
+	  
+	  // Nếu có ảnh thì ghép chuỗi trỏ ra thư mục uploads
+	  if (logoUrl && logoUrl !== 'null' && logoUrl.trim() !== '') {
+	    previewImg.src = '/uploads/brands/' + logoUrl;
+	    previewImg.style.display = 'inline-block';
+	  } else {
+	    // Không có ảnh thì ẩn đi
+	    previewImg.src = '';
+	    previewImg.style.display = 'none';
+	  }
+	  
+	  // Reset input file để tránh lưu cache file cũ vừa chọn
+	  document.getElementById('editLogoInput').value = '';
+	}
+
+	// Hàm đọc file ngay dưới trình duyệt và hiển thị preview
+	function previewEditLogo(event) {
+	  const file = event.target.files[0];
+	  if (file) {
+	    const reader = new FileReader();
+	    reader.onload = function(e) {
+	      const previewImg = document.getElementById('editLogoPreview');
+	      previewImg.src = e.target.result;
+	      previewImg.style.display = 'inline-block';
+	    }
+	    reader.readAsDataURL(file);
+	  }
+	}
 function fillDeleteBrandModal(btn) {
   document.getElementById('deleteBrandForm').action =
     '/admin/categories/brands/' + btn.dataset.id + '/delete';

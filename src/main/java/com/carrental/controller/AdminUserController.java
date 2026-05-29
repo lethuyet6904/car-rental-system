@@ -58,8 +58,9 @@ public class AdminUserController {
 
     // ── GET: Xác minh danh tính ──────────────────────────────────
     @GetMapping("/{id}/identity")
-    public String identityDetail(@PathVariable Long id, Model model) {
+    public String identityDetail(@PathVariable Long id, @RequestParam(defaultValue = "0") int returnPage, Model model) {
         model.addAttribute("user", adminUserService.getUserDetail(id));
+        model.addAttribute("returnPage", returnPage);
         return "pages/admin/identity-detail";
     }
 

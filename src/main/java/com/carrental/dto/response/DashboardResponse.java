@@ -9,24 +9,27 @@ import java.util.List;
 @Builder
 public class DashboardResponse {
 
-    // KPI cards
+    // Row 1 — KPI
     private final long totalUsers;
     private final long totalCars;
     private final long totalOrders;
     private final BigDecimal totalRevenue;
 
-    // Alert badges
+    // Row 2 — Alerts
     private final long pendingComplaints;
     private final long pendingCars;
-    private final long pendingOwners;
-    private final long activeOrders;
 
-    // Biểu đồ trạng thái đơn
+    // Pie chart
     private final long completedOrders;
     private final long cancelledOrders;
     private final long inProgressOrders;
 
-    // Top xe & khu vực
+    // Chart data — dùng chung labels cho cả 2 chart
+    private final List<String> chartLabels;
+    private final List<Long> orderCountData;
+    private final List<BigDecimal> revenueData;
+
+    // Row 4 — Top lists
     private final List<TopCarItem> topCars;
     private final List<TopRegionItem> topRegions;
 
