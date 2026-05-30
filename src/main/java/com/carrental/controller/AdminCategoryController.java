@@ -5,8 +5,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/admin/categories")
@@ -77,9 +85,15 @@ public class AdminCategoryController {
     }
 
     @PostMapping("/brands/add")
-    public String addBrand(@RequestParam String name, RedirectAttributes ra) {
+    public String addBrand(@RequestParam String name,
+                           @RequestParam(value = "logo", required = false) MultipartFile logoFile,
+                           RedirectAttributes ra) {
         try {
-            adminCategoryService.addBrand(name);
+            String logoUrl = saveLogoFile(logoFile);
+            
+            // Lưu ý: Bạn cần mở file AdminCategoryService ra và thêm tham số logoUrl vào method này
+            adminCategoryService.addBrand(name, logoUrl);
+            
             ra.addFlashAttribute("successMessage",
                     "Đã thêm hãng xe \"" + name + "\" thành công");
         } catch (Exception e) {
@@ -92,9 +106,14 @@ public class AdminCategoryController {
     public String editBrand(@PathVariable Long id,
                             @RequestParam String name,
                             @RequestParam String status,
+                            @RequestParam(value = "logo", required = false) MultipartFile logoFile,
                             RedirectAttributes ra) {
         try {
-            adminCategoryService.editBrand(id, name, status);
+            String logoUrl = saveLogoFile(logoFile);
+            
+            // Lưu ý: Bạn cần mở file AdminCategoryService ra và thêm tham số logoUrl vào method này
+            adminCategoryService.editBrand(id, name, status, logoUrl);
+            
             ra.addFlashAttribute("successMessage", "Đã cập nhật hãng xe thành công");
         } catch (Exception e) {
             ra.addFlashAttribute("errorMessage", e.getMessage());
@@ -158,5 +177,27 @@ public class AdminCategoryController {
             ra.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/admin/categories/regions";
+    }
+
+    // ── Helper: Lưu file ảnh ─────────────────────────────────────
+    
+    private String saveLogoFile(MultipartFile logoFile) throws Exception {
+        if (logoFile != null && !logoFile.isEmpty()) {
+            String originalFilename = StringUtils.cleanPath(logoFile.getOriginalFilename());
+            String newFilename = UUID.randomUUID().toString() + "-" + originalFilename;
+
+            String uploadDir = "uploads/brands/";
+            Path uploadPath = Paths.get(uploadDir);
+
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            Path filePath = uploadPath.resolve(newFilename);
+            Files.copy(logoFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            return newFilename;
+        }
+        return null;
     }
 }

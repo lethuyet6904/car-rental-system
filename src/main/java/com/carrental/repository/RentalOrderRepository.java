@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,7 +62,7 @@ public interface RentalOrderRepository extends JpaRepository<RentalOrder, Long> 
     @EntityGraph(attributePaths = {"car", "car.brand"})
     List<RentalOrder> findByCustomerUserIdOrderByCreatedAtDesc(Long userId);
 
- // Admin filter
+    // Admin filter
     @Query(value = """
             SELECT o FROM RentalOrder o
             JOIN FETCH o.customer
@@ -101,12 +102,81 @@ public interface RentalOrderRepository extends JpaRepository<RentalOrder, Long> 
             """)
     Optional<RentalOrder> findWithDetailsById(@Param("id") Long id);
     
- // Top 5 xe được thuê nhiều nhất
+    // Doanh thu theo ngày
+    @Query(value = """
+            SELECT CONVERT(varchar(10), o.createdAt, 120) AS dateLabel,
+                   SUM(o.totalAmount) AS revenue
+            FROM RentalOrder o
+            WHERE o.status = 'Completed'
+              AND o.createdAt >= :fromDate
+            GROUP BY CONVERT(varchar(10), o.createdAt, 120)
+            ORDER BY dateLabel
+            """, nativeQuery = true)
+    List<Object[]> findRevenueByDate(@Param("fromDate") LocalDateTime fromDate);
+
+    // Số đơn theo ngày
+    @Query(value = """
+            SELECT CONVERT(varchar(10), o.createdAt, 120) AS dateLabel,
+                   COUNT(o.orderId) AS orderCount
+            FROM RentalOrder o
+            WHERE o.createdAt >= :fromDate
+            GROUP BY CONVERT(varchar(10), o.createdAt, 120)
+            ORDER BY dateLabel
+            """, nativeQuery = true)
+    List<Object[]> findOrderCountByDate(@Param("fromDate") LocalDateTime fromDate);
+    
+    @Query("SELECT COUNT(o) FROM RentalOrder o WHERE o.status = :status AND o.createdAt >= :fromDate")
+    long countByStatusAndFromDate(@Param("status") OrderStatus status,
+                                   @Param("fromDate") LocalDateTime fromDate);
+    
+    // Group theo năm (dùng cho "Tất cả")
+    @Query(value = """
+            SELECT CAST(YEAR(o.createdAt) AS varchar) AS dateLabel,
+                   SUM(o.totalAmount) AS revenue
+            FROM RentalOrder o
+            WHERE o.status = 'Completed'
+            GROUP BY YEAR(o.createdAt)
+            ORDER BY dateLabel
+            """, nativeQuery = true)
+    List<Object[]> findRevenueByYear();
+
+    // Group theo tháng trong 1 năm (dùng cho "Năm này")
+    @Query(value = """
+            SELECT CONVERT(varchar(7), o.createdAt, 120) AS dateLabel,
+                   SUM(o.totalAmount) AS revenue
+            FROM RentalOrder o
+            WHERE o.status = 'Completed'
+              AND YEAR(o.createdAt) = YEAR(GETDATE())
+            GROUP BY CONVERT(varchar(7), o.createdAt, 120)
+            ORDER BY dateLabel
+            """, nativeQuery = true)
+    List<Object[]> findRevenueByMonthThisYear();
+
+    @Query(value = """
+            SELECT CAST(YEAR(o.createdAt) AS varchar) AS dateLabel,
+                   COUNT(o.orderId) AS orderCount
+            FROM RentalOrder o
+            GROUP BY YEAR(o.createdAt)
+            ORDER BY dateLabel
+            """, nativeQuery = true)
+    List<Object[]> findOrderCountByYear();
+
+    @Query(value = """
+            SELECT CONVERT(varchar(7), o.createdAt, 120) AS dateLabel,
+                   COUNT(o.orderId) AS orderCount
+            FROM RentalOrder o
+            WHERE YEAR(o.createdAt) = YEAR(GETDATE())
+            GROUP BY CONVERT(varchar(7), o.createdAt, 120)
+            ORDER BY dateLabel
+            """, nativeQuery = true)
+    List<Object[]> findOrderCountByMonthThisYear();
+    
+    // Top 5 xe
     @Query("""
-            SELECT c.modelName, c.licensePlate, COUNT(o.orderId) as orderCount
+            SELECT c.modelName, c.licensePlate, COUNT(o.orderId)
             FROM RentalOrder o
             JOIN o.car c
-            WHERE o.status = 'Completed'
+            WHERE o.status = com.carrental.enums.OrderStatus.Completed
             GROUP BY c.carId, c.modelName, c.licensePlate
             ORDER BY COUNT(o.orderId) DESC
             """)
@@ -114,10 +184,10 @@ public interface RentalOrderRepository extends JpaRepository<RentalOrder, Long> 
 
     // Top 5 khu vực
     @Query("""
-            SELECT c.region.regionName, COUNT(o.orderId) as orderCount
+            SELECT c.region.regionName, COUNT(o.orderId)
             FROM RentalOrder o
             JOIN o.car c
-            WHERE o.status = 'Completed'
+            WHERE o.status = com.carrental.enums.OrderStatus.Completed
             GROUP BY c.region.regionId, c.region.regionName
             ORDER BY COUNT(o.orderId) DESC
             """)

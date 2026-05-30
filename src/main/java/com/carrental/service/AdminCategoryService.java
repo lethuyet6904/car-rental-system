@@ -15,8 +15,8 @@ public interface AdminCategoryService {
 
     // Brand
     List<AdminBrandResponse> getBrandList(String keyword);
-    void addBrand(String name);
-    void editBrand(Long id, String name, String status);
+    void addBrand(String name, String logoUrl);
+    void editBrand(Long id, String name, String status, String logoUrl);
     void deleteBrand(Long id);
 
     // Region
