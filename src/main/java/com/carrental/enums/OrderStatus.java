@@ -1,11 +1,11 @@
 package com.carrental.enums;
 
 public enum OrderStatus {
-	 PENDING_PAYMENT,  // Chờ thanh toán cọc (mới thêm)
-	Pending,      // Khách vừa đặt, chờ Owner xác nhận
-    Confirmed,    // Owner đã xác nhận
-    InProgress,   // Đang thuê (đã nhận xe)
-    Completed,    // Đã trả xe xong
-    Cancelled,    // Khách hoặc Owner hủy
-    Rejected      // Owner từ chối
+    Pending, // Chờ khách thanh toán cọc
+    PendingApproval, // Đã cọc, chờ Owner duyệt
+    Confirmed, // Owner đã duyệt, chờ giao xe
+    InProgress, // Owner đã bấm "Đã giao xe"
+    Completed, // Khách trả xe + thanh toán nốt
+    Cancelled, // Đã hủy (có hoặc không hoàn cọc)
+    Rejected // Owner từ chối (hoàn 100% cọc)
 }

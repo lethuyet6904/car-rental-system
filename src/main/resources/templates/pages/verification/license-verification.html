@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head('Bổ sung Giấy phép lái xe', ~{::link})}">
+    <link rel="stylesheet" th:href="@{/assets/css/verification.css}" />
+</head>
+
+<body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="ct-verification-page">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-6 col-lg-7 col-md-9">
+
+                    <!-- Steps -->
+                    <div
+                        style="display:flex;align-items:center;gap:0;margin-bottom:24px;background:var(--ct-white);border-radius:var(--r-lg);padding:14px 20px;box-shadow:var(--shadow-sm);border:1px solid var(--ct-gray-200)">
+                        <div style="display:flex;align-items:center;gap:8px;flex:1">
+                            <div
+                                style="width:28px;height:28px;border-radius:50%;background:#16a34a;color:white;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0">
+                                <i class="fa-solid fa-check" style="font-size:.7rem"></i>
+                            </div>
+                            <div>
+                                <div style="font-size:.8rem;font-weight:700;color:#16a34a">CCCD đã xác minh</div>
+                                <div style="font-size:.72rem;color:var(--ct-text-muted)">Hoàn thành</div>
+                            </div>
+                        </div>
+                        <div style="flex:0 0 40px;height:2px;background:var(--ct-primary)"></div>
+                        <div style="display:flex;align-items:center;gap:8px;flex:1">
+                            <div
+                                style="width:28px;height:28px;border-radius:50%;background:var(--ct-primary);color:white;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0">
+                                2</div>
+                            <div>
+                                <div style="font-size:.8rem;font-weight:700;color:var(--ct-primary-hover)">Bổ sung GPLX
+                                </div>
+                                <div style="font-size:.72rem;color:var(--ct-text-muted)">Bước hiện tại</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ct-verif-card">
+                        <div class="ct-verif-card__header">
+                            <div class="ct-verif-badge-top">
+                                <i class="fa-solid fa-car"></i> Bước 2 / 2
+                            </div>
+                            <h2 class="ct-verif-title">Bổ Sung Giấy Phép Lái Xe</h2>
+                            <p class="ct-verif-subtitle">
+                                CCCD của bạn đã được xác minh. Bổ sung GPLX để có thể thuê xe trên Carto.
+                            </p>
+                        </div>
+
+                        <div class="ct-verif-card__body">
+
+                            <!-- Flash alerts -->
+                            <div th:if="${success}" class="ct-state-card success" style="margin-bottom:20px">
+                                <div class="ct-state-icon"><i class="fa-solid fa-circle-check"></i></div>
+                                <div>
+                                    <p class="ct-state-title">Cập nhật thành công!</p>
+                                    <p class="ct-state-desc" th:text="${success}"></p>
+                                </div>
+                            </div>
+                            <div th:if="${error}" class="ct-state-card rejected" style="margin-bottom:20px">
+                                <div class="ct-state-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+                                <div>
+                                    <p class="ct-state-title">Có lỗi xảy ra</p>
+                                    <p class="ct-state-desc" th:text="${error}"></p>
+                                </div>
+                            </div>
+
+                            <!-- CCCD summary box -->
+                            <div
+                                style="background:rgba(95,207,134,.06);border:1px solid rgba(95,207,134,.25);border-radius:var(--r-lg);padding:14px 18px;margin-bottom:24px;display:flex;align-items:center;gap:12px">
+                                <div
+                                    style="width:36px;height:36px;border-radius:50%;background:rgba(95,207,134,.15);color:#16a34a;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                                    <i class="fa-solid fa-id-card" style="font-size:.9rem"></i>
+                                </div>
+                                <div>
+                                    <div style="font-size:.82rem;font-weight:700;color:#16a34a">CCCD đã được xác minh
+                                    </div>
+                                    <div style="font-size:.8rem;color:var(--ct-text-muted)">
+                                        Số CCCD: <strong
+                                            th:text="${identity != null ? identity.nationalId : '—'}"></strong>
+                                        · <span th:text="${user != null ? user.fullName : ''}"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Đã có GPLX -->
+                            <div th:if="${alreadyHasLicense}">
+                                <div class="ct-state-card success">
+                                    <div class="ct-state-icon"><i class="fa-solid fa-circle-check"></i></div>
+                                    <div>
+                                        <p class="ct-state-title">Đã có GPLX trong hồ sơ</p>
+                                        <p class="ct-state-desc">
+                                            Số GPLX: <strong
+                                                th:text="${identity != null ? identity.licenseNumber : ''}"></strong><br>
+                                            Hồ sơ của bạn đã đầy đủ. Bạn có thể thuê xe ngay bây giờ.
+                                        </p>
+                                    </div>
+                                </div>
+                                <a th:href="@{/}" class="ct-btn-submit mt-3" style="text-decoration:none;display:flex">
+                                    <i class="fa-solid fa-magnifying-glass"></i> Tìm xe ngay
+                                </a>
+                                <a th:href="@{/customer/profile}" class="ct-link-back">
+                                    <i class="fa-solid fa-arrow-left me-1"></i> Quay lại hồ sơ cá nhân
+                                </a>
+                            </div>
+
+                            <!-- Form bổ sung GPLX -->
+                            <div th:if="${alreadyHasLicense == null or !alreadyHasLicense}">
+                                <form th:action="@{/verification/license}" method="post" enctype="multipart/form-data">
+
+                                    <div class="mb-3">
+                                        <label class="ct-form-label">Số giấy phép lái xe <span
+                                                style="color:var(--ct-danger)">*</span></label>
+                                        <input type="text" name="licenseNumber" class="ct-form-input"
+                                            placeholder="Ví dụ: B2-2023-112233" />
+                                        <p class="ct-form-hint">6–20 ký tự chữ và số, có thể có dấu gạch ngang</p>
+                                    </div>
+
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6">
+                                            <label class="ct-upload-label">Ảnh GPLX mặt trước <span
+                                                    style="color:var(--ct-danger)">*</span></label>
+                                            <div class="ct-upload-area" id="frontArea"
+                                                onclick="document.getElementById('frontInput').click()">
+                                                <input type="file" id="frontInput" name="frontImage" accept="image/*"
+                                                    style="display:none"
+                                                    onchange="previewImage(this,'frontArea','frontPreview')">
+                                                <img class="ct-upload-preview" id="frontPreview" alt="" />
+                                                <div class="ct-upload-placeholder">
+                                                    <i class="fa-solid fa-camera"></i>
+                                                    <p>Nhấn để chọn ảnh<br><small style="font-size:.72rem">JPG/PNG · tối
+                                                            đa 5MB</small></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="ct-upload-label">Ảnh GPLX mặt sau <span
+                                                    style="color:var(--ct-danger)">*</span></label>
+                                            <div class="ct-upload-area" id="backArea"
+                                                onclick="document.getElementById('backInput').click()">
+                                                <input type="file" id="backInput" name="backImage" accept="image/*"
+                                                    style="display:none"
+                                                    onchange="previewImage(this,'backArea','backPreview')">
+                                                <img class="ct-upload-preview" id="backPreview" alt="" />
+                                                <div class="ct-upload-placeholder">
+                                                    <i class="fa-solid fa-camera"></i>
+                                                    <p>Nhấn để chọn ảnh<br><small style="font-size:.72rem">JPG/PNG · tối
+                                                            đa 5MB</small></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="ct-info-note">
+                                        <i class="fa-solid fa-circle-info mt-1"></i>
+                                        <span>GPLX được lưu trực tiếp vào hồ sơ của bạn (không cần Admin duyệt lại). Bạn
+                                            có thể thuê xe ngay sau khi bổ sung.</span>
+                                    </div>
+
+                                    <button type="submit" class="ct-btn-submit">
+                                        <i class="fa-solid fa-floppy-disk"></i> Lưu GPLX
+                                    </button>
+                                </form>
+
+                                <a th:href="@{/customer/profile}" class="ct-link-back">
+                                    <i class="fa-solid fa-arrow-left me-1"></i> Bổ sung sau
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function previewImage(input, areaId, previewId) {
+            const file = input.files[0];
+            if (!file) return;
+            if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) { alert('Chỉ chấp nhận JPG/PNG'); input.value = ''; return; }
+            if (file.size > 5 * 1024 * 1024) { alert('File không được vượt quá 5MB'); input.value = ''; return; }
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById(previewId).src = e.target.result;
+                document.getElementById(areaId).classList.add('has-file');
+            };
+            reader.readAsDataURL(file);
+        }
+    </script>
+</body>
+
+</html>

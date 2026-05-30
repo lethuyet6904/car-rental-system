@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head('Thanh toán thành công - Carto', ~{::link})}">
+    <link rel="stylesheet" th:href="@{/assets/css/global.css}" />
+</head>
+
+<body class="bg-light">
+
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="container py-5" style="padding-top: 100px !important;">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8 text-center">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white p-5">
+                    <div class="mb-4">
+                        <i class="fa-solid fa-circle-check text-success" style="font-size: 80px;"></i>
+                    </div>
+                    <h2 class="h3 fw-bold text-dark mb-3" style="font-family: 'Outfit', sans-serif;">Đặt cọc thành công!</h2>
+                    <p class="text-secondary mb-4">
+                        Đơn hàng <strong>#<span th:text="${orderId}"></span></strong> của bạn đã được thanh toán cọc thành công.<br>
+                        Vui lòng chờ chủ xe xác nhận để hoàn tất quá trình thuê.
+                    </p>
+                    
+                    <div class="alert alert-info border-0 rounded-3 mb-4 text-start">
+                        <i class="fa-solid fa-circle-info me-2"></i><strong>Lưu ý:</strong>
+                        <ul class="mb-0 small mt-2">
+                            <li>Bạn có thể theo dõi trạng thái đơn hàng trong phần "Đơn hàng của tôi".</li>
+                            <li>Nếu chủ xe từ chối, bạn sẽ được hoàn lại 100% số tiền cọc.</li>
+                        </ul>
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-3">
+                        <a th:href="@{/booking/order/{id}(id=${orderId})}" class="btn btn-outline-dark rounded-3 px-4 py-2 fw-medium">
+                            <i class="fa-solid fa-file-invoice me-1"></i> Xem chi tiết đơn
+                        </a>
+                        <a th:href="@{/booking/my-orders}" class="btn btn-primary rounded-3 px-4 py-2 fw-semibold shadow-sm">
+                            <i class="fa-solid fa-list me-1"></i> Quản lý đơn hàng
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

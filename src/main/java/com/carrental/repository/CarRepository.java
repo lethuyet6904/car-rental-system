@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CarRepository extends JpaRepository<Car, Long> {
+public interface CarRepository extends JpaRepository<Car, Long>, JpaSpecificationExecutor<Car> {
 
   @EntityGraph(attributePaths = { "brand", "carType", "region", "owner" })
   @Query("""
@@ -25,6 +26,7 @@ public interface CarRepository extends JpaRepository<Car, Long> {
         AND (:regionId IS NULL OR c.region.regionId = :regionId)
         AND (:fuel IS NULL OR c.fuel = :fuel)
         AND (:transmission IS NULL OR c.transmission = :transmission)
+        AND (:seats IS NULL OR c.seats = :seats)
       """)
   Page<Car> searchCars(
       @Param("status") CarStatus status,
@@ -32,6 +34,7 @@ public interface CarRepository extends JpaRepository<Car, Long> {
       @Param("regionId") Long regionId,
       @Param("fuel") com.carrental.enums.FuelType fuel,
       @Param("transmission") com.carrental.enums.TransmissionType transmission,
+      @Param("seats") Integer seats,
       Pageable pageable);
 
   // METHOD QUAN TRỌNG: Lấy xe kèm đầy đủ thông tin brand, carType, region, owner

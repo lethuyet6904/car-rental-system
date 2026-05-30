@@ -18,6 +18,11 @@ public class AdminOwnerRequestDetailResponse {
     private final VerificationStatus status;
     private final String rejectReason;
 
+    // Thông tin ngân hàng
+    private final String bankName;
+    private final String bankAccount;
+    private final String accountHolder;
+
     // Từ IdentityVerification (nullable — user có thể chưa xác minh)
     private final String nationalId;
     private final String nationalIdFrontImage;
@@ -33,6 +38,9 @@ public class AdminOwnerRequestDetailResponse {
         this.reviewedAt     = r.getReviewedAt();
         this.status         = r.getStatus();
         this.rejectReason   = r.getRejectReason();
+        this.bankName       = r.getBankName();
+        this.bankAccount    = r.getBankAccount();
+        this.accountHolder  = r.getAccountHolder();
 
         if (identity != null) {
             this.nationalId            = identity.getNationalId();

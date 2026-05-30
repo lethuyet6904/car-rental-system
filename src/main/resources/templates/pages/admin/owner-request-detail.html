@@ -76,7 +76,7 @@
         </div>
         <div class="detail-row">
           <span class="detail-label">Số CCCD</span>
-          <span class="detail-value" th:text="${request.nationalId}"></span>
+          <span class="detail-value" th:text="${request.nationalId != null ? request.nationalId : '—'}"></span>
         </div>
 
         <div style="font-size:12px;color:#6b7280;margin:12px 0 6px">Ảnh CCCD</div>
@@ -107,6 +107,26 @@
               Mặt sau
             </div>
           </div>
+        </div>
+
+        <!-- Thông tin ngân hàng -->
+        <div style="font-weight:600;font-size:12px;margin:16px 0 8px;color:#374151">
+          Thông tin ngân hàng
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Tên ngân hàng</span>
+          <span class="detail-value"
+                th:text="${request.bankName != null ? request.bankName : '—'}"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Số tài khoản</span>
+          <span class="detail-value"
+                th:text="${request.bankAccount != null ? request.bankAccount : '—'}"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Chủ tài khoản</span>
+          <span class="detail-value"
+                th:text="${request.accountHolder != null ? request.accountHolder : '—'}"></span>
         </div>
 
         <!-- Action buttons — chỉ hiện khi Pending -->

@@ -174,14 +174,14 @@
     color: #475569;
 }
 
-/* Booking Card */
+/* =============================================
+   BOOKING CARD — gộp 2 block thành 1, đúng sticky
+   ============================================= */
 .cd-booking-card {
     background: white;
     border: 1px solid #E2E8F0;
     border-radius: 16px;
     padding: 24px;
-    position: sticky;
-    top: 20px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
@@ -209,31 +209,33 @@
     font-weight: 500;
 }
 
+/* Date picker */
 .cd-date-picker {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
     border: 1px solid #E2E8F0;
     border-radius: 8px;
     margin-bottom: 20px;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+}
+
+.cd-date-picker:hover {
+    border-color: #10B981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
 .cd-date-item {
+    flex: 1;
     padding: 12px;
 }
 
-.cd-date-item:first-child {
-    border-right: 1px solid #E2E8F0;
-}
-
 .cd-date-label {
-    font-size: 12px;
+    font-size: 11px;
+    font-weight: 700;
     color: #64748B;
     margin-bottom: 4px;
-}
-
-.cd-date-value {
-    font-weight: 600;
-    font-size: 14px;
+    letter-spacing: 0.05em;
 }
 
 .cd-location-picker {
@@ -344,9 +346,143 @@ input[type="radio"].cd-radio {
     font-weight: 600;
     font-size: 16px;
     margin-top: 20px;
+    cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .cd-btn-book:hover {
     background: #059669;
+}
+
+/* =============================================
+   OWNER CARD
+   ============================================= */
+.cd-owner-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 8px;
+}
+
+.cd-owner-info {
+    flex: 1;
+}
+
+.cd-owner-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 6px;
+}
+
+.cd-owner-meta {
+    font-size: 13px;
+    color: #64748B;
+}
+
+/* =============================================
+   REVIEWS
+   ============================================= */
+.cd-reviews-summary {
+    font-size: 15px;
+    color: #0F172A;
+}
+
+.cd-review-item {
+    padding: 20px 0;
+    border-bottom: 1px solid #F1F5F9;
+}
+
+.cd-review-item:last-child {
+    border-bottom: none;
+}
+
+.cd-review-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.cd-review-meta {
+    flex: 1;
+}
+
+.cd-review-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #0F172A;
+}
+
+.cd-review-date {
+    font-size: 12px;
+    color: #94A3B8;
+    margin-top: 2px;
+}
+
+.cd-review-stars i {
+    font-size: 13px;
+}
+
+.cd-review-comment {
+    font-size: 14px;
+    color: #475569;
+    line-height: 1.6;
+    padding-left: 54px;
+}
+
+.cd-no-reviews {
+    text-align: center;
+    padding: 40px 0;
+    color: #94A3B8;
+}
+
+.cd-no-reviews i {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.cd-no-reviews p {
+    font-size: 14px;
+    margin: 0;
+}
+
+/* =============================================
+   RESPONSIVE — Car Detail
+   ============================================= */
+@media (max-width: 767.98px) {
+    .cd-gallery {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        height: auto;
+    }
+
+    .cd-gallery-main {
+        grid-row: auto;
+    }
+
+    .cd-specs {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cd-features-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cd-booking-card {
+        position: static;
+        margin-top: 30px;
+    }
+}
+
+@media (min-width: 768px) {
+    .cd-booking-card {
+        position: sticky;
+        top: 90px;
+    }
 }

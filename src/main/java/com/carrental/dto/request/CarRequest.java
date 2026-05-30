@@ -65,6 +65,11 @@ public class CarRequest {
 
     private List<MultipartFile> images;
 
+    // Giấy tờ xe
+    private MultipartFile registrationImage;   // Cà vẹt
+    private MultipartFile inspectionImage;     // Đăng kiểm
+    private MultipartFile insuranceImage;      // Bảo hiểm vật chất
+
     public static CarRequest from(Car car) {
         CarRequest request = new CarRequest();
         request.setCarId(car.getCarId());

@@ -157,7 +157,8 @@
                                 <td class="text-muted" th:text="${order.createdAt != null ? #temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm') : 'N/A'}"></td>
                                 <td class="fw-bold text-dark" th:text="${order.totalAmount != null ? #numbers.formatInteger(order.totalAmount, 0, 'COMMA') + 'đ' : '0đ'}"></td>
                                 <td>
-                                    <span th:if="${order.status?.name() == 'Pending'}" class="badge rounded-pill bg-warning bg-opacity-10 text-warning px-3 py-2 fw-semibold">Chờ xác nhận</span>
+                                    <span th:if="${order.status?.name() == 'Pending'}" class="badge rounded-pill bg-warning bg-opacity-10 text-warning px-3 py-2 fw-semibold">Chờ thanh toán cọc</span>
+                                    <span th:if="${order.status?.name() == 'PendingApproval'}" class="badge rounded-pill bg-warning bg-opacity-10 text-warning px-3 py-2 fw-semibold">Chờ xác nhận</span>
                                     <span th:if="${order.status?.name() == 'Confirmed'}" class="badge rounded-pill bg-info bg-opacity-10 text-info px-3 py-2 fw-semibold">Đã xác nhận</span>
                                     <span th:if="${order.status?.name() == 'InProgress'}" class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3 py-2 fw-semibold">Đang thuê</span>
                                     <span th:if="${order.status?.name() == 'Completed'}" class="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2 fw-semibold">Hoàn thành</span>

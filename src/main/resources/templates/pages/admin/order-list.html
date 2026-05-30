@@ -76,7 +76,7 @@
                   th:text="${orders.number * 10 + iter.index + 1}"></td>
               <td>
                 <div th:if="${o.firstImageUrl != null}">
-                  <img th:src="@{'/assets/images/cars/' + ${o.firstImageUrl}}"
+                  <img th:src="${o.firstImageUrl.startsWith('/') ? o.firstImageUrl : '/assets/images/cars/' + o.firstImageUrl}"
                        style="width:48px;height:34px;object-fit:cover;
                               border-radius:5px;border:1px solid #e5e7eb"
                        alt="ảnh xe"/>

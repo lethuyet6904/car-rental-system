@@ -42,9 +42,7 @@ public class AdminOwnerRequestServiceImpl implements AdminOwnerRequestService {
     @Override
     public AdminOwnerRequestDetailResponse getRequestDetail(Long registrationId) {
         OwnerRegistration reg = findRegOrThrow(registrationId);
-        IdentityVerification identity = identityVerificationRepository
-                .findTopByUserUserIdOrderBySubmittedAtDesc(reg.getUser().getUserId())
-                .orElse(null);
+        IdentityVerification identity = reg.getIdentityVerification();
         return AdminOwnerRequestDetailResponse.from(reg, identity);
     }
 

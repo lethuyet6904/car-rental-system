@@ -2,6 +2,7 @@ package com.carrental.service.impl;
 
 import com.carrental.dto.request.OwnerRegistrationRequest;
 import com.carrental.dto.request.RegisterRequest;
+import com.carrental.entity.IdentityVerification;
 import com.carrental.entity.OwnerRegistration;
 import com.carrental.entity.RentalOrder;
 import com.carrental.entity.User;
@@ -12,6 +13,7 @@ import com.carrental.repository.IdentityVerificationRepository;
 import com.carrental.repository.OwnerRegistrationRepository;
 import com.carrental.repository.RentalOrderRepository;
 import com.carrental.repository.UserRepository;
+import com.carrental.service.IdentityVerificationService;
 import com.carrental.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class UserServiceImpl implements UserService {
     private final IdentityVerificationRepository identityVerificationRepository;
     private final RentalOrderRepository          rentalOrderRepository;
     private final PasswordEncoder                passwordEncoder;
+    private final IdentityVerificationService    identityVerificationService;
 
     // ====================== ĐĂNG KÝ ======================
     @Override
@@ -74,6 +77,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void applyForOwner(Long userId, OwnerRegistrationRequest req) {
+        if (!identityVerificationService.isCccdApproved(userId)) {
+            throw new RuntimeException("Bạn cần xác minh CCCD trước khi đăng ký làm chủ xe");
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
 
@@ -91,9 +98,20 @@ public class UserServiceImpl implements UserService {
         // Flow đúng: user phải xác minh danh tính qua /verification/identity trước,
         // sau đó mới được phép truy cập trang đăng ký chủ xe.
         // OwnerController.submitOwnerRegistration() đã kiểm tra isIdentityVerified() rồi.
+        IdentityVerification currentVerification = identityVerificationRepository
+                .findTopByUserUserIdOrderBySubmittedAtDesc(userId)
+                .orElse(null);
+                
+        if (currentVerification == null || !com.carrental.enums.VerificationStatus.Approved.equals(currentVerification.getStatus())) {
+            throw new RuntimeException("Bạn cần hoàn tất xác minh danh tính (CCCD đã được duyệt) trước khi đăng ký chủ xe.");
+        }
 
         OwnerRegistration reg = new OwnerRegistration();
         reg.setUser(user);
+        reg.setIdentityVerification(currentVerification);
+        reg.setBankName(req.getBankName().trim());
+        reg.setBankAccount(req.getBankAccount().trim());
+        reg.setAccountHolder(req.getAccountHolder().trim());
         ownerRegistrationRepository.save(reg);
     }
 

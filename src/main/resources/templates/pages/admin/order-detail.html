@@ -1,343 +1,338 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
 <head th:replace="~{fragments/admin-layout :: adminHead('Chi tiết đơn thuê')}"></head>
+
 <body>
-<div class="admin-wrapper">
+  <div class="admin-wrapper">
 
-  <th:block th:replace="~{fragments/admin-layout :: sidebar('orders')}"></th:block>
+    <th:block th:replace="~{fragments/admin-layout :: sidebar('orders')}"></th:block>
 
-  <div class="admin-body">
-    <th:block th:replace="~{fragments/admin-layout :: topbar(
+    <div class="admin-body">
+      <th:block
+        th:replace="~{fragments/admin-layout :: topbar(
         'Chi tiết đơn thuê',
         'Admin / <a href=&quot;/admin/orders&quot; style=&quot;color:#7F77DD;text-decoration:none&quot;>Đơn thuê</a> / <span>Chi tiết</span>')}">
-    </th:block>
+      </th:block>
 
-    <div class="admin-content">
+      <div class="admin-content">
 
-      <div style="margin-bottom:16px">
-        <a th:href="@{/admin/orders}"
-           style="font-size:13px;color:#6b7280;text-decoration:none">
-          <i class="bi bi-arrow-left"></i> Quay lại danh sách
-        </a>
-      </div>
+        <div style="margin-bottom:16px">
+          <a th:href="@{/admin/orders}" style="font-size:13px;color:#6b7280;text-decoration:none">
+            <i class="bi bi-arrow-left"></i> Quay lại danh sách
+          </a>
+        </div>
 
-      <!-- Tiêu đề + mã đơn -->
-      <div style="text-align:center;font-weight:700;font-size:13px;
+        <!-- Tiêu đề + mã đơn -->
+        <div style="text-align:center;font-weight:700;font-size:13px;
                   letter-spacing:.05em;margin-bottom:20px;color:#374151">
-        CHI TIẾT ĐƠN THUÊ
-        <div style="font-family:monospace;font-size:12px;color:#7F77DD;
-                    font-weight:400;margin-top:4px"
-             th:text="${'#' + order.orderId}"></div>
-      </div>
+          CHI TIẾT ĐƠN THUÊ
+          <div style="font-family:monospace;font-size:12px;color:#7F77DD;
+                    font-weight:400;margin-top:4px" th:text="${'#' + order.orderId}"></div>
+        </div>
 
-      <!-- Grid 2 cột trên -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <!-- Grid 2 cột trên -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
 
-        <!-- Thông tin đơn thuê -->
-        <div class="admin-card">
-          <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:#374151">
-            Thông tin đơn thuê
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Mã đơn</span>
-            <span class="detail-value" style="font-family:monospace"
-                  th:text="${'#' + order.orderId}"></span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Ngày đặt</span>
-            <span class="detail-value"
-                  th:text="${#temporals.format(order.createdAt,'dd/MM/yyyy HH:mm')}"></span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Thời gian thuê</span>
-            <span class="detail-value"
-                  th:text="${#temporals.format(order.pickupDate,'dd/MM/yyyy') +
+          <!-- Thông tin đơn thuê -->
+          <div class="admin-card">
+            <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:#374151">
+              Thông tin đơn thuê
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Mã đơn</span>
+              <span class="detail-value" style="font-family:monospace" th:text="${'#' + order.orderId}"></span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Ngày đặt</span>
+              <span class="detail-value" th:text="${#temporals.format(order.createdAt,'dd/MM/yyyy HH:mm')}"></span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Thời gian thuê</span>
+              <span class="detail-value" th:text="${#temporals.format(order.pickupDate,'dd/MM/yyyy') +
                              ' → ' +
                              #temporals.format(order.returnDate,'dd/MM/yyyy')}"></span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Giờ nhận xe</span>
-            <span class="detail-value"
-                  th:text="${#temporals.format(order.pickupTime,'HH:mm')}"></span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Giờ trả xe</span>
-            <span class="detail-value"
-                  th:text="${#temporals.format(order.returnTime,'HH:mm')}"></span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Số ngày thuê</span>
-            <span class="detail-value"
-                  th:text="${order.totalDays + ' ngày'}"></span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Hình thức nhận xe</span>
-            <span class="detail-value"
-                  th:text="${order.pickupMethod.name() == 'SelfPickup' ?
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Giờ nhận xe</span>
+              <span class="detail-value" th:text="${#temporals.format(order.pickupTime,'HH:mm')}"></span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Giờ trả xe</span>
+              <span class="detail-value" th:text="${#temporals.format(order.returnTime,'HH:mm')}"></span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Số ngày thuê</span>
+              <span class="detail-value" th:text="${order.totalDays + ' ngày'}"></span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Hình thức nhận xe</span>
+              <span class="detail-value" th:text="${order.pickupMethod.name() == 'SelfPickup' ?
                              'Tự đến lấy' : 'Chủ xe giao đến'}"></span>
-          </div>
-          <div class="detail-row"
-               th:if="${order.pickupMethod.name() == 'Delivery' and order.deliveryAddress != null}">
-            <span class="detail-label">Địa chỉ nhận xe</span>
-            <span class="detail-value" th:text="${order.deliveryAddress}"></span>
-          </div>
-          <div class="detail-row" th:if="${order.note != null}">
-            <span class="detail-label">Ghi chú cho chủ xe</span>
-            <span class="detail-value" th:text="${order.note}"></span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Trạng thái</span>
-            <span class="detail-value">
-              <span th:class="${order.status.name() == 'Completed'  ? 'badge-approved' :
+            </div>
+            <div class="detail-row"
+              th:if="${order.pickupMethod.name() == 'Delivery' and order.deliveryAddress != null}">
+              <span class="detail-label">Địa chỉ nhận xe</span>
+              <span class="detail-value" th:text="${order.deliveryAddress}"></span>
+            </div>
+            <div class="detail-row" th:if="${order.note != null}">
+              <span class="detail-label">Ghi chú cho chủ xe</span>
+              <span class="detail-value" th:text="${order.note}"></span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Trạng thái</span>
+              <span class="detail-value">
+                <span th:class="${order.status.name() == 'Completed'  ? 'badge-approved' :
                                 order.status.name() == 'Cancelled'  ? 'badge-rejected' :
                                 order.status.name() == 'Rejected'   ? 'badge-rejected' :
                                 order.status.name() == 'InProgress' ? 'badge-none'     : 
-								order.status.name() == 'Confirmed'  ? 'badge-confirmed' : 'badge-pending'}"
-                    th:text="${order.status.name() == 'Pending'    ? 'Chờ xác nhận' :
+								order.status.name() == 'Confirmed'  ? 'badge-confirmed' : 'badge-pending'}" th:text="${order.status.name() == 'Pending'    ? 'Chờ xác nhận' :
                                order.status.name() == 'Confirmed'  ? 'Đã xác nhận'  :
                                order.status.name() == 'InProgress' ? 'Đang thuê'     :
                                order.status.name() == 'Completed'  ? 'Hoàn thành'   :
                                order.status.name() == 'Cancelled'  ? 'Đã hủy'       : 'Đã từ chối'}">
+                </span>
               </span>
-            </span>
-          </div>
-        </div>
-
-        <!-- Cột phải: Khách hàng + Xe & chủ xe -->
-        <div style="display:flex;flex-direction:column;gap:16px">
-
-          <!-- Thông tin khách hàng -->
-          <div class="admin-card">
-            <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:#374151">
-              Thông tin khách hàng
             </div>
-            <div style="display:flex;align-items:center;gap:12px">
-              <div style="width:40px;height:40px;border-radius:50%;background:#ede9fe;
+          </div>
+
+          <!-- Cột phải: Khách hàng + Xe & chủ xe -->
+          <div style="display:flex;flex-direction:column;gap:16px">
+
+            <!-- Thông tin khách hàng -->
+            <div class="admin-card">
+              <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:#374151">
+                Thông tin khách hàng
+              </div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="width:40px;height:40px;border-radius:50%;background:#ede9fe;
                            color:#5b21b6;display:flex;align-items:center;justify-content:center;
                            font-size:14px;font-weight:600;flex-shrink:0"
-                   th:text="${#strings.substring(order.customerName,0,1)}"></div>
-              <div>
-                <div style="font-weight:500;font-size:13px"
-                     th:text="${order.customerName}"></div>
-                <div class="text-muted-small" th:text="${order.customerPhone}"></div>
-              </div>
-              <a th:href="@{/admin/users/{id}(id=${order.customerId})}"
-                 style="margin-left:auto;font-size:12px;color:#7F77DD;
+                  th:text="${#strings.substring(order.customerName,0,1)}"></div>
+                <div>
+                  <div style="font-weight:500;font-size:13px" th:text="${order.customerName}"></div>
+                  <div class="text-muted-small" th:text="${order.customerPhone}"></div>
+                </div>
+                <a th:href="@{/admin/users/{id}(id=${order.customerId})}" style="margin-left:auto;font-size:12px;color:#7F77DD;
                         text-decoration:none;border:1px solid #7F77DD;
                         padding:3px 10px;border-radius:6px">
-                Xem hồ sơ
-              </a>
+                  Xem hồ sơ
+                </a>
+              </div>
             </div>
-          </div>
 
-          <!-- Xe và chủ xe -->
-          <div class="admin-card">
-            <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:#374151">
-              Xe và chủ xe
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Tên xe</span>
-              <span class="detail-value" style="font-weight:500"
-                    th:text="${order.carName}"></span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Biển số</span>
-              <span class="detail-value" th:text="${order.licensePlate}"></span>
-            </div>
-            <!-- Ảnh xe -->
-            <div th:if="${!#lists.isEmpty(order.carImages)}"
-                 style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0">
-              <img th:each="img : ${order.carImages}"
-                   th:src="@{'/assets/images/cars/' + ${img}}"
-                   style="width:100%;height:70px;object-fit:cover;
-                          border-radius:6px;border:1px solid #e5e7eb"
-                   alt="ảnh xe"/>
-            </div>
-            <!-- Chủ xe -->
-            <div style="display:flex;align-items:center;gap:12px;margin-top:12px;
+            <!-- Xe và chủ xe -->
+            <div class="admin-card">
+              <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:#374151">
+                Xe và chủ xe
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Tên xe</span>
+                <span class="detail-value" style="font-weight:500" th:text="${order.carName}"></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Biển số</span>
+                <span class="detail-value" th:text="${order.licensePlate}"></span>
+              </div>
+              <!-- Ảnh xe -->
+              <div th:if="${!#lists.isEmpty(order.carImages)}"
+                style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0">
+                <img th:each="img : ${order.carImages}" th:src="${img.startsWith('/') ? img : '/assets/images/cars/' + img}" style="width:100%;height:70px;object-fit:cover;
+                          border-radius:6px;border:1px solid #e5e7eb" alt="ảnh xe" />
+              </div>
+              <!-- Chủ xe -->
+              <div style="display:flex;align-items:center;gap:12px;margin-top:12px;
                         padding-top:12px;border-top:1px solid #f3f4f6">
-              <div style="width:36px;height:36px;border-radius:50%;background:#fef3c7;
+                <div style="width:36px;height:36px;border-radius:50%;background:#fef3c7;
                            color:#92400e;display:flex;align-items:center;justify-content:center;
                            font-size:13px;font-weight:600;flex-shrink:0"
-                   th:text="${#strings.substring(order.ownerName,0,1)}"></div>
-              <div>
-                <div style="font-size:12px;color:#9ca3af">Chủ xe</div>
-                <div style="font-weight:500;font-size:13px"
-                     th:text="${order.ownerName}"></div>
-                <div class="text-muted-small" th:text="${order.ownerPhone}"></div>
-              </div>
-              <a th:href="@{/admin/users/{id}(id=${order.ownerId})}"
-                 style="margin-left:auto;font-size:12px;color:#7F77DD;
+                  th:text="${#strings.substring(order.ownerName,0,1)}"></div>
+                <div>
+                  <div style="font-size:12px;color:#9ca3af">Chủ xe</div>
+                  <div style="font-weight:500;font-size:13px" th:text="${order.ownerName}"></div>
+                  <div class="text-muted-small" th:text="${order.ownerPhone}"></div>
+                </div>
+                <a th:href="@{/admin/users/{id}(id=${order.ownerId})}" style="margin-left:auto;font-size:12px;color:#7F77DD;
                         text-decoration:none;border:1px solid #7F77DD;
                         padding:3px 10px;border-radius:6px">
-                Xem hồ sơ
-              </a>
+                  Xem hồ sơ
+                </a>
+              </div>
             </div>
-          </div>
 
+          </div>
         </div>
-      </div>
 
-      <!-- Grid 2 cột dưới -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <!-- Grid 2 cột dưới -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
 
-        <!-- Thanh toán -->
-        <div class="admin-card">
-          <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:#374151">
-            Thanh toán
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Đơn giá / ngày</span>
-            <span class="detail-value"
-                  th:text="${#numbers.formatDecimal(order.pricePerDay,0,'COMMA',0,'POINT') + ' ₫'}">
-            </span>
-          </div>
-		  
-		  <div class="detail-row">
-		    <span class="detail-label">Tiền cọc (30%)</span>
-		    <span class="detail-value"
-		          th:text="${#numbers.formatDecimal(order.depositAmount,0,'COMMA',0,'POINT') + ' ₫'}"></span>
-		  </div>
-		  
-		  <div class="detail-row">
-		    <span class="detail-label">Thanh toán trực tiếp (70%)</span>
-		    <span class="detail-value"
-		          th:text="${#numbers.formatDecimal(order.remainingAmount,0,'COMMA',0,'POINT') + ' ₫'}"></span>
-		  </div>
-		  
-		  <div class="detail-row">
-		    <span class="detail-label">Tổng cộng</span>
-		    <span class="detail-value" style="font-weight:600;color:#534AB7"
-		          th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT') + ' ₫'}"></span>
-		  </div>
-		  
-          <div class="detail-row" th:if="${order.paymentMethod != null}">
-            <span class="detail-label">Phương thức</span>
-            <span class="detail-value" th:text="${order.paymentMethod.name()}"></span>
-          </div>
-		  
-		  <div class="detail-row">
-		    <span class="detail-label">Trạng thái tiền cọc</span>
-		    <span class="detail-value">
-		      <span th:if="${order.status.name() == 'Completed'}"
-		            class="badge-approved">Đã giải ngân cho chủ xe</span>
-		      <span th:if="${order.status.name() == 'Cancelled' or order.status.name() == 'Rejected'}"
-		            th:class="${order.depositPaid ? 'badge-approved' : 'badge-none'}"
-		            th:text="${order.depositPaid ? 'Đã hoàn cọc' : 'Không phát sinh'}"></span>
-		      <span th:if="${order.status.name() != 'Completed'
+          <!-- Thanh toán -->
+          <div class="admin-card">
+            <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:#374151">
+              Thanh toán
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Đơn giá / ngày</span>
+              <span class="detail-value"
+                th:text="${#numbers.formatDecimal(order.pricePerDay,0,'COMMA',0,'POINT') + ' ₫'}">
+              </span>
+            </div>
+
+            <div class="detail-row">
+              <span class="detail-label">Tiền cọc (30%)</span>
+              <span class="detail-value"
+                th:text="${#numbers.formatDecimal(order.depositAmount,0,'COMMA',0,'POINT') + ' ₫'}"></span>
+            </div>
+
+            <div class="detail-row">
+              <span class="detail-label">Thanh toán trực tiếp (70%)</span>
+              <span class="detail-value"
+                th:text="${#numbers.formatDecimal(order.remainingAmount,0,'COMMA',0,'POINT') + ' ₫'}"></span>
+            </div>
+
+            <div class="detail-row">
+              <span class="detail-label">Tổng cộng</span>
+              <span class="detail-value" style="font-weight:600;color:#534AB7"
+                th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT') + ' ₫'}"></span>
+            </div>
+
+            <div class="detail-row" th:if="${order.paymentMethod != null}">
+              <span class="detail-label">Phương thức</span>
+              <span class="detail-value" th:text="${order.paymentMethod.name()}"></span>
+            </div>
+
+            <div class="detail-row">
+              <span class="detail-label">Trạng thái tiền cọc</span>
+              <span class="detail-value">
+                <span th:if="${order.status.name() == 'Completed'}" class="badge-approved">Đã giải ngân cho chủ
+                  xe</span>
+                <span th:if="${order.status.name() == 'Cancelled' or order.status.name() == 'Rejected'}"
+                  th:class="${order.depositPaid ? 'badge-approved' : 'badge-none'}"
+                  th:text="${order.depositPaid ? 'Đã hoàn cọc' : 'Không phát sinh'}"></span>
+                <span th:if="${order.status.name() != 'Completed'
 		                    and order.status.name() != 'Cancelled'
 		                    and order.status.name() != 'Rejected'}"
-		            th:class="${order.depositPaid ? 'badge-approved' : 'badge-pending'}"
-		            th:text="${order.depositPaid ? 'Đã đặt cọc' : 'Chờ đặt cọc'}"></span>
-		    </span>
-		  </div>
-		  
-          <!-- Đánh giá -->
-          <div th:if="${order.rating != null}"
-               style="margin-top:14px;padding-top:12px;border-top:1px solid #f3f4f6">
-            <div style="font-size:12px;color:#6b7280;margin-bottom:6px">Đánh giá của khách</div>
-            <div style="display:flex;align-items:center;gap:6px">
-              <span style="color:#f59e0b;font-size:14px">
-                <i th:each="i : ${#numbers.sequence(1, order.rating)}"
-                   class="bi bi-star-fill"></i>
+                  th:class="${order.depositPaid ? 'badge-approved' : 'badge-pending'}"
+                  th:text="${order.depositPaid ? 'Đã đặt cọc' : 'Chờ đặt cọc'}"></span>
               </span>
-              <span style="font-size:13px;font-weight:500"
-                    th:text="${order.rating + '/5'}"></span>
             </div>
-            <div th:if="${order.reviewComment != null}"
-                 style="font-size:12px;color:#6b7280;margin-top:6px;font-style:italic"
-                 th:text="${order.reviewComment}"></div>
+
+            <!-- Đánh giá -->
+            <div th:if="${order.rating != null}" style="margin-top:14px;padding-top:12px;border-top:1px solid #f3f4f6">
+              <div style="font-size:12px;color:#6b7280;margin-bottom:6px">Đánh giá của khách</div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="color:#f59e0b;font-size:14px">
+                  <i th:each="i : ${#numbers.sequence(1, order.rating)}" class="bi bi-star-fill"></i>
+                </span>
+                <span style="font-size:13px;font-weight:500" th:text="${order.rating + '/5'}"></span>
+              </div>
+              <div th:if="${order.reviewComment != null}"
+                style="font-size:12px;color:#6b7280;margin-top:6px;font-style:italic" th:text="${order.reviewComment}">
+              </div>
+            </div>
           </div>
-        </div>
 
-        <!-- Lịch sử trạng thái -->
-        <div class="admin-card">
-          <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:#374151">
-            Lịch sử trạng thái
+          <!-- Lịch sử trạng thái -->
+          <div class="admin-card">
+            <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:#374151">
+              Lịch sử trạng thái
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+
+              <!-- Bước 1: Chờ xác nhận — luôn có -->
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px"
+                  th:style="${true} ? 'background:#7F77DD' : 'background:#d1d5db'"></div>
+                <div>
+                  <div style="font-size:12px;font-weight:600;color:#374151">Khách đặt đơn</div>
+                  <div class="text-muted-small" th:text="${#temporals.format(order.createdAt,'dd/MM HH:mm')}"></div>
+                </div>
+              </div>
+
+              <!-- Bước 2: Đã xác nhận -->
+              <div style="display:flex;gap:12px;align-items:flex-start" th:if="${order.status.name() != 'Rejected'}">
+                <div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px"
+                  th:style="${order.status.name() != 'Pending'} ? 'background:#7F77DD' : 'background:#d1d5db'"></div>
+                <div>
+                  <div style="font-size:12px;font-weight:500"
+                    th:style="${order.status.name() != 'Pending'} ? 'color:#374151' : 'color:#9ca3af'">
+                    Owner xác nhận
+                  </div>
+                </div>
+              </div>
+
+              <!-- Từ chối -->
+              <div style="display:flex;gap:12px;align-items:flex-start" th:if="${order.status.name() == 'Rejected'}">
+                <div style="width:10px;height:10px;border-radius:50%;background:#ef4444;
+		                  flex-shrink:0;margin-top:3px"></div>
+                <div>
+                  <div style="font-size:12px;font-weight:500;color:#b91c1c">Đã từ chối</div>
+                </div>
+              </div>
+
+              <!-- Hủy -->
+              <div style="display:flex;gap:12px;align-items:flex-start" th:if="${order.status.name() == 'Cancelled'}">
+                <div style="width:10px;height:10px;border-radius:50%;background:#ef4444;
+		                  flex-shrink:0;margin-top:3px"></div>
+                <div>
+                  <div style="font-size:12px;font-weight:500;color:#b91c1c">Đã hủy</div>
+                </div>
+              </div>
+
+              <!-- Bước 3: Đang thuê -->
+              <div style="display:flex;gap:12px;align-items:flex-start"
+                th:if="${order.status.name() != 'Rejected' and order.status.name() != 'Cancelled'}">
+                <div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px"
+                  th:style="${order.actualPickupTime != null} ? 'background:#7F77DD' : 'background:#d1d5db'"></div>
+                <div>
+                  <div style="font-size:12px;font-weight:500"
+                    th:style="${order.actualPickupTime != null} ? 'color:#374151' : 'color:#9ca3af'">
+                    Bắt đầu thuê
+                  </div>
+                  <div class="text-muted-small" th:if="${order.actualPickupTime != null}"
+                    th:text="${#temporals.format(order.actualPickupTime,'dd/MM HH:mm')}"></div>
+                  <!-- Ảnh giao xe -->
+                  <div th:if="${!#lists.isEmpty(order.pickupImages)}" style="margin-top:8px;">
+                    <div style="font-size:11px;color:#6b7280;margin-bottom:4px">Ảnh lúc giao xe</div>
+                    <div style="display:flex;gap:4px;flex-wrap:wrap">
+                      <img th:each="img : ${order.pickupImages}" th:src="@{'/assets/images/rental/' + ${img}}" 
+                           style="width:50px;height:50px;object-fit:cover;border-radius:4px;border:1px solid #e5e7eb" alt="Pickup image"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bước 4: Hoàn thành -->
+              <div style="display:flex;gap:12px;align-items:flex-start"
+                th:if="${order.status.name() != 'Rejected' and order.status.name() != 'Cancelled'}">
+                <div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px"
+                  th:style="${order.status.name() == 'Completed'} ? 'background:#10b981' : 'background:#d1d5db'"></div>
+                <div>
+                  <div style="font-size:12px;font-weight:500"
+                    th:style="${order.status.name() == 'Completed'} ? 'color:#065f46' : 'color:#9ca3af'">
+                    Hoàn thành
+                  </div>
+                  <div class="text-muted-small" th:if="${order.actualReturnTime != null}"
+                    th:text="${#temporals.format(order.actualReturnTime,'dd/MM HH:mm')}"></div>
+                  <!-- Ảnh nhận xe -->
+                  <div th:if="${!#lists.isEmpty(order.returnImages)}" style="margin-top:8px;">
+                    <div style="font-size:11px;color:#6b7280;margin-bottom:4px">Ảnh lúc nhận xe</div>
+                    <div style="display:flex;gap:4px;flex-wrap:wrap">
+                      <img th:each="img : ${order.returnImages}" th:src="@{'/assets/images/rental/' + ${img}}" 
+                           style="width:50px;height:50px;object-fit:cover;border-radius:4px;border:1px solid #e5e7eb" alt="Return image"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
           </div>
-		  <div style="display:flex;flex-direction:column;gap:12px">
 
-		    <!-- Bước 1: Chờ xác nhận — luôn có -->
-		    <div style="display:flex;gap:12px;align-items:flex-start">
-		      <div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px"
-		           th:style="${true} ? 'background:#7F77DD' : 'background:#d1d5db'"></div>
-		      <div>
-		        <div style="font-size:12px;font-weight:600;color:#374151">Khách đặt đơn</div>
-		        <div class="text-muted-small"
-		             th:text="${#temporals.format(order.createdAt,'dd/MM HH:mm')}"></div>
-		      </div>
-		    </div>
-
-		    <!-- Bước 2: Đã xác nhận -->
-		    <div style="display:flex;gap:12px;align-items:flex-start"
-		         th:if="${order.status.name() != 'Rejected'}">
-		      <div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px"
-		           th:style="${order.status.name() != 'Pending'} ? 'background:#7F77DD' : 'background:#d1d5db'"></div>
-		      <div>
-		        <div style="font-size:12px;font-weight:500"
-		             th:style="${order.status.name() != 'Pending'} ? 'color:#374151' : 'color:#9ca3af'">
-		          Owner xác nhận
-		        </div>
-		      </div>
-		    </div>
-
-		    <!-- Từ chối -->
-		    <div style="display:flex;gap:12px;align-items:flex-start"
-		         th:if="${order.status.name() == 'Rejected'}">
-		      <div style="width:10px;height:10px;border-radius:50%;background:#ef4444;
-		                  flex-shrink:0;margin-top:3px"></div>
-		      <div>
-		        <div style="font-size:12px;font-weight:500;color:#b91c1c">Đã từ chối</div>
-		      </div>
-		    </div>
-
-		    <!-- Hủy -->
-		    <div style="display:flex;gap:12px;align-items:flex-start"
-		         th:if="${order.status.name() == 'Cancelled'}">
-		      <div style="width:10px;height:10px;border-radius:50%;background:#ef4444;
-		                  flex-shrink:0;margin-top:3px"></div>
-		      <div>
-		        <div style="font-size:12px;font-weight:500;color:#b91c1c">Đã hủy</div>
-		      </div>
-		    </div>
-
-		    <!-- Bước 3: Đang thuê -->
-		    <div style="display:flex;gap:12px;align-items:flex-start"
-		         th:if="${order.status.name() != 'Rejected' and order.status.name() != 'Cancelled'}">
-		      <div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px"
-		           th:style="${order.actualPickupTime != null} ? 'background:#7F77DD' : 'background:#d1d5db'"></div>
-		      <div>
-		        <div style="font-size:12px;font-weight:500"
-		             th:style="${order.actualPickupTime != null} ? 'color:#374151' : 'color:#9ca3af'">
-		          Bắt đầu thuê
-		        </div>
-		        <div class="text-muted-small" th:if="${order.actualPickupTime != null}"
-		             th:text="${#temporals.format(order.actualPickupTime,'dd/MM HH:mm')}"></div>
-		      </div>
-		    </div>
-
-		    <!-- Bước 4: Hoàn thành -->
-		    <div style="display:flex;gap:12px;align-items:flex-start"
-		         th:if="${order.status.name() != 'Rejected' and order.status.name() != 'Cancelled'}">
-		      <div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px"
-		           th:style="${order.status.name() == 'Completed'} ? 'background:#10b981' : 'background:#d1d5db'"></div>
-		      <div>
-		        <div style="font-size:12px;font-weight:500"
-		             th:style="${order.status.name() == 'Completed'} ? 'color:#065f46' : 'color:#9ca3af'">
-		          Hoàn thành
-		        </div>
-		        <div class="text-muted-small" th:if="${order.actualReturnTime != null}"
-		             th:text="${#temporals.format(order.actualReturnTime,'dd/MM HH:mm')}"></div>
-		      </div>
-		    </div>
-
-		  </div>
         </div>
-
       </div>
     </div>
   </div>
-</div>
-<th:block th:replace="~{fragments/admin-layout :: scripts}"></th:block>
+  <th:block th:replace="~{fragments/admin-layout :: scripts}"></th:block>
 </body>
+
 </html>

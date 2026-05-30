@@ -29,6 +29,8 @@
 	    private final String description;
 	    private final BigDecimal avgRating;
 	    private final List<String> imageUrls;
+	    private final String ownerName;
+	    private final String ownerPhone;
 	    
 	    // Thuộc tính phụ có thể có trong Entity, ta lấy nếu có
 	    // Dựa vào DB thiết kế, ta lấy các field cần thiết cho Detail view
@@ -53,11 +55,14 @@
 	        this.features          = car.getFeatures();
 	        this.description       = car.getDescription();
 	        this.avgRating         = car.getAvgRating();
+	        
+	        // Owner info
+	        this.ownerName         = car.getOwner().getFullName();
+	        this.ownerPhone        = car.getOwner().getPhone();
 	
 	        this.imageUrls = images.stream()
 	                .sorted(Comparator.comparingInt(CarImage::getSortOrder))
 	                .map(CarImage::getImageUrl)
-	                .map(url -> url.startsWith("http") || url.startsWith("/") ? url : "/assets/images/cars/" + url)
 	                .collect(Collectors.toList());
 	    }
 	}

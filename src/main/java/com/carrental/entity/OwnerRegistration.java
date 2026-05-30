@@ -25,6 +25,10 @@ public class OwnerRegistration {
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "identity_verification_id")
+    private IdentityVerification identityVerification;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private VerificationStatus status;
@@ -38,7 +42,16 @@ public class OwnerRegistration {
 
     @Column(name = "reviewedAt")
     private LocalDateTime reviewedAt;
-    
+
+    @Column(name = "bankName", length = 100)
+    private String bankName;
+
+    @Column(name = "bankAccount", length = 50)
+    private String bankAccount;
+
+    @Column(name = "accountHolder", length = 100)
+    private String accountHolder;
+
     @PrePersist
     public void prePersist() {
         this.submittedAt = LocalDateTime.now();

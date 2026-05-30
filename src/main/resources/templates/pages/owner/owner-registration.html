@@ -1,169 +1,268 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/head :: head('Quản lý Đơn hàng - Chủ xe', ~{::link})}">
-    <link rel="stylesheet" th:href="@{/assets/css/owner.css}"/>
+
+<head th:replace="~{fragments/head :: head('Đăng ký trở thành chủ xe', ~{::link})}">
+    <link rel="stylesheet" th:href="@{/assets/css/verification.css}" />
+    <style>
+        /* Ghi đè nhỏ cho trang này */
+        .ct-readonly-field {
+            background: var(--ct-gray-100);
+            border: 1.5px solid var(--ct-gray-200);
+            border-radius: var(--r-md);
+            padding: 10px 14px;
+            font-size: 0.93rem;
+            font-weight: 500;
+            color: var(--ct-text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ct-confirm-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .ct-confirm-table td {
+            padding: 11px 0;
+            border-bottom: 1px solid var(--ct-gray-200);
+            font-size: 0.9rem;
+        }
+
+        .ct-confirm-table td:first-child {
+            color: var(--ct-text-muted);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            width: 160px;
+        }
+
+        .ct-confirm-table td:last-child {
+            color: var(--ct-text-main);
+            font-weight: 500;
+        }
+
+        .ct-confirm-table tr:last-child td {
+            border-bottom: none;
+        }
+    </style>
 </head>
+
 <body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<div th:replace="~{fragments/navbar :: navbar}"></div>
+    <div class="ct-verification-page">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-6 col-lg-7 col-md-9">
 
-<div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <nav class="col-md-3 col-lg-2 d-md-block bg-dark sidebar" style="min-height: calc(100vh - 70px);">
-            <div class="position-sticky pt-3">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link text-white" th:href="@{/owner/dashboard}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" th:href="@{/owner/cars}"><i class="fa-solid fa-car"></i> Quản lý xe</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white active" th:href="@{/owner/orders}"><i class="fa-solid fa-truck"></i> Quản lý đơn hàng</a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+                    <div class="ct-verif-card">
 
-        <!-- Main content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-4 border-bottom">
-                <h1 class="h2">Quản lý Đơn hàng</h1>
-            </div>
+                        <!-- Header -->
+                        <div class="ct-verif-card__header">
+                            <div class="ct-verif-badge-top">
+                                <i class="fa-solid fa-car-side"></i> Trở thành chủ xe
+                            </div>
+                            <h2 class="ct-verif-title">Đăng Ký Chủ Xe</h2>
+                            <p class="ct-verif-subtitle">
+                                Xác nhận thông tin hồ sơ của bạn để gửi yêu cầu trở thành chủ xe
+                            </p>
+                        </div>
 
-            <!-- Alert -->
-            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
-                <span th:text="${success}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
-                <span th:text="${error}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
+                        <div class="ct-verif-card__body">
 
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Mã đơn</th>
-                                    <th>Khách hàng</th>
-                                    <th>Xe</th>
-                                    <th>Nhận xe</th>
-                                    <th>Trả xe</th>
-                                    <th>Tổng tiền</th>
-                                    <th>Trạng thái</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="order : ${orders}">
-                                    <td>#<span th:text="${order.orderId}"></span></td>
-                                    <td th:text="${order.customer?.fullName} ?: 'N/A'"></td>
-                                    <td th:text="${(order.car?.brand?.brandName ?: '') + ' ' + (order.car?.modelName ?: 'N/A')}"></td>
-                                    <td th:text="${#temporals.format(order.pickupDate, 'dd/MM/yyyy')} + ' ' + ${order.pickupTime}"></td>
-                                    <td th:text="${#temporals.format(order.returnDate, 'dd/MM/yyyy')} + ' ' + ${order.returnTime}"></td>
-                                    <td th:text="${#numbers.formatInteger(order.totalAmount ?: 0, 0, 'COMMA')} + 'đ'"></td>
-                                    <td>
-                                        <span th:if="${order.status?.name() == 'Pending'}" class="badge bg-warning">Chờ xác nhận</span>
-                                        <span th:if="${order.status?.name() == 'Confirmed'}" class="badge bg-info">Đã xác nhận</span>
-                                        <span th:if="${order.status?.name() == 'InProgress'}" class="badge bg-primary">Đang thuê</span>
-                                        <span th:if="${order.status?.name() == 'Completed'}" class="badge bg-success">Hoàn thành</span>
-                                        <span th:if="${order.status?.name() == 'Rejected'}" class="badge bg-secondary">Từ chối</span>
-                                    </td>
-                                    <td>
-                                        <div th:if="${order.status?.name() == 'Pending'}">
-                                            <!-- Duyệt -->
-                                            <form th:action="@{/owner/orders/{orderId}/confirm(orderId=${order.orderId})}" 
-                                                  method="post" style="display: inline;">
-                                                <button type="submit" class="btn btn-sm btn-success"
-                                                        onclick="return confirm('Duyệt đơn hàng này?')">Duyệt</button>
-                                            </form>
+                            <!-- Flash alerts -->
+                            <div th:if="${success}" class="ct-state-card success" style="margin-bottom:20px">
+                                <div class="ct-state-icon"><i class="fa-solid fa-circle-check"></i></div>
+                                <div>
+                                    <p class="ct-state-title">Gửi yêu cầu thành công!</p>
+                                    <p class="ct-state-desc" th:text="${success}"></p>
+                                </div>
+                            </div>
+                            <div th:if="${error}" class="ct-state-card rejected" style="margin-bottom:20px">
+                                <div class="ct-state-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+                                <div>
+                                    <p class="ct-state-title">Không thể gửi yêu cầu</p>
+                                    <p class="ct-state-desc" th:text="${error}"></p>
+                                </div>
+                            </div>
 
-                                            <!-- Từ chối -->
-                                            <button type="button" class="btn btn-sm btn-danger ms-2"
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#rejectModal"
-                                                    th:data-order-id="${order.orderId}">
-                                                Từ chối
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr th:if="${orders == null or orders.isEmpty()}">
-                                    <td colspan="8" class="text-center py-5 text-muted">Chưa có đơn hàng nào</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                            <!-- CASE 1: Chưa xác minh CCCD → yêu cầu xác minh trước -->
+                            <div th:if="${requireVerification != null and requireVerification}">
+                                <div class="ct-state-card" style="background:#fffbeb;border-color:#fde68a">
+                                    <div class="ct-state-icon" style="background:#fef3c7;color:#b45309">
+                                        <i class="fa-solid fa-triangle-exclamation"></i>
+                                    </div>
+                                    <div>
+                                        <p class="ct-state-title" style="color:#b45309">Cần xác minh danh tính trước</p>
+                                        <p class="ct-state-desc">
+                                            Bạn cần xác minh CCCD/CMND trước khi đăng ký trở thành chủ xe.
+                                        </p>
+                                    </div>
+                                </div>
+                                <a th:href="@{/verification/cccd}" class="ct-btn-submit mt-3"
+                                    style="text-decoration:none;display:flex">
+                                    <i class="fa-solid fa-id-card"></i> Xác minh ngay
+                                </a>
+                            </div>
+
+                            <!-- CASE 2: Đang chờ duyệt CCCD -->
+                            <div th:if="${pendingVerification != null and pendingVerification}">
+                                <div class="ct-state-card pending">
+                                    <div class="ct-state-icon"><i class="fa-solid fa-clock"></i></div>
+                                    <div>
+                                        <p class="ct-state-title">Hồ sơ CCCD đang được xét duyệt</p>
+                                        <p class="ct-state-desc">Thông tin xác minh danh tính của bạn đang được Admin xử
+                                            lý. Vui lòng chờ kết quả trước khi đăng ký chủ xe.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CASE 3: Đơn đăng ký đang chờ duyệt -->
+                            <div th:if="${hasPendingApplication != null and hasPendingApplication}">
+                                <div class="ct-state-card pending">
+                                    <div class="ct-state-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+                                    <div>
+                                        <p class="ct-state-title">Đơn đang chờ xét duyệt</p>
+                                        <p class="ct-state-desc">
+                                            Yêu cầu đăng ký chủ xe của bạn đã được gửi. Admin sẽ xét duyệt trong 1–3
+                                            ngày làm việc.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CASE 4: Đơn bị từ chối trước đó → cho phép gửi lại -->
+                            <div th:if="${wasRejected != null and wasRejected}" class="mb-3">
+                                <div class="ct-state-card rejected">
+                                    <div class="ct-state-icon"><i class="fa-solid fa-circle-xmark"></i></div>
+                                    <div>
+                                        <p class="ct-state-title">Đơn đăng ký đã bị từ chối</p>
+                                        <p class="ct-state-desc">
+                                            Lý do: <strong th:text="${rejectReason}"></strong><br>
+                                            Bạn có thể gửi lại đơn đăng ký bên dưới.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CASE 5: Đủ điều kiện → hiển thị form xác nhận -->
+                            <div th:if="${canRegister != null and canRegister}">
+
+                                <!-- Thông báo hướng dẫn -->
+                                <div class="ct-info-note" style="margin-bottom:24px">
+                                    <i class="fa-solid fa-circle-info mt-1"></i>
+                                    <span>Vui lòng xác nhận thông tin bên dưới và cung cấp thông tin ngân hàng để gửi yêu cầu trở thành chủ xe. Admin sẽ
+                                        xét duyệt trong 1–3 ngày làm việc.</span>
+                                </div>
+
+                                <!-- Thông tin xác nhận (readonly — từ hồ sơ đã xác minh) -->
+                                <div class="ct-section-header" style="margin-bottom:16px">
+                                    <div class="ct-section-header__icon"><i class="fa-solid fa-user-check"></i></div>
+                                    <h5 class="ct-section-header__title">Thông tin hồ sơ</h5>
+                                </div>
+
+                                <table class="ct-confirm-table" style="margin-bottom:24px">
+                                    <tr>
+                                        <td>Họ và tên</td>
+                                        <td th:text="${user != null ? user.fullName : '—'}">Nguyễn Văn A</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Số điện thoại</td>
+                                        <td th:text="${user != null ? user.phone : '—'}">0901234567</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Số CCCD/CMND</td>
+                                        <td th:text="${verifiedIdentity != null ? verifiedIdentity.nationalId : '—'}">
+                                            0123456789</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Trạng thái xác minh</td>
+                                        <td>
+                                            <span
+                                                style="display:inline-flex;align-items:center;gap:5px;background:rgba(95,207,134,.1);color:#16a34a;border:1px solid rgba(95,207,134,.3);border-radius:6px;padding:2px 10px;font-size:0.8rem;font-weight:600">
+                                                <i class="fa-solid fa-circle-check" style="font-size:.7rem"></i> Đã xác
+                                                minh
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <form th:action="@{/owner/owner-registration}" method="post">
+
+                                    <!-- Section: Thông tin ngân hàng -->
+                                    <div class="ct-section-header" style="margin-bottom:16px">
+                                        <div class="ct-section-header__icon"><i class="fa-solid fa-building-columns"></i></div>
+                                        <h5 class="ct-section-header__title">Thông tin ngân hàng</h5>
+                                    </div>
+
+                                    <div class="ct-field-group" style="margin-bottom:16px">
+                                        <label class="ct-form-label" for="bankName">
+                                            Tên ngân hàng <span style="color:#ef4444">*</span>
+                                        </label>
+                                        <input type="text"
+                                               id="bankName"
+                                               name="bankName"
+                                               class="ct-form-input"
+                                               placeholder="VD: Vietcombank, Techcombank, MB Bank..."
+                                               required
+                                               autocomplete="off" />
+                                    </div>
+
+                                    <div class="ct-field-group" style="margin-bottom:16px">
+                                        <label class="ct-form-label" for="bankAccount">
+                                            Số tài khoản <span style="color:#ef4444">*</span>
+                                        </label>
+                                        <input type="text"
+                                               id="bankAccount"
+                                               name="bankAccount"
+                                               class="ct-form-input"
+                                               placeholder="VD: 1234567890"
+                                               required
+                                               autocomplete="off" />
+                                    </div>
+
+                                    <div class="ct-field-group" style="margin-bottom:24px">
+                                        <label class="ct-form-label" for="accountHolder">
+                                            Tên chủ tài khoản <span style="color:#ef4444">*</span>
+                                        </label>
+                                        <input type="text"
+                                               id="accountHolder"
+                                               name="accountHolder"
+                                               class="ct-form-input"
+                                               placeholder="VD: NGUYEN VAN A (viết hoa, không dấu)"
+                                               required
+                                               autocomplete="off" />
+                                        <small class="ct-form-hint">
+                                            <i class="fa-solid fa-circle-info"></i>
+                                            Nhập đúng tên chủ tài khoản như trên thẻ ngân hàng để nhận thanh toán chính xác.
+                                        </small>
+                                    </div>
+
+                                    <div style="display:flex;gap:12px">
+                                        <a th:href="@{/}" class="ct-btn-submit"
+                                            style="text-decoration:none;background:transparent;border:1.5px solid var(--ct-gray-300);color:var(--ct-text-muted);flex:1">
+                                            <i class="fa-solid fa-xmark"></i> Hủy bỏ
+                                        </a>
+                                        <button type="submit" class="ct-btn-submit" style="flex:2">
+                                            <i class="fa-solid fa-paper-plane"></i> Gửi yêu cầu
+                                        </button>
+                                    </div>
+                                </form>
+
+                            </div>
+
+                        </div>
                     </div>
+
                 </div>
-            </div>
-        </main>
-    </div>
-</div>
-
-<!-- MODAL TỪ CHỐI -->
-<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Từ chối đơn hàng</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="rejectForm" method="post">
-                    <div class="mb-3">
-                        <label class="form-label fw-medium">Lý do từ chối <span class="text-danger">*</span></label>
-                        <textarea class="form-control" id="rejectReason" name="reason" rows="5" required></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-danger" onclick="submitReject()">Xác nhận từ chối</button>
             </div>
         </div>
     </div>
-</div>
 
-<div th:replace="~{fragments/footer :: footer}"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-    let currentRejectOrderId = null;
-
-    // Khi modal được mở
-    document.addEventListener('DOMContentLoaded', function() {
-        const modal = document.getElementById('rejectModal');
-        modal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            currentRejectOrderId = button.getAttribute('data-order-id');
-        });
-    });
-
-    function submitReject() {
-        const reasonField = document.getElementById('rejectReason');
-        const reason = reasonField.value.trim();
-
-        if (!reason) {
-            alert("Vui lòng nhập lý do từ chối!");
-            reasonField.focus();
-            return;
-        }
-
-        if (!currentRejectOrderId) {
-            alert("Lỗi hệ thống: Không tìm thấy mã đơn hàng!");
-            return;
-        }
-
-        const form = document.getElementById('rejectForm');
-        form.action = `/owner/orders/${currentRejectOrderId}/reject`;
-        form.submit();
-    }
-</script>
-
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

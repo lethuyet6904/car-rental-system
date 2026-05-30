@@ -13,14 +13,14 @@ public interface AdminUserService {
     Page<AdminUserListResponse> getUserList(String keyword, UserRole role, UserStatus status, Pageable pageable);
 
     AdminUserDetailResponse getUserDetail(Long userId);
-    
+
     // Khóa tài khoản
     void lockAccount(Long userId, LockAccountRequest request);
 
     // Mở khóa tài khoản
     void unlockAccount(Long userId);
-    
- 	// Duyệt xác minh CCCD/GPLX
+
+    // Duyệt xác minh CCCD/GPLX
     void approveIdentityVerification(Long userId);
 
     // Từ chối xác minh CCCD/GPLX

@@ -2,15 +2,21 @@ package com.carrental.service;
 
 import com.carrental.dto.request.IdentityVerificationRequest;
 import com.carrental.entity.IdentityVerification;
-import com.carrental.entity.User;
-import com.carrental.enums.VerificationStatus;
 
 public interface IdentityVerificationService {
 
     /**
-     * Nộp hồ sơ xác minh danh tính
+     * Bước 1: Nộp hồ sơ CCCD (bắt buộc trước)
+     * → Trạng thái: Pending (chờ Admin duyệt CCCD)
      */
-    IdentityVerification submitVerification(Long userId, IdentityVerificationRequest request);
+    IdentityVerification submitCccd(Long userId, IdentityVerificationRequest request);
+
+    /**
+     * Bước 2: Bổ sung GPLX (chỉ sau khi CCCD đã Approved)
+     * → Giữ nguyên record, cập nhật thêm GPLX fields
+     * → Trạng thái vẫn là Approved (hoặc tùy business)
+     */
+    IdentityVerification submitLicense(Long userId, IdentityVerificationRequest request);
 
     /**
      * Lấy hồ sơ xác minh mới nhất của user
@@ -18,23 +24,29 @@ public interface IdentityVerificationService {
     IdentityVerification findLatestByUser(Long userId);
 
     /**
-     * Kiểm tra user đã được xác minh danh tính chưa
+     * Kiểm tra CCCD đã được Admin duyệt chưa
+     * (điều kiện để đăng ký chủ xe)
      */
-    boolean isIdentityVerified(Long userId);
+    boolean isCccdApproved(Long userId);
 
     /**
-     * Admin: Duyệt hồ sơ xác minh
+     * Kiểm tra đã có cả CCCD + GPLX được duyệt chưa
+     * (điều kiện để thuê xe)
      */
-    IdentityVerification approveVerification(Long verificationId);
+    boolean isFullyVerified(Long userId);
 
     /**
-     * Admin: Từ chối hồ sơ xác minh
+     * Admin: Duyệt CCCD (theo verificationId)
      */
-    IdentityVerification rejectVerification(Long verificationId, String reason);
+    IdentityVerification approveCccd(Long verificationId);
 
     /**
-     * Lấy hồ sơ xác minh của user (kèm thông tin user)
-     * Dùng cho OwnerRegistration fill tự động
+     * Admin: Từ chối CCCD
      */
-    IdentityVerification getVerifiedIdentityByUser(Long userId);
+    IdentityVerification rejectCccd(Long verificationId, String reason);
+
+    /**
+     * Lấy hồ sơ đã xác minh (dùng khi fill thông tin owner registration)
+     */
+    IdentityVerification getApprovedByUser(Long userId);
 }

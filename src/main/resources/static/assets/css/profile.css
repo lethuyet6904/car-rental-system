@@ -1,0 +1,405 @@
+/* =====================================================
+   profile.css — Carto Platform
+   Trang hồ sơ cá nhân & xác minh danh tính
+   ===================================================== */
+
+/* ── LAYOUT TỔNG THỂ ─────────────────────────────── */
+.ct-profile-page {
+    min-height: calc(100vh - 76px);
+    background: var(--ct-gray-100);
+    padding: 40px 0 60px;
+}
+
+/* ── SIDEBAR TRÁI ────────────────────────────────── */
+.ct-profile-sidebar {
+    background: var(--ct-white);
+    border-radius: var(--r-xl);
+    padding: 32px 24px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--ct-gray-200);
+    position: sticky;
+    top: 96px;
+}
+
+/* Avatar */
+.ct-avatar-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--ct-gray-200);
+    margin-bottom: 24px;
+}
+
+.ct-avatar-circle {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--ct-primary) 0%, var(--ct-primary-hover) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--ct-white);
+    font-weight: 700;
+    letter-spacing: -1px;
+    position: relative;
+    box-shadow: 0 4px 16px rgba(95, 207, 134, 0.35);
+    flex-shrink: 0;
+}
+
+.ct-avatar-img {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--ct-white);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.ct-avatar-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--ct-text-main);
+    text-align: center;
+    font-family: 'Outfit', sans-serif;
+}
+
+.ct-avatar-phone {
+    font-size: 0.82rem;
+    color: var(--ct-text-muted);
+    text-align: center;
+}
+
+/* Badge xác minh trong sidebar */
+.ct-verify-badge {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 12px;
+    border-radius: var(--r-md);
+    font-size: 0.78rem;
+    font-weight: 600;
+    width: 100%;
+    justify-content: center;
+}
+
+.ct-verify-badge.verified {
+    background: rgba(95, 207, 134, 0.12);
+    color: #16a34a;
+    border: 1px solid rgba(95, 207, 134, 0.3);
+}
+
+.ct-verify-badge.pending {
+    background: rgba(245, 158, 11, 0.1);
+    color: #b45309;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.ct-verify-badge.unverified {
+    background: rgba(239, 68, 68, 0.08);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Nav menu sidebar */
+.ct-profile-nav {
+    list-style: none;
+    padding: 0;
+    margin: 24px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ct-profile-nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: var(--r-md);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--ct-text-muted);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.ct-profile-nav a:hover {
+    background: var(--ct-gray-100);
+    color: var(--ct-text-main);
+}
+
+.ct-profile-nav a.active {
+    background: var(--ct-primary-bg);
+    color: var(--ct-primary-hover);
+    font-weight: 600;
+}
+
+.ct-profile-nav a i {
+    width: 18px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+/* ── MAIN CONTENT CARD ───────────────────────────── */
+.ct-profile-card {
+    background: var(--ct-white);
+    border-radius: var(--r-xl);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--ct-gray-200);
+    overflow: hidden;
+}
+
+.ct-profile-card__header {
+    padding: 28px 32px 20px;
+    border-bottom: 1px solid var(--ct-gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.ct-profile-card__title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--ct-text-main);
+    margin: 0;
+}
+
+.ct-profile-card__subtitle {
+    font-size: 0.85rem;
+    color: var(--ct-text-muted);
+    margin: 3px 0 0;
+}
+
+.ct-profile-card__body {
+    padding: 24px 32px 32px;
+}
+
+/* ── THÔNG TIN FIELD ROWS ────────────────────────── */
+.ct-info-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--ct-gray-200);
+    gap: 16px;
+}
+
+.ct-info-row:last-child {
+    border-bottom: none;
+}
+
+.ct-info-row__label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ct-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.ct-info-row__value {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--ct-text-main);
+}
+
+.ct-info-row__value.muted {
+    color: var(--ct-text-muted);
+    font-size: 0.88rem;
+}
+
+/* Input mode khi đang edit */
+.ct-profile-input {
+    border: 1.5px solid var(--ct-gray-200);
+    border-radius: var(--r-md);
+    padding: 9px 14px;
+    font-size: 0.93rem;
+    font-weight: 500;
+    color: var(--ct-text-main);
+    background: var(--ct-white);
+    width: 100%;
+    transition: var(--transition);
+    font-family: var(--font-family);
+}
+
+.ct-profile-input:focus {
+    outline: none;
+    border-color: var(--ct-primary);
+    box-shadow: 0 0 0 3px var(--ct-primary-bg);
+}
+
+/* ── BUTTONS ─────────────────────────────────────── */
+.ct-btn-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 18px;
+    border-radius: var(--r-md);
+    font-size: 0.87rem;
+    font-weight: 600;
+    border: 1.5px solid var(--ct-gray-300);
+    background: var(--ct-white);
+    color: var(--ct-text-main);
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+}
+
+.ct-btn-edit:hover {
+    border-color: var(--ct-text-main);
+    background: var(--ct-gray-100);
+}
+
+.ct-btn-save {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 22px;
+    border-radius: var(--r-md);
+    font-size: 0.87rem;
+    font-weight: 600;
+    background: var(--ct-primary);
+    color: var(--ct-white);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.ct-btn-save:hover {
+    background: var(--ct-primary-hover);
+    transform: translateY(-1px);
+}
+
+.ct-btn-cancel {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 18px;
+    border-radius: var(--r-md);
+    font-size: 0.87rem;
+    font-weight: 600;
+    background: transparent;
+    border: 1.5px solid var(--ct-gray-300);
+    color: var(--ct-text-muted);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.ct-btn-cancel:hover {
+    border-color: var(--ct-text-muted);
+    color: var(--ct-text-main);
+}
+
+/* Action bar khi edit */
+.ct-action-bar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 0 0;
+    margin-top: 8px;
+    border-top: 1px solid var(--ct-gray-200);
+}
+
+/* ── ALERT MESSAGES ──────────────────────────────── */
+.ct-alert-success {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: rgba(95, 207, 134, 0.1);
+    border: 1px solid rgba(95, 207, 134, 0.3);
+    border-radius: var(--r-md);
+    padding: 12px 16px;
+    color: #15803d;
+    font-size: 0.88rem;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.ct-alert-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--ct-danger-bg);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: var(--r-md);
+    padding: 12px 16px;
+    color: var(--ct-danger);
+    font-size: 0.88rem;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+/* ── SECTION XÁC MINH ────────────────────────────── */
+.ct-identity-section {
+    padding: 20px 0 0;
+    margin-top: 4px;
+}
+
+.ct-identity-section__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--ct-gray-200);
+}
+
+.ct-identity-item {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    align-items: center;
+    padding: 12px 0;
+    gap: 16px;
+    border-bottom: 1px solid var(--ct-gray-200);
+}
+
+.ct-identity-item:last-child {
+    border-bottom: none;
+}
+
+/* ── RESPONSIVE ──────────────────────────────────── */
+@media (max-width: 991px) {
+    .ct-profile-sidebar {
+        position: static;
+        margin-bottom: 24px;
+    }
+
+    .ct-profile-card__header,
+    .ct-profile-card__body {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    .ct-info-row {
+        grid-template-columns: 140px 1fr;
+    }
+}
+
+@media (max-width: 767px) {
+    .ct-profile-page {
+        padding: 24px 0 40px;
+    }
+
+    .ct-info-row,
+    .ct-identity-item {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+
+    .ct-info-row__label {
+        margin-bottom: 2px;
+    }
+
+    .ct-profile-card__header,
+    .ct-profile-card__body {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}

@@ -26,7 +26,7 @@
                     <a th:href="@{'/cars/' + ${car.carId}}" class="ct-car-link">
                         <div class="ct-car-card">
                             <div class="ct-car-card__thumb">
-                                <img th:src="${car.thumbnailUrl != null ? car.thumbnailUrl : '/assets/images/car-placeholder.png'}"
+                                <img th:src="${car.thumbnailUrl != null ? (car.thumbnailUrl.startsWith('/') ? car.thumbnailUrl : '/assets/images/cars/' + car.thumbnailUrl) : '/assets/images/car-placeholder.png'}"
                                     th:alt="${car.modelName}" />
                             </div>
                             <div class="ct-car-card__body">

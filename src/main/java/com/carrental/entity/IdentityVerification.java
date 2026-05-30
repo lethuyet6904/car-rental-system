@@ -7,8 +7,10 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "IdentityVerification")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class IdentityVerification {
 
@@ -17,54 +19,60 @@ public class IdentityVerification {
     @Column(name = "verificationId")
     private Long verificationId;
 
-    // FK → User
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 
-    // varchar(20) NOT NULL — số CCCD/CMND
+    // ── CCCD / CMND (bắt buộc) ──────────────────────────────────
     @Column(name = "nationalId", nullable = false, length = 20)
     private String nationalId;
 
-    // Ảnh CCCD mặt trước
     @Column(name = "nationalIdFrontImage", nullable = false, length = 200)
     private String nationalIdFrontImage;
 
-    // Ảnh CCCD mặt sau
     @Column(name = "nationalIdBackImage", nullable = false, length = 200)
     private String nationalIdBackImage;
 
-    // Số GPLX
-    @Column(name = "licenseNumber", nullable = false, length = 20)
+    // ── GPLX (bổ sung sau — nullable) ───────────────────────────
+    // Bước 2: customer bổ sung GPLX sau khi CCCD được duyệt
+    @Column(name = "licenseNumber", nullable = true, length = 20)
     private String licenseNumber;
 
-    // Ảnh GPLX mặt trước
-    @Column(name = "frontImage", nullable = false, length = 200)
+    @Column(name = "frontImage", nullable = true, length = 200)
     private String frontImage;
 
-    // Ảnh GPLX mặt sau
-    @Column(name = "backImage", nullable = false, length = 200)
+    @Column(name = "backImage", nullable = true, length = 200)
     private String backImage;
 
+    // ── Trạng thái & metadata ────────────────────────────────────
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private VerificationStatus status;
 
-    // nvarchar(300) NULL — lý do từ chối
     @Column(name = "rejectReason", length = 300)
     private String rejectReason;
 
-    // datetime NOT NULL — ngày nộp hồ sơ
     @Column(name = "submittedAt", nullable = false)
     private LocalDateTime submittedAt;
 
-    // datetime NULL — ngày Admin xem xét
     @Column(name = "reviewedAt")
     private LocalDateTime reviewedAt;
 
     @PrePersist
     public void prePersist() {
         this.submittedAt = LocalDateTime.now();
-        if (this.status == null) this.status = VerificationStatus.Pending;
+        if (this.status == null)
+            this.status = VerificationStatus.Pending;
+    }
+
+    // ── Helper methods ───────────────────────────────────────────
+    /** CCCD đã được duyệt */
+    public boolean isCccdApproved() {
+        return VerificationStatus.Approved.equals(this.status);
+    }
+
+    /** Đã có GPLX (dù chưa duyệt hay rồi — chỉ check data tồn tại) */
+    public boolean hasLicense() {
+        return this.licenseNumber != null && !this.licenseNumber.isBlank();
     }
 }

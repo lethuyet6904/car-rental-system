@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head('Xác minh CCCD / CMND', ~{::link})}">
+    <link rel="stylesheet" th:href="@{/assets/css/verification.css}" />
+</head>
+
+<body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="ct-verification-page">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-6 col-lg-7 col-md-9">
+
+                    <!-- Breadcrumb steps -->
+                    <div class="ct-steps"
+                        style="display:flex;align-items:center;gap:0;margin-bottom:24px;background:var(--ct-white);border-radius:var(--r-lg);padding:14px 20px;box-shadow:var(--shadow-sm);border:1px solid var(--ct-gray-200)">
+                        <div style="display:flex;align-items:center;gap:8px;flex:1">
+                            <div
+                                style="width:28px;height:28px;border-radius:50%;background:var(--ct-primary);color:white;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0">
+                                1</div>
+                            <div>
+                                <div style="font-size:.8rem;font-weight:700;color:var(--ct-primary-hover)">Xác minh CCCD
+                                </div>
+                                <div style="font-size:.72rem;color:var(--ct-text-muted)">Bước hiện tại</div>
+                            </div>
+                        </div>
+                        <div style="flex:0 0 40px;height:2px;background:var(--ct-gray-200)"></div>
+                        <div style="display:flex;align-items:center;gap:8px;flex:1;opacity:.45">
+                            <div
+                                style="width:28px;height:28px;border-radius:50%;background:var(--ct-gray-200);color:var(--ct-text-muted);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0">
+                                2</div>
+                            <div>
+                                <div style="font-size:.8rem;font-weight:600;color:var(--ct-text-muted)">Bổ sung GPLX
+                                </div>
+                                <div style="font-size:.72rem;color:var(--ct-text-muted)">Để thuê xe</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ct-verif-card">
+                        <div class="ct-verif-card__header">
+                            <div class="ct-verif-badge-top">
+                                <i class="fa-solid fa-id-card"></i> Bước 1 / 2
+                            </div>
+                            <h2 class="ct-verif-title">Xác Minh CCCD / CMND</h2>
+                            <p class="ct-verif-subtitle">
+                                Upload ảnh CCCD để xác minh danh tính. Bước này bắt buộc để đăng ký làm chủ xe và thuê
+                                xe.
+                            </p>
+                        </div>
+
+                        <div class="ct-verif-card__body">
+
+                            <!-- Flash alerts -->
+                            <div th:if="${success}" class="ct-state-card success" style="margin-bottom:20px">
+                                <div class="ct-state-icon"><i class="fa-solid fa-circle-check"></i></div>
+                                <div>
+                                    <p class="ct-state-title">Gửi hồ sơ thành công!</p>
+                                    <p class="ct-state-desc" th:text="${success}"></p>
+                                </div>
+                            </div>
+                            <div th:if="${error}" class="ct-state-card rejected" style="margin-bottom:20px">
+                                <div class="ct-state-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+                                <div>
+                                    <p class="ct-state-title">Có lỗi xảy ra</p>
+                                    <p class="ct-state-desc" th:text="${error}"></p>
+                                </div>
+                            </div>
+
+                            <!-- Info user -->
+                            <div class="ct-user-info-box">
+                                <div class="ct-user-info-box__icon"><i class="fa-solid fa-user"></i></div>
+                                <div class="ct-user-info-box__text">
+                                    <strong th:text="${user != null ? user.fullName : ''}"></strong>
+                                    <span th:text="${user != null ? user.phone : ''}"></span>
+                                </div>
+                            </div>
+
+                            <!-- Đang chờ duyệt -->
+                            <div th:if="${pending}">
+                                <div class="ct-state-card pending">
+                                    <div class="ct-state-icon"><i class="fa-solid fa-clock"></i></div>
+                                    <div>
+                                        <p class="ct-state-title">Hồ sơ đang chờ Admin duyệt</p>
+                                        <p class="ct-state-desc">
+                                            Đã gửi lúc <strong
+                                                th:text="${#temporals.format(submittedAt,'dd/MM/yyyy HH:mm')}"></strong>.<br>
+                                            Admin sẽ xét duyệt trong 1–3 ngày làm việc.
+                                        </p>
+                                    </div>
+                                </div>
+                                <a th:href="@{/customer/profile}" class="ct-link-back">
+                                    <i class="fa-solid fa-arrow-left me-1"></i> Quay lại hồ sơ
+                                </a>
+                            </div>
+
+                            <!-- Bị từ chối -->
+                            <div th:if="${rejected}" class="mb-3">
+                                <div class="ct-state-card rejected">
+                                    <div class="ct-state-icon"><i class="fa-solid fa-circle-xmark"></i></div>
+                                    <div>
+                                        <p class="ct-state-title">Hồ sơ bị từ chối</p>
+                                        <p class="ct-state-desc">
+                                            Lý do: <strong th:text="${rejectReason}"></strong><br>
+                                            Vui lòng kiểm tra và nộp lại hồ sơ bên dưới.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Form -->
+                            <div th:if="${pending == null or !pending}">
+                                <form th:action="@{/verification/cccd}" method="post" enctype="multipart/form-data">
+
+                                    <div class="mb-3">
+                                        <label class="ct-form-label">Số CCCD / CMND <span
+                                                style="color:var(--ct-danger)">*</span></label>
+                                        <input type="text" name="nationalId" class="ct-form-input"
+                                            placeholder="Nhập 9–12 chữ số" />
+                                        <p class="ct-form-hint">Chỉ nhập chữ số, không dấu cách (ví dụ: 034095001234)
+                                        </p>
+                                    </div>
+
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6">
+                                            <label class="ct-upload-label">Ảnh mặt trước <span
+                                                    style="color:var(--ct-danger)">*</span></label>
+                                            <div class="ct-upload-area" id="frontArea"
+                                                onclick="document.getElementById('frontInput').click()">
+                                                <input type="file" id="frontInput" name="nationalIdFrontImage"
+                                                    accept="image/*" style="display:none"
+                                                    onchange="previewImage(this,'frontArea','frontPreview')">
+                                                <img class="ct-upload-preview" id="frontPreview" alt="" />
+                                                <div class="ct-upload-placeholder">
+                                                    <i class="fa-solid fa-camera"></i>
+                                                    <p>Nhấn để chọn ảnh<br><small style="font-size:.72rem">JPG/PNG · tối
+                                                            đa 5MB</small></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="ct-upload-label">Ảnh mặt sau <span
+                                                    style="color:var(--ct-danger)">*</span></label>
+                                            <div class="ct-upload-area" id="backArea"
+                                                onclick="document.getElementById('backInput').click()">
+                                                <input type="file" id="backInput" name="nationalIdBackImage"
+                                                    accept="image/*" style="display:none"
+                                                    onchange="previewImage(this,'backArea','backPreview')">
+                                                <img class="ct-upload-preview" id="backPreview" alt="" />
+                                                <div class="ct-upload-placeholder">
+                                                    <i class="fa-solid fa-camera"></i>
+                                                    <p>Nhấn để chọn ảnh<br><small style="font-size:.72rem">JPG/PNG · tối
+                                                            đa 5MB</small></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="ct-info-note">
+                                        <i class="fa-solid fa-circle-info mt-1"></i>
+                                        <span>Sau khi CCCD được duyệt, bạn có thể đăng ký làm chủ xe. Để thuê xe, bạn
+                                            cần bổ sung thêm GPLX ở bước 2.</span>
+                                    </div>
+
+                                    <button type="submit" class="ct-btn-submit">
+                                        <i class="fa-solid fa-paper-plane"></i> Gửi hồ sơ CCCD
+                                    </button>
+                                </form>
+
+                                <a th:href="@{/customer/profile}" class="ct-link-back">
+                                    <i class="fa-solid fa-arrow-left me-1"></i> Quay lại hồ sơ cá nhân
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function previewImage(input, areaId, previewId) {
+            const file = input.files[0];
+            if (!file) return;
+            if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) { alert('Chỉ chấp nhận JPG/PNG'); input.value = ''; return; }
+            if (file.size > 5 * 1024 * 1024) { alert('File không được vượt quá 5MB'); input.value = ''; return; }
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById(previewId).src = e.target.result;
+                document.getElementById(areaId).classList.add('has-file');
+            };
+            reader.readAsDataURL(file);
+        }
+    </script>
+</body>
+
+</html>

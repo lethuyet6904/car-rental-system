@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     // Xem review của 1 xe (join qua RentalOrder)
-    @Query("SELECT r FROM Review r WHERE r.rentalOrder.car.carId = :carId")
+    @Query("SELECT r FROM Review r JOIN FETCH r.customer WHERE r.rentalOrder.car.carId = :carId")
     List<Review> findByCarId(Long carId);
 
     // Kiểm tra đơn đã được review chưa — mỗi đơn chỉ review 1 lần

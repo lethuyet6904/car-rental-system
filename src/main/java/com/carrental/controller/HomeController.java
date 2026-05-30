@@ -3,6 +3,7 @@ package com.carrental.controller;
 import com.carrental.dto.response.CarListResponse;
 import com.carrental.entity.User;
 import com.carrental.service.CarService;
+import com.carrental.service.RegionService;
 import com.carrental.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class HomeController {
     // Controller chỉ được gọi Service, không gọi Repository trực tiếp
     private final UserService userService;
     private final CarService carService;
+    private final RegionService regionService;
 
     @GetMapping("/")
     public String home(Model model, HttpServletRequest request) {
@@ -44,6 +46,7 @@ public class HomeController {
         // Hiển thị 8 xe nổi bật trên trang chủ (trang đầu tiên, sắp xếp mặc định)
         Page<CarListResponse> carPage = carService.searchActiveCars(null, null, null, null, PageRequest.of(0, 4));
         model.addAttribute("cars", carPage.getContent());
+        model.addAttribute("regions", regionService.getActiveRegions());
 
         return "home";
     }

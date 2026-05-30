@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.carrental.service.PaymentService;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -31,13 +32,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OwnerServiceImpl implements OwnerService {
 
-    private final CarRepository          carRepository;
-    private final CarImageRepository     carImageRepository;
-    private final RentalOrderRepository  rentalOrderRepository;
-    private final BrandRepository        brandRepository;
-    private final CarTypeRepository      carTypeRepository;
-    private final RegionRepository       regionRepository;
-    private final UserRepository         userRepository;
+    private final CarRepository carRepository;
+    private final CarImageRepository carImageRepository;
+    private final RentalOrderRepository rentalOrderRepository;
+    private final BrandRepository brandRepository;
+    private final CarTypeRepository carTypeRepository;
+    private final RegionRepository regionRepository;
+    private final UserRepository userRepository;
+    private final PaymentService paymentService;
+    private final RentalImageRepository rentalImageRepository;
+    private final CarScheduleRepository carScheduleRepository;
 
     @Value("${upload.path:uploads}")
     private String uploadPath;
@@ -47,14 +51,16 @@ public class OwnerServiceImpl implements OwnerService {
     @Override
     public long countCarsByOwner(Long ownerId) {
         User owner = userRepository.findById(ownerId).orElse(null);
-        if (owner == null) return 0;
+        if (owner == null)
+            return 0;
         return carRepository.findByOwner(owner).size();
     }
 
     @Override
     public long countCarsByOwnerAndStatus(Long ownerId, CarStatus status) {
         User owner = userRepository.findById(ownerId).orElse(null);
-        if (owner == null) return 0;
+        if (owner == null)
+            return 0;
         return carRepository.findByOwner(owner).stream()
                 .filter(car -> car.getStatus() == status)
                 .count();
@@ -63,7 +69,8 @@ public class OwnerServiceImpl implements OwnerService {
     @Override
     public long countOrdersByOwnerAndStatus(Long ownerId, OrderStatus status) {
         User owner = userRepository.findById(ownerId).orElse(null);
-        if (owner == null) return 0;
+        if (owner == null)
+            return 0;
         return rentalOrderRepository.findByCarOwner(owner).stream()
                 .filter(order -> order.getStatus() == status)
                 .count();
@@ -72,7 +79,8 @@ public class OwnerServiceImpl implements OwnerService {
     @Override
     public long getTotalRevenueByOwner(Long ownerId) {
         User owner = userRepository.findById(ownerId).orElse(null);
-        if (owner == null) return 0;
+        if (owner == null)
+            return 0;
         return rentalOrderRepository.findByCarOwner(owner).stream()
                 .filter(order -> order.getStatus() == OrderStatus.Completed)
                 .mapToLong(order -> order.getTotalAmount().longValue())
@@ -83,7 +91,8 @@ public class OwnerServiceImpl implements OwnerService {
     @Transactional(readOnly = true)
     public List<RentalOrder> getRecentOrdersByOwner(Long ownerId, int limit) {
         User owner = userRepository.findById(ownerId).orElse(null);
-        if (owner == null) return new ArrayList<>();
+        if (owner == null)
+            return new ArrayList<>();
 
         List<RentalOrder> orders = rentalOrderRepository
                 .findByCarOwnerUserIdOrderByCreatedAtDesc(ownerId);
@@ -110,7 +119,8 @@ public class OwnerServiceImpl implements OwnerService {
     @Transactional(readOnly = true)
     public Page<Car> getCarsByOwner(Long ownerId, String status, Pageable pageable) {
         User owner = userRepository.findById(ownerId).orElse(null);
-        if (owner == null) return Page.empty(pageable);
+        if (owner == null)
+            return Page.empty(pageable);
 
         List<Car> allCars = carRepository.findByOwner(owner);
 
@@ -120,13 +130,14 @@ public class OwnerServiceImpl implements OwnerService {
                 allCars = allCars.stream()
                         .filter(car -> car.getStatus() == carStatus)
                         .collect(Collectors.toList());
-            } catch (IllegalArgumentException ignored) {}
+            } catch (IllegalArgumentException ignored) {
+            }
         }
 
         allCars.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
 
         int start = (int) pageable.getOffset();
-        int end   = Math.min(start + pageable.getPageSize(), allCars.size());
+        int end = Math.min(start + pageable.getPageSize(), allCars.size());
 
         if (start > allCars.size()) {
             return new PageImpl<>(new ArrayList<>(), pageable, allCars.size());
@@ -162,11 +173,11 @@ public class OwnerServiceImpl implements OwnerService {
             throw new RuntimeException("Biển số xe \"" + request.getLicensePlate() + "\" đã tồn tại trong hệ thống");
         }
 
-        Brand   brand   = brandRepository.findById(request.getBrandId())
+        Brand brand = brandRepository.findById(request.getBrandId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy hãng xe"));
         CarType carType = carTypeRepository.findById(request.getCarTypeId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy loại xe"));
-        Region  region  = regionRepository.findById(request.getRegionId())
+        Region region = regionRepository.findById(request.getRegionId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy khu vực"));
 
         Car car = Car.builder()
@@ -190,8 +201,27 @@ public class OwnerServiceImpl implements OwnerService {
 
         Car savedCar = carRepository.save(car);
 
+        System.out.println("registrationImage empty: " +
+                (request.getRegistrationImage() != null ? request.getRegistrationImage().isEmpty() : "null"));
+        System.out.println("inspectionImage empty: " +
+                (request.getInspectionImage() != null ? request.getInspectionImage().isEmpty() : "null"));
+        System.out.println("insuranceImage empty: " +
+                (request.getInsuranceImage() != null ? request.getInsuranceImage().isEmpty() : "null"));
+
         // Lưu ảnh xe nếu có
         saveCarImages(savedCar, request.getImages());
+
+        // Lưu ảnh giấy tờ xe
+        if (request.getRegistrationImage() != null && !request.getRegistrationImage().isEmpty()) {
+            savedCar.setRegistrationImage(saveImageFile(request.getRegistrationImage(), "docs"));
+        }
+        if (request.getInspectionImage() != null && !request.getInspectionImage().isEmpty()) {
+            savedCar.setInspectionImage(saveImageFile(request.getInspectionImage(), "docs"));
+        }
+        if (request.getInsuranceImage() != null && !request.getInsuranceImage().isEmpty()) {
+            savedCar.setInsuranceImage(saveImageFile(request.getInsuranceImage(), "docs"));
+        }
+        carRepository.save(savedCar);
 
         return savedCar;
     }
@@ -207,15 +237,16 @@ public class OwnerServiceImpl implements OwnerService {
         // Kiểm tra biển số trùng (trừ chính xe đang sửa)
         if (!car.getLicensePlate().equalsIgnoreCase(request.getLicensePlate().trim())) {
             if (carRepository.existsByLicensePlate(request.getLicensePlate().trim())) {
-                throw new RuntimeException("Biển số xe \"" + request.getLicensePlate() + "\" đã tồn tại trong hệ thống");
+                throw new RuntimeException(
+                        "Biển số xe \"" + request.getLicensePlate() + "\" đã tồn tại trong hệ thống");
             }
         }
 
-        Brand   brand   = brandRepository.findById(request.getBrandId())
+        Brand brand = brandRepository.findById(request.getBrandId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy hãng xe"));
         CarType carType = carTypeRepository.findById(request.getCarTypeId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy loại xe"));
-        Region  region  = regionRepository.findById(request.getRegionId())
+        Region region = regionRepository.findById(request.getRegionId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy khu vực"));
 
         car.setBrand(brand);
@@ -244,12 +275,28 @@ public class OwnerServiceImpl implements OwnerService {
 
         Car savedCar = carRepository.save(car);
 
-        // Nếu có ảnh mới thì xóa ảnh cũ và lưu ảnh mới
+        // Nếu có ảnh xe mới thì xóa ảnh cũ và lưu ảnh mới
         boolean hasNewImages = request.getImages() != null &&
                 request.getImages().stream().anyMatch(f -> f != null && !f.isEmpty());
         if (hasNewImages) {
             carImageRepository.deleteByCarCarId(carId);
             saveCarImages(savedCar, request.getImages());
+        }
+
+        // Cập nhật ảnh giấy tờ xe nếu có upload mới (giữ ảnh cũ nếu không upload)
+        if (request.getRegistrationImage() != null && !request.getRegistrationImage().isEmpty()) {
+            savedCar.setRegistrationImage(saveImageFile(request.getRegistrationImage(), "docs"));
+        }
+        if (request.getInspectionImage() != null && !request.getInspectionImage().isEmpty()) {
+            savedCar.setInspectionImage(saveImageFile(request.getInspectionImage(), "docs"));
+        }
+        if (request.getInsuranceImage() != null && !request.getInsuranceImage().isEmpty()) {
+            savedCar.setInsuranceImage(saveImageFile(request.getInsuranceImage(), "docs"));
+        }
+        if (request.getRegistrationImage() != null && !request.getRegistrationImage().isEmpty()
+                || request.getInspectionImage() != null && !request.getInspectionImage().isEmpty()
+                || request.getInsuranceImage() != null && !request.getInsuranceImage().isEmpty()) {
+            carRepository.save(savedCar);
         }
 
         return savedCar;
@@ -263,9 +310,9 @@ public class OwnerServiceImpl implements OwnerService {
             throw new RuntimeException("Không tìm thấy xe hoặc bạn không có quyền");
         }
         switch (car.getStatus()) {
-            case Active   -> car.setStatus(CarStatus.Inactive);
+            case Active -> car.setStatus(CarStatus.Inactive);
             case Inactive -> car.setStatus(CarStatus.Active);
-            case Pending  -> throw new RuntimeException("Xe đang chờ duyệt, không thể thay đổi trạng thái");
+            case Pending -> throw new RuntimeException("Xe đang chờ duyệt, không thể thay đổi trạng thái");
             case Rejected -> throw new RuntimeException("Xe bị từ chối, vui lòng chỉnh sửa và gửi lại");
         }
         carRepository.save(car);
@@ -292,7 +339,8 @@ public class OwnerServiceImpl implements OwnerService {
     @Transactional(readOnly = true)
     public Page<RentalOrder> getOrdersByOwner(Long ownerId, OrderStatus status, Pageable pageable) {
         User owner = userRepository.findById(ownerId).orElse(null);
-        if (owner == null) return Page.empty(pageable);
+        if (owner == null)
+            return Page.empty(pageable);
 
         List<RentalOrder> allOrders = rentalOrderRepository.findByCarOwner(owner);
 
@@ -305,7 +353,7 @@ public class OwnerServiceImpl implements OwnerService {
         allOrders.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
 
         int start = (int) pageable.getOffset();
-        int end   = Math.min(start + pageable.getPageSize(), allOrders.size());
+        int end = Math.min(start + pageable.getPageSize(), allOrders.size());
 
         List<RentalOrder> pageContent = (start > allOrders.size())
                 ? new ArrayList<>()
@@ -324,7 +372,7 @@ public class OwnerServiceImpl implements OwnerService {
 
     @Override
     public RentalOrder getOrderByIdAndOwner(Long orderId, Long ownerId) {
-        return rentalOrderRepository.findById(orderId)
+        return rentalOrderRepository.findWithDetailsById(orderId)
                 .filter(order -> order.getCar().getOwner().getUserId().equals(ownerId))
                 .orElse(null);
     }
@@ -333,8 +381,9 @@ public class OwnerServiceImpl implements OwnerService {
     @Transactional
     public void confirmOrder(Long orderId, Long ownerId) {
         RentalOrder order = getOrderByIdAndOwner(orderId, ownerId);
-        if (order == null) throw new RuntimeException("Không tìm thấy đơn hàng");
-        if (order.getStatus() != OrderStatus.Pending)
+        if (order == null)
+            throw new RuntimeException("Không tìm thấy đơn hàng");
+        if (order.getStatus() != OrderStatus.PendingApproval)
             throw new RuntimeException("Đơn hàng không ở trạng thái chờ xác nhận");
         order.setStatus(OrderStatus.Confirmed);
         rentalOrderRepository.save(order);
@@ -344,24 +393,147 @@ public class OwnerServiceImpl implements OwnerService {
     @Transactional
     public void rejectOrder(Long orderId, Long ownerId, String reason) {
         RentalOrder order = getOrderByIdAndOwner(orderId, ownerId);
-        if (order == null) throw new RuntimeException("Không tìm thấy đơn hàng");
-        if (order.getStatus() != OrderStatus.Pending)
+        if (order == null)
+            throw new RuntimeException("Không tìm thấy đơn hàng");
+        if (order.getStatus() != OrderStatus.PendingApproval)
             throw new RuntimeException("Đơn hàng không ở trạng thái chờ xác nhận");
+            
+        paymentService.processRefund(orderId, 100, null);
+        
         order.setStatus(OrderStatus.Rejected);
         order.setCancelReason(reason);
         rentalOrderRepository.save(order);
+
+        carScheduleRepository.findByRentalOrderOrderId(orderId)
+            .ifPresent(carScheduleRepository::delete);
+    }
+
+    @Override
+    @Transactional
+    public void startRental(Long orderId, Long ownerId) {
+        RentalOrder order = getOrderByIdAndOwner(orderId, ownerId);
+        if (order == null)
+            throw new RuntimeException("Không tìm thấy đơn hàng");
+        if (order.getStatus() != OrderStatus.Confirmed)
+            throw new RuntimeException("Đơn hàng chưa được xác nhận");
+        order.setStatus(OrderStatus.InProgress);
+        order.setActualPickupTime(LocalDateTime.now());
+        rentalOrderRepository.save(order);
+    }
+
+    @Override
+    @Transactional
+    public void startRentalWithImages(Long orderId, Long ownerId, List<MultipartFile> images, String checklistNote) {
+        RentalOrder order = getOrderByIdAndOwner(orderId, ownerId);
+        if (order == null)
+            throw new org.springframework.security.access.AccessDeniedException("Bạn không có quyền thực hiện trên đơn hàng này, hoặc đơn không tồn tại");
+        if (order.getStatus() != OrderStatus.Confirmed)
+            throw new RuntimeException("Chỉ cho phép chuyển từ CONFIRMED sang IN_PROGRESS");
+            
+        order.setStatus(OrderStatus.InProgress);
+        order.setActualPickupTime(LocalDateTime.now());
+        order.setPickupChecklistNote(checklistNote);
+        
+        List<String> savedFiles = new ArrayList<>();
+        try {
+            rentalOrderRepository.save(order);
+            savedFiles = saveRentalImages(order, images, com.carrental.enums.RentalImageType.Pickup);
+            rentalOrderRepository.flush(); // Đẩy SQL xuống DB để bắt exception ngay (nếu có)
+        } catch (Exception e) {
+            deleteFiles(savedFiles, "rental");
+            throw e;
+        }
+    }
+    
+    private List<String> saveRentalImages(RentalOrder order, List<MultipartFile> images, com.carrental.enums.RentalImageType type) {
+        if (images == null || images.isEmpty()) {
+            throw new RuntimeException("Vui lòng upload ít nhất 1 ảnh");
+        }
+        
+        boolean hasValidImage = false;
+        List<String> savedFileNames = new ArrayList<>();
+        int sortOrder = 1;
+        
+        for (MultipartFile file : images) {
+            if (file != null && !file.isEmpty()) {
+                if (file.getContentType() == null || !file.getContentType().startsWith("image/")) {
+                    throw new RuntimeException("Chỉ cho phép upload file định dạng hình ảnh");
+                }
+                hasValidImage = true;
+                String fileName = saveImageFile(file, "rental");
+                savedFileNames.add(fileName);
+                
+                RentalImage rentalImage = new RentalImage();
+                rentalImage.setRentalOrder(order);
+                rentalImage.setImageUrl(fileName);
+                rentalImage.setImageType(type);
+                rentalImage.setSortOrder(sortOrder++);
+                rentalImageRepository.save(rentalImage);
+            }
+        }
+        if (!hasValidImage) {
+            throw new RuntimeException("Vui lòng upload ít nhất 1 ảnh không rỗng");
+        }
+        
+        return savedFileNames;
+    }
+    
+    private void deleteFiles(List<String> fileNames, String folder) {
+        if (fileNames == null || fileNames.isEmpty()) return;
+        for (String fileName : fileNames) {
+            try {
+                Path filePath = Paths.get(uploadPath, folder, fileName);
+                Files.deleteIfExists(filePath);
+            } catch (IOException ignored) {}
+        }
     }
 
     @Override
     @Transactional
     public void completeOrder(Long orderId, Long ownerId) {
         RentalOrder order = getOrderByIdAndOwner(orderId, ownerId);
-        if (order == null) throw new RuntimeException("Không tìm thấy đơn hàng");
+        if (order == null)
+            throw new RuntimeException("Không tìm thấy đơn hàng");
         if (order.getStatus() != OrderStatus.InProgress)
             throw new RuntimeException("Đơn hàng không ở trạng thái đang thuê");
+            
+        com.carrental.entity.Payment finalPayment = paymentService.getPaymentByOrderAndType(orderId, com.carrental.enums.TransactionType.FinalPayment);
+        if (finalPayment == null || finalPayment.getStatus() != com.carrental.enums.PaymentStatus.Success) {
+            throw new RuntimeException("Khách hàng chưa thanh toán phần còn lại.");
+        }
+        
         order.setStatus(OrderStatus.Completed);
         order.setActualReturnTime(LocalDateTime.now());
         rentalOrderRepository.save(order);
+    }
+
+    @Override
+    @Transactional
+    public void returnOrderWithImages(Long orderId, Long ownerId, List<MultipartFile> images, String checklistNote) {
+        RentalOrder order = getOrderByIdAndOwner(orderId, ownerId);
+        if (order == null)
+            throw new org.springframework.security.access.AccessDeniedException("Bạn không có quyền thực hiện trên đơn hàng này, hoặc đơn không tồn tại");
+        if (order.getStatus() != OrderStatus.InProgress)
+            throw new RuntimeException("Chỉ cho phép chuyển từ IN_PROGRESS sang COMPLETED");
+            
+        com.carrental.entity.Payment finalPayment = paymentService.getPaymentByOrderAndType(orderId, com.carrental.enums.TransactionType.FinalPayment);
+        if (finalPayment == null || finalPayment.getStatus() != com.carrental.enums.PaymentStatus.Success) {
+            throw new RuntimeException("Khách hàng chưa thanh toán phần còn lại.");
+        }
+        
+        order.setStatus(OrderStatus.Completed);
+        order.setActualReturnTime(LocalDateTime.now());
+        order.setReturnChecklistNote(checklistNote);
+        
+        List<String> savedFiles = new ArrayList<>();
+        try {
+            rentalOrderRepository.save(order);
+            savedFiles = saveRentalImages(order, images, com.carrental.enums.RentalImageType.Return);
+            rentalOrderRepository.flush(); // Đẩy SQL xuống DB để bắt exception ngay (nếu có)
+        } catch (Exception e) {
+            deleteFiles(savedFiles, "rental");
+            throw e;
+        }
     }
 
     // ====================== DỮ LIỆU DANH MỤC ======================
@@ -388,11 +560,15 @@ public class OwnerServiceImpl implements OwnerService {
      * sortOrder bắt đầu từ 0 — ảnh đầu tiên là ảnh bìa (thumbnail).
      */
     private void saveCarImages(Car car, List<MultipartFile> images) {
-        if (images == null || images.isEmpty()) return;
+        System.out.println("saveCarImages called, count: " + (images != null ? images.size() : "null"));
+        if (images == null || images.isEmpty())
+            return;
 
         int order = 0;
         for (MultipartFile file : images) {
-            if (file == null || file.isEmpty()) continue;
+            System.out.println("car image empty: " + (file != null ? file.isEmpty() : "null"));
+            if (file == null || file.isEmpty())
+                continue;
 
             String imageUrl = saveImageFile(file, "cars");
 
@@ -431,8 +607,8 @@ public class OwnerServiceImpl implements OwnerService {
                     ? originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase()
                     : ".jpg";
 
-            String filename  = UUID.randomUUID() + extension;
-            Path   uploadDir = Paths.get(uploadPath).toAbsolutePath().normalize().resolve(subDir);
+            String filename = UUID.randomUUID() + extension;
+            Path uploadDir = Paths.get(uploadPath).toAbsolutePath().normalize().resolve(subDir);
 
             if (!Files.exists(uploadDir)) {
                 Files.createDirectories(uploadDir);

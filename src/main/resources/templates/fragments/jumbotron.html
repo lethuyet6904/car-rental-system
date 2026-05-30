@@ -45,20 +45,12 @@
                             </div>
                         
                             <ul class="dropdown-menu ct-dropdown-menu w-100 shadow-lg">
-                                <th:block th:if="${locations != null}">
-                                    <li th:each="loc : ${locations}">
-                                        <a class="dropdown-item" href="#" th:data-value="${loc.name}" th:text="${loc.name}"></a>
-                                    </li>
-                                </th:block>
-                                
-                                <th:block th:if="${locations == null}">
-                                    <li><a class="dropdown-item" href="#" data-value="Đà Nẵng">Đà Nẵng</a></li>
-                                    <li><a class="dropdown-item" href="#" data-value="Hà Nội">Hà Nội</a></li>
-                                    <li><a class="dropdown-item" href="#" data-value="TP Hồ Chí Minh">TP. Hồ Chí Minh</a></li>
-                                </th:block>
+                                <li th:each="region : ${regions}">
+                                    <a class="dropdown-item" href="#" th:data-value="${region.regionName}" th:text="${region.regionName}"></a>
+                                </li>
                             </ul>
                         
-                            <input type="hidden" name="city" id="locationValue" required="required">
+                            <input type="hidden" name="city" id="locationValue">
                         </div>
 
                         <div class="ct-field-divider"></div>
@@ -67,7 +59,8 @@
                             <label class="ct-field__label" for="dateFrom">
                                 <i class="fa-regular fa-calendar-plus"></i> Nhận xe
                             </label>
-                            <input class="ct-field__input" type="date" id="dateFrom" name="dateFrom" required="required"/>
+                            <input class="ct-field__input" type="date" id="dateFrom" name="dateFrom"
+                                   th:attr="min=${#temporals.format(#temporals.createToday().plusDays(1), 'yyyy-MM-dd')}" />
                         </div>
 
                         <div class="ct-field-divider"></div>
@@ -76,7 +69,7 @@
                             <label class="ct-field__label" for="dateTo">
                                 <i class="fa-regular fa-calendar-check"></i> Trả xe
                             </label>
-                            <input class="ct-field__input" type="date" id="dateTo" name="dateTo" required="required"/>
+                            <input class="ct-field__input" type="date" id="dateTo" name="dateTo" />
                         </div>
 
                         <button type="submit" class="ct-search-btn">
@@ -88,6 +81,23 @@
         </div>
     </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dropdownItems = document.querySelectorAll('.ct-dropdown-menu .dropdown-item');
+    const locationDisplay = document.getElementById('locationDisplay');
+    const locationValue = document.getElementById('locationValue');
+    
+    dropdownItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const val = this.getAttribute('data-value');
+            locationDisplay.innerHTML = `<span style="color: #0F172A; font-weight: 500;">${val}</span>`;
+            locationValue.value = val;
+        });
+    });
+});
+</script>
 
 </body>
 </html>

@@ -30,98 +30,78 @@ public class IdentityVerificationServiceImpl implements IdentityVerificationServ
     @Value("${upload.path:/uploads}")
     private String uploadPath;
 
-    // ====================== NỘP HỒ SƠ XÁC MINH ======================
+    // ════════════════════════════════════════════════════════════
+    // BƯỚC 1: Nộp CCCD
+    // ════════════════════════════════════════════════════════════
     @Override
     @Transactional
-    public IdentityVerification submitVerification(Long userId, IdentityVerificationRequest request) {
+    public IdentityVerification submitCccd(Long userId, IdentityVerificationRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
 
-        // Kiểm tra trạng thái hồ sơ hiện tại
+        // Kiểm tra hồ sơ hiện tại
         identityVerificationRepository
                 .findTopByUserUserIdOrderBySubmittedAtDesc(userId)
                 .ifPresent(iv -> {
-                    switch (iv.getStatus()) {
-                        case Pending -> throw new RuntimeException(
-                                "Bạn đã có hồ sơ đang chờ duyệt! Vui lòng chờ admin xử lý.");
-                        case Approved -> throw new RuntimeException(
-                                "Danh tính của bạn đã được xác minh thành công!");
-                        // Nếu Rejected → cho phép nộp lại bình thường, không throw
-                        default -> {}
+                    if (iv.getStatus() == VerificationStatus.Pending) {
+                        throw new RuntimeException("Hồ sơ CCCD của bạn đang chờ Admin duyệt, vui lòng chờ.");
                     }
+                    if (iv.getStatus() == VerificationStatus.Approved) {
+                        throw new RuntimeException("CCCD của bạn đã được xác minh thành công rồi.");
+                    }
+                    // Rejected → xóa record cũ để tạo mới
+                    identityVerificationRepository.delete(iv);
                 });
 
-        // Lưu ảnh CCCD và GPLX
-        String nationalIdFrontPath = saveImage(request.getNationalIdFrontImage(), "cccd/front");
-        String nationalIdBackPath  = saveImage(request.getNationalIdBackImage(),  "cccd/back");
-        String frontImagePath      = saveImage(request.getFrontImage(),            "gplx/front");
-        String backImagePath       = saveImage(request.getBackImage(),             "gplx/back");
+        String frontPath = saveImage(request.getNationalIdFrontImage(), "cccd/front");
+        String backPath = saveImage(request.getNationalIdBackImage(), "cccd/back");
 
-        IdentityVerification verification = IdentityVerification.builder()
+        IdentityVerification iv = IdentityVerification.builder()
                 .user(user)
-                .nationalId(request.getNationalId())
-                .nationalIdFrontImage(nationalIdFrontPath)
-                .nationalIdBackImage(nationalIdBackPath)
-                .licenseNumber(request.getLicenseNumber())
-                .frontImage(frontImagePath)
-                .backImage(backImagePath)
+                .nationalId(request.getNationalId().trim())
+                .nationalIdFrontImage(frontPath)
+                .nationalIdBackImage(backPath)
+                // GPLX để null — sẽ bổ sung ở bước 2
+                .licenseNumber(null)
+                .frontImage(null)
+                .backImage(null)
                 .status(VerificationStatus.Pending)
                 .submittedAt(LocalDateTime.now())
                 .build();
 
-        return identityVerificationRepository.save(verification);
+        return identityVerificationRepository.save(iv);
     }
 
-    // ====================== HELPER: Lưu ảnh lên server ======================
-    private String saveImage(MultipartFile file, String subDir) {
-        if (file == null || file.isEmpty()) {
-            throw new RuntimeException("Vui lòng upload đầy đủ ảnh (" + subDir + ")");
+    // ════════════════════════════════════════════════════════════
+    // BƯỚC 2: Bổ sung GPLX (chỉ sau khi CCCD đã Approved)
+    // ════════════════════════════════════════════════════════════
+    @Override
+    @Transactional
+    public IdentityVerification submitLicense(Long userId, IdentityVerificationRequest request) {
+        IdentityVerification iv = identityVerificationRepository
+                .findTopByUserUserIdOrderBySubmittedAtDesc(userId)
+                .orElseThrow(() -> new RuntimeException("Bạn cần xác minh CCCD trước khi bổ sung GPLX."));
+
+        if (iv.getStatus() != VerificationStatus.Approved) {
+            throw new RuntimeException("CCCD của bạn chưa được Admin duyệt. Vui lòng chờ kết quả trước.");
+        }
+        if (iv.hasLicense()) {
+            throw new RuntimeException("Bạn đã nộp GPLX rồi.");
         }
 
-        // Kiểm tra loại file
-        String contentType = file.getContentType();
-        if (contentType == null ||
-            (!contentType.equals("image/jpeg") &&
-             !contentType.equals("image/png") &&
-             !contentType.equals("image/jpg"))) {
-            throw new RuntimeException("Chỉ chấp nhận file ảnh JPG hoặc PNG");
-        }
+        String frontPath = saveImage(request.getFrontImage(), "gplx/front");
+        String backPath = saveImage(request.getBackImage(), "gplx/back");
 
-        // Kiểm tra kích thước (tối đa 5MB)
-        if (file.getSize() > 5 * 1024 * 1024) {
-            throw new RuntimeException("File ảnh không được vượt quá 5MB");
-        }
+        iv.setLicenseNumber(request.getLicenseNumber().trim());
+        iv.setFrontImage(frontPath);
+        iv.setBackImage(backPath);
 
-        try {
-            String originalFilename = file.getOriginalFilename();
-            if (originalFilename == null || !originalFilename.contains(".")) {
-                throw new RuntimeException("Tên file không hợp lệ");
-            }
-            String extension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
-            String filename = UUID.randomUUID() + extension;
-
-            // Dùng đường dẫn tuyệt đối (absolute path) để tránh lỗi với embedded Tomcat
-            // Paths.get(uploadPath) nếu uploadPath là relative (vd: "uploads") sẽ resolve
-            // từ thư mục làm việc hiện tại của JVM (project root), không phải temp của Tomcat
-            Path uploadDir = Paths.get(uploadPath).toAbsolutePath().normalize().resolve(subDir);
-            if (!Files.exists(uploadDir)) {
-                Files.createDirectories(uploadDir);
-            }
-
-            Path filePath = uploadDir.resolve(filename);
-
-            // Dùng Files.copy thay vì transferTo() để tránh lỗi FileNotFoundException
-            // với embedded Tomcat trên Windows
-            Files.copy(file.getInputStream(), filePath,
-                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-
-            return "/uploads/" + subDir + "/" + filename;
-        } catch (IOException e) {
-            throw new RuntimeException("Lỗi khi lưu ảnh: " + e.getMessage());
-        }
+        return identityVerificationRepository.save(iv);
     }
 
-    // ====================== QUERY ======================
+    // ════════════════════════════════════════════════════════════
+    // QUERY
+    // ════════════════════════════════════════════════════════════
     @Override
     public IdentityVerification findLatestByUser(Long userId) {
         return identityVerificationRepository
@@ -130,58 +110,96 @@ public class IdentityVerificationServiceImpl implements IdentityVerificationServ
     }
 
     @Override
-    public boolean isIdentityVerified(Long userId) {
-        return identityVerificationRepository
-                .findTopByUserUserIdOrderBySubmittedAtDesc(userId)
-                .map(iv -> iv.getStatus() == VerificationStatus.Approved)
-                .orElse(false);
+    public boolean isCccdApproved(Long userId) {
+        IdentityVerification iv = findLatestByUser(userId);
+        return iv != null && iv.getStatus() == VerificationStatus.Approved;
     }
 
     @Override
-    public IdentityVerification getVerifiedIdentityByUser(Long userId) {
-        return identityVerificationRepository
-                .findTopByUserUserIdOrderBySubmittedAtDesc(userId)
-                .filter(iv -> iv.getStatus() == VerificationStatus.Approved)
-                .orElse(null);
+    public boolean isFullyVerified(Long userId) {
+        IdentityVerification iv = findLatestByUser(userId);
+        return iv != null
+                && iv.getStatus() == VerificationStatus.Approved
+                && iv.hasLicense();
     }
 
-    // ====================== ADMIN: Duyệt / Từ chối ======================
     @Override
-    @Transactional
-    public IdentityVerification approveVerification(Long verificationId) {
-        IdentityVerification verification = identityVerificationRepository.findById(verificationId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy hồ sơ xác minh id=" + verificationId));
-
-        if (verification.getStatus() != VerificationStatus.Pending) {
-            throw new IllegalStateException("Hồ sơ này đã được xử lý rồi (trạng thái: "
-                    + verification.getStatus() + ")");
-        }
-
-        verification.setStatus(VerificationStatus.Approved);
-        verification.setReviewedAt(LocalDateTime.now());
-
-        return identityVerificationRepository.save(verification);
+    public IdentityVerification getApprovedByUser(Long userId) {
+        IdentityVerification iv = findLatestByUser(userId);
+        return (iv != null && iv.getStatus() == VerificationStatus.Approved) ? iv : null;
     }
 
+    // ════════════════════════════════════════════════════════════
+    // ADMIN: Duyệt / Từ chối CCCD
+    // ════════════════════════════════════════════════════════════
     @Override
     @Transactional
-    public IdentityVerification rejectVerification(Long verificationId, String reason) {
-        IdentityVerification verification = identityVerificationRepository.findById(verificationId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy hồ sơ xác minh id=" + verificationId));
+    public IdentityVerification approveCccd(Long verificationId) {
+        IdentityVerification iv = findByIdOrThrow(verificationId);
+        assertPending(iv);
+        iv.setStatus(VerificationStatus.Approved);
+        iv.setReviewedAt(LocalDateTime.now());
+        return identityVerificationRepository.save(iv);
+    }
 
-        if (verification.getStatus() != VerificationStatus.Pending) {
-            throw new IllegalStateException("Hồ sơ này đã được xử lý rồi (trạng thái: "
-                    + verification.getStatus() + ")");
-        }
-
-        if (reason == null || reason.isBlank()) {
+    @Override
+    @Transactional
+    public IdentityVerification rejectCccd(Long verificationId, String reason) {
+        if (reason == null || reason.isBlank())
             throw new RuntimeException("Vui lòng nhập lý do từ chối");
+
+        IdentityVerification iv = findByIdOrThrow(verificationId);
+        assertPending(iv);
+        iv.setStatus(VerificationStatus.Rejected);
+        iv.setRejectReason(reason.trim());
+        iv.setReviewedAt(LocalDateTime.now());
+        return identityVerificationRepository.save(iv);
+    }
+
+    // ════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS
+    // ════════════════════════════════════════════════════════════
+    private IdentityVerification findByIdOrThrow(Long id) {
+        return identityVerificationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy hồ sơ xác minh id=" + id));
+    }
+
+    private void assertPending(IdentityVerification iv) {
+        if (iv.getStatus() != VerificationStatus.Pending) {
+            throw new IllegalStateException("Hồ sơ đã được xử lý (trạng thái: " + iv.getStatus() + ")");
         }
+    }
 
-        verification.setStatus(VerificationStatus.Rejected);
-        verification.setRejectReason(reason.trim());
-        verification.setReviewedAt(LocalDateTime.now());
+    private String saveImage(MultipartFile file, String subDir) {
+        if (file == null || file.isEmpty())
+            throw new RuntimeException("Vui lòng upload đầy đủ ảnh (" + subDir + ")");
 
-        return identityVerificationRepository.save(verification);
+        String ct = file.getContentType();
+        if (ct == null || (!ct.equals("image/jpeg") && !ct.equals("image/png") && !ct.equals("image/jpg")))
+            throw new RuntimeException("Chỉ chấp nhận file JPG hoặc PNG");
+
+        if (file.getSize() > 5 * 1024 * 1024)
+            throw new RuntimeException("File ảnh không được vượt quá 5MB");
+
+        try {
+            String original = file.getOriginalFilename();
+            if (original == null || !original.contains("."))
+                throw new RuntimeException("Tên file không hợp lệ");
+
+            String ext = original.substring(original.lastIndexOf(".")).toLowerCase();
+            String filename = UUID.randomUUID() + ext;
+
+            Path uploadDir = Paths.get(uploadPath).toAbsolutePath().normalize().resolve(subDir);
+            if (!Files.exists(uploadDir))
+                Files.createDirectories(uploadDir);
+
+            Files.copy(file.getInputStream(),
+                    uploadDir.resolve(filename),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+            return "/uploads/" + subDir + "/" + filename;
+        } catch (IOException e) {
+            throw new RuntimeException("Lỗi khi lưu ảnh: " + e.getMessage());
+        }
     }
 }

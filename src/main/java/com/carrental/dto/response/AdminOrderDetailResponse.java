@@ -44,6 +44,10 @@ public class AdminOrderDetailResponse {
     private final String licensePlate;
     private final List<String> carImages;
 
+    // Ảnh giao nhận xe (Rental Images)
+    private final List<String> pickupImages;
+    private final List<String> returnImages;
+
     // Chủ xe
     private final Long ownerId;
     private final String ownerName;
@@ -61,7 +65,8 @@ public class AdminOrderDetailResponse {
     private final String reviewComment;
 
     private AdminOrderDetailResponse(RentalOrder o, List<String> carImages,
-                                     Payment deposit, Byte rating, String reviewComment) {
+                                     Payment deposit, Byte rating, String reviewComment,
+                                     List<String> pickupImages, List<String> returnImages) {
         this.orderId          = o.getOrderId();
         this.createdAt        = o.getCreatedAt();
         this.pickupDate       = o.getPickupDate();
@@ -105,11 +110,14 @@ public class AdminOrderDetailResponse {
         this.depositPaid     = deposit != null ? deposit.getIsPaid() : false;
         this.rating        = rating;
         this.reviewComment = reviewComment;
+        this.pickupImages  = pickupImages != null ? pickupImages : List.of();
+        this.returnImages  = returnImages != null ? returnImages : List.of();
     }
 
     public static AdminOrderDetailResponse from(RentalOrder o, List<String> carImages,
                                                 Payment deposit, Byte rating,
-                                                String reviewComment) {
-        return new AdminOrderDetailResponse(o, carImages, deposit, rating, reviewComment);
+                                                String reviewComment,
+                                                List<String> pickupImages, List<String> returnImages) {
+        return new AdminOrderDetailResponse(o, carImages, deposit, rating, reviewComment, pickupImages, returnImages);
     }
 }

@@ -31,7 +31,8 @@ public class PaymentController {
      * GET: Hiển thị trang thanh toán cọc
      */
     @GetMapping("/checkout/{orderId}")
-    public String showCheckout(@PathVariable Long orderId, Model model, RedirectAttributes ra, HttpServletRequest request) {
+    public String showCheckout(@PathVariable Long orderId, Model model, RedirectAttributes ra,
+            HttpServletRequest request) {
         // Kiểm tra đăng nhập
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
@@ -50,22 +51,14 @@ public class PaymentController {
             return "redirect:/booking/my-orders";
         }
 
-        // SỬA: Cho phép cả PENDING_PAYMENT và Confirmed đều vào được checkout
-        if (order.getStatus() != OrderStatus.PENDING_PAYMENT && order.getStatus() != OrderStatus.Confirmed) {
+        // Chỉ cho vào checkout khi đang chờ thanh toán cọc
+        if (order.getStatus() != OrderStatus.Pending) {
             ra.addFlashAttribute("error", "Đơn hàng không cần thanh toán hoặc đã được thanh toán");
             return "redirect:/booking/order/" + orderId;
         }
 
-        // Tính số tiền cần thanh toán
-        BigDecimal amountToPay;
-        if (order.getStatus() == OrderStatus.PENDING_PAYMENT) {
-            amountToPay = order.getDepositAmount(); // Cọc 30%
-        } else {
-            amountToPay = order.getTotalAmount().subtract(order.getDepositAmount()); // Còn lại 70%
-        }
-
         model.addAttribute("order", order);
-        model.addAttribute("amountToPay", amountToPay);
+        model.addAttribute("amountToPay", order.getDepositAmount());
         model.addAttribute("paymentMethods", PaymentMethod.values());
         return "pages/payment/checkout";
     }
@@ -75,14 +68,25 @@ public class PaymentController {
      */
     @PostMapping("/process-deposit")
     public String processDeposit(@RequestParam Long orderId,
-                                  @RequestParam PaymentMethod paymentMethod,
-                                  @RequestParam(required = false) String transactionId,
-                                  RedirectAttributes ra) {
+            @RequestParam PaymentMethod paymentMethod,
+            @RequestParam(required = false) String transactionId,
+            HttpServletRequest request,
+            RedirectAttributes ra) {
+
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null)
+            return "redirect:/auth/login";
+
+        RentalOrder order = bookingService.getOrderById(orderId);
+        if (order == null || !order.getCustomer().getUserId().equals(user.getUserId())) {
+            ra.addFlashAttribute("error", "Báº¡n khÃ´ng cÃ³ quyá»n thanh toÃ¡n Ä‘Æ¡n hÃ ng nÃ y");
+            return "redirect:/booking/my-orders";
+        }
 
         boolean success = paymentService.processDepositPayment(orderId, paymentMethod, transactionId, ra);
 
         if (success) {
-            return "redirect:/booking/order/" + orderId;
+            return "redirect:/payment/success?orderId=" + orderId + "&paymentMethod=" + paymentMethod;
         } else {
             return "redirect:/payment/checkout/" + orderId;
         }
@@ -93,10 +97,10 @@ public class PaymentController {
      */
     @GetMapping("/final/{orderId}")
     public String showFinalPayment(@PathVariable Long orderId,
-                                    @RequestParam(required = false) BigDecimal extraFee,
-                                    @RequestParam(required = false) String damages,
-                                    Model model,
-                                    RedirectAttributes ra) {
+            @RequestParam(required = false) BigDecimal extraFee,
+            @RequestParam(required = false) String damages,
+            Model model,
+            RedirectAttributes ra) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) {
@@ -125,11 +129,11 @@ public class PaymentController {
      */
     @PostMapping("/process-final")
     public String processFinalPayment(@RequestParam Long orderId,
-                                       @RequestParam PaymentMethod paymentMethod,
-                                       @RequestParam(required = false) BigDecimal extraFee,
-                                       @RequestParam(required = false) String damages,
-                                       @RequestParam(required = false) String transactionId,
-                                       RedirectAttributes ra) {
+            @RequestParam PaymentMethod paymentMethod,
+            @RequestParam(required = false) BigDecimal extraFee,
+            @RequestParam(required = false) String damages,
+            @RequestParam(required = false) String transactionId,
+            RedirectAttributes ra) {
 
         boolean success = paymentService.processFinalPayment(orderId, paymentMethod, extraFee, damages, ra);
 
@@ -145,8 +149,8 @@ public class PaymentController {
      */
     @GetMapping("/success")
     public String paymentSuccess(@RequestParam(required = false) Long orderId,
-                                  @RequestParam(required = false) String paymentMethod,
-                                  Model model) {
+            @RequestParam(required = false) String paymentMethod,
+            Model model) {
         model.addAttribute("orderId", orderId);
         model.addAttribute("paymentMethod", paymentMethod);
         return "pages/payment/success";

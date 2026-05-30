@@ -59,7 +59,7 @@ public interface RentalOrderRepository extends JpaRepository<RentalOrder, Long> 
 
     // Dùng cho khách hàng xem đơn
     @EntityGraph(attributePaths = {"car", "car.brand"})
-    List<RentalOrder> findByCustomerUserId(Long userId);
+    List<RentalOrder> findByCustomerUserIdOrderByCreatedAtDesc(Long userId);
 
  // Admin filter
     @Query(value = """

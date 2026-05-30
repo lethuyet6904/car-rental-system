@@ -1,142 +1,350 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/head :: head('Thông tin cá nhân - Carto', ~{::link})}">
-    <link rel="stylesheet" th:href="@{/assets/css/customer.css}"/>
+
+<head th:replace="~{fragments/head :: head('Hồ sơ cá nhân', ~{::link})}">
+    <link rel="stylesheet" th:href="@{/assets/css/profile.css}" />
 </head>
-<body class="bg-light">
 
-<div th:replace="~{fragments/navbar :: navbar}"></div>
+<body>
 
-<div class="container py-5" style="padding-top: 100px !important;">
-    <div class="row justify-content-center">
-        <div class="col-md-10 col-lg-8">
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white mb-4">
-                
-                <div class="card-header border-0 bg-white p-4 pt-5 pb-2">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <div>
-                            <span class="text-primary fw-semibold small text-uppercase tracking-wider">Tài khoản thành viên</span>
-                            <h1 class="h3 fw-bold text-dark mb-1" style="font-family: 'Outfit', sans-serif;">
-                                <i class="fa-solid fa-user-gear me-2 text-secondary fs-4"></i>Thông tin cá nhân
-                            </h1>
+    <div class="ct-profile-page">
+        <div class="container">
+            <div class="row g-4">
+
+                <!-- ===================== SIDEBAR TRÁI ===================== -->
+                <div class="col-lg-3 col-md-4">
+                    <div class="ct-profile-sidebar">
+
+                        <!-- Avatar + tên -->
+                        <div class="ct-avatar-wrap">
+                            <div th:if="${user.avatar != null}" class="ct-avatar-img-wrap">
+                                <img th:src="${user.avatar}" alt="Avatar" class="ct-avatar-img" />
+                            </div>
+                            <div th:if="${user.avatar == null}" class="ct-avatar-circle"
+                                th:text="${#strings.substring(user.fullName, 0, 1).toUpperCase()}">U</div>
+                            <div>
+                                <div class="ct-avatar-name" th:text="${user.fullName}">Nguyễn Văn A</div>
+                                <div class="ct-avatar-phone" th:text="${user.phone}">0901234567</div>
+                            </div>
+
+                            <!-- Badge trạng thái xác minh -->
+                            <div th:if="${identityStatus != null and identityStatus.name() == 'Approved'}"
+                                class="ct-verify-badge verified w-100">
+                                <i class="fa-solid fa-circle-check"></i> Đã xác minh
+                            </div>
+                            <div th:if="${identityStatus != null and identityStatus.name() == 'Pending'}"
+                                class="ct-verify-badge pending w-100">
+                                <i class="fa-solid fa-clock"></i> Chờ xác minh
+                            </div>
+                            <div th:if="${identityStatus == null or identityStatus.name() == 'Rejected'}"
+                                class="ct-verify-badge unverified w-100">
+                                <i class="fa-solid fa-circle-xmark"></i> Chưa xác minh
+                            </div>
                         </div>
-                        <button id="editBtn" class="btn btn-light border rounded-3 px-3 py-2 fw-medium shadow-sm" onclick="toggleEdit()">
-                            <i class="fa-solid fa-pen-to-square me-1.5 small text-muted"></i> Chỉnh sửa
-                        </button>
+
+                        <!-- Nav -->
+                        <ul class="ct-profile-nav">
+                            <li>
+                                <a th:href="@{/customer/profile}" class="active">
+                                    <i class="fa-solid fa-user"></i> Hồ sơ cá nhân
+                                </a>
+                            </li>
+                            <li>
+                                <a th:href="@{/customer/change-password}">
+                                    <i class="fa-solid fa-lock"></i> Đổi mật khẩu
+                                </a>
+                            </li>
+                            <li>
+                                <a th:href="@{/booking/my-orders}">
+                                    <i class="fa-solid fa-file-contract"></i> Đơn thuê của tôi
+                                </a>
+                            </li>
+                            <li th:if="${identityStatus == null or identityStatus.name() == 'Rejected'}">
+                                <a th:href="@{/verification/cccd}">
+                                    <i class="fa-solid fa-id-card"></i> Xác minh CCCD
+                                </a>
+                            </li>
+                            <li th:if="${identityStatus != null and identityStatus.name() == 'Approved'
+                                    and (identity == null or identity.licenseNumber == null)}">
+                                <a th:href="@{/verification/license}">
+                                    <i class="fa-solid fa-car"></i> Bổ sung GPLX
+                                </a>
+                            </li>
+                        </ul>
+
                     </div>
                 </div>
 
-                <div class="card-body px-4 py-2">
-                    <form id="profileForm" th:action="@{/customer/profile/update}" method="post">
-                        
-                        <div class="row align-items-center border-bottom py-3.5 mx-0">
-                            <div class="col-sm-3 ps-0 mb-1 mb-sm-0">
-                                <span class="fw-semibold text-secondary small text-uppercase">Họ và tên</span>
-                            </div>
-                            <div class="col-sm-9 pe-0">
-                                <input type="text" class="form-control border-0 bg-transparent px-0 fw-medium text-dark fs-6 shadow-none form-control-plaintext transition-all" 
-                                       id="fullName" name="fullName" th:value="${user.fullName}" readonly>
-                            </div>
-                        </div>
+                <!-- ===================== MAIN CONTENT ===================== -->
+                <div class="col-lg-9 col-md-8">
 
-                        <div class="row align-items-center border-bottom py-3.5 mx-0">
-                            <div class="col-sm-3 ps-0 mb-1 mb-sm-0">
-                                <span class="fw-semibold text-secondary small text-uppercase">Số điện thoại</span>
-                            </div>
-                            <div class="col-sm-9 pe-0">
-                                <input type="text" class="form-control border-0 bg-transparent px-0 fw-medium text-muted fs-6 shadow-none form-control-plaintext" 
-                                       th:value="${user.phone}" readonly>
-                            </div>
-                        </div>
+                    <!-- Alert messages -->
+                    <div th:if="${success}" class="ct-alert-success mb-3">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span th:text="${success}"></span>
+                    </div>
+                    <div th:if="${error}" class="ct-alert-error mb-3">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <span th:text="${error}"></span>
+                    </div>
 
-                        <div class="row align-items-center border-bottom py-3.5 mx-0">
-                            <div class="col-sm-3 ps-0 mb-1 mb-sm-0">
-                                <span class="fw-semibold text-secondary small text-uppercase">Email</span>
+                    <!-- Card Thông tin cá nhân -->
+                    <div class="ct-profile-card">
+                        <div class="ct-profile-card__header">
+                            <div>
+                                <h2 class="ct-profile-card__title">
+                                    <i class="fa-solid fa-user-gear me-2 text-secondary" style="font-size:1.1rem"></i>
+                                    Thông tin cá nhân
+                                </h2>
+                                <p class="ct-profile-card__subtitle">Quản lý thông tin hồ sơ của bạn</p>
                             </div>
-                            <div class="col-sm-9 pe-0">
-                                <input type="email" class="form-control border-0 bg-transparent px-0 fw-medium text-dark fs-6 shadow-none form-control-plaintext transition-all" 
-                                       id="email" name="email" th:value="${user.email}" readonly>
-                            </div>
-                        </div>
-
-                        <div class="row align-items-center border-bottom-0 py-3.5 mx-0">
-                            <div class="col-sm-3 ps-0 mb-1 mb-sm-0">
-                                <span class="fw-semibold text-secondary small text-uppercase">Địa chỉ</span>
-                            </div>
-                            <div class="col-sm-9 pe-0">
-                                <input type="text" class="form-control border-0 bg-transparent px-0 fw-medium text-dark fs-6 shadow-none form-control-plaintext transition-all" 
-                                       id="address" name="address" th:value="${user.address}" readonly>
-                            </div>
-                        </div>
-
-                        <div class="p-4 rounded-3 text-end bg-light my-3 border" id="actionButtons" style="display: none;">
-                            <button type="button" class="btn btn-outline-secondary rounded-3 px-3.5 py-2 fw-medium border me-2" onclick="toggleEdit()">
-                                Hủy bỏ
-                            </button>
-                            <button type="submit" class="btn btn-dark rounded-3 px-4 py-2 fw-medium shadow-sm">
-                                <i class="fa-solid fa-cloud-arrow-up me-1.5 small"></i> Lưu thay đổi
+                            <button id="editBtn" class="ct-btn-edit" onclick="toggleEdit()">
+                                <i class="fa-solid fa-pen-to-square"></i> Chỉnh sửa
                             </button>
                         </div>
-                    </form>
-                </div>
 
-                <div class="card-footer bg-white border-top-0 p-4 pt-2 pb-5">
-                    <hr class="my-3 text-muted opacity-20" />
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <div>
-                            <a th:href="@{/verification/identity}" class="btn btn-outline-primary rounded-3 px-3 py-2 fw-medium transition-all">
-                                <i class="fa-solid fa-id-card me-1.5 small"></i> Định danh tài khoản 
-                            </a>
-                        </div>
-                        
-                        <div th:if="${user != null}" class="text-end">
-                            <span class="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2.5 fw-semibold fs-7 border border-success border-opacity-10">
-                                <i class="fa-solid fa-circle-check me-1.5 small"></i> Đã định danh thành công
-                            </span>
+                        <div class="ct-profile-card__body">
+                            <form id="profileForm" th:action="@{/customer/profile/update}" method="post">
+
+                                <!-- Họ và tên -->
+                                <div class="ct-info-row">
+                                    <span class="ct-info-row__label">Họ và tên</span>
+                                    <div>
+                                        <span id="fullName-view" class="ct-info-row__value"
+                                            th:text="${user.fullName}">Nguyễn Văn A</span>
+                                        <input id="fullName-edit" name="fullName" type="text"
+                                            class="ct-profile-input d-none" th:value="${user.fullName}"
+                                            placeholder="Nhập họ và tên" />
+                                    </div>
+                                </div>
+
+                                <!-- Số điện thoại (không sửa được) -->
+                                <div class="ct-info-row">
+                                    <span class="ct-info-row__label">Số điện thoại</span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="ct-info-row__value muted" th:text="${user.phone}">0901234567</span>
+                                        <span class="badge rounded-pill"
+                                            style="background:var(--ct-gray-100);color:var(--ct-text-muted);font-size:0.7rem;padding:3px 8px;font-weight:600;">
+                                            Không thể thay đổi
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Email -->
+                                <div class="ct-info-row">
+                                    <span class="ct-info-row__label">Email</span>
+                                    <div>
+                                        <span id="email-view" class="ct-info-row__value"
+                                            th:text="${user.email}">email@example.com</span>
+                                        <input id="email-edit" name="email" type="email" class="ct-profile-input d-none"
+                                            th:value="${user.email}" placeholder="Nhập địa chỉ email" />
+                                    </div>
+                                </div>
+
+                                <!-- Địa chỉ -->
+                                <div class="ct-info-row">
+                                    <span class="ct-info-row__label">Địa chỉ</span>
+                                    <div>
+                                        <span id="address-view" class="ct-info-row__value"
+                                            th:text="${user.address != null ? user.address : '—'}">Hà Nội</span>
+                                        <input id="address-edit" name="address" type="text"
+                                            class="ct-profile-input d-none" th:value="${user.address}"
+                                            placeholder="Nhập địa chỉ thường trú" />
+                                    </div>
+                                </div>
+
+                                <!-- Ngày tham gia -->
+                                <div class="ct-info-row">
+                                    <span class="ct-info-row__label">Ngày tham gia</span>
+                                    <span class="ct-info-row__value muted"
+                                        th:text="${user.createdAt != null ? #temporals.format(user.createdAt, 'dd/MM/yyyy') : '—'}">
+                                        01/01/2025
+                                    </span>
+                                </div>
+
+                                <!-- Action buttons (ẩn mặc định) -->
+                                <div class="ct-action-bar d-none" id="actionBar">
+                                    <button type="button" class="ct-btn-cancel" onclick="toggleEdit()">
+                                        <i class="fa-solid fa-xmark"></i> Hủy bỏ
+                                    </button>
+                                    <button type="submit" class="ct-btn-save">
+                                        <i class="fa-solid fa-cloud-arrow-up"></i> Lưu thay đổi
+                                    </button>
+                                </div>
+
+                            </form>
                         </div>
                     </div>
-                </div>
 
+                    <!-- Card Xác minh danh tính -->
+                    <div class="ct-profile-card mt-4">
+                        <div class="ct-profile-card__header">
+                            <div>
+                                <h2 class="ct-profile-card__title">
+                                    <i class="fa-solid fa-id-card me-2 text-secondary" style="font-size:1.1rem"></i>
+                                    Xác minh danh tính
+                                </h2>
+                                <p class="ct-profile-card__subtitle">Xác minh CCCD và GPLX để thuê xe</p>
+                            </div>
+                        </div>
+
+                        <div class="ct-profile-card__body">
+
+                            <!-- ── BƯỚC 1: Chưa xác minh CCCD ── -->
+                            <div th:if="${identityStatus == null}">
+                                <div class="ct-state-card"
+                                    style="background:var(--ct-gray-100);border-color:var(--ct-gray-300)">
+                                    <div class="ct-state-icon"
+                                        style="background:var(--ct-gray-200);color:var(--ct-text-muted)">
+                                        <i class="fa-solid fa-id-card"></i>
+                                    </div>
+                                    <div>
+                                        <p class="ct-state-title" style="color:var(--ct-text-main)">Chưa xác minh danh
+                                            tính</p>
+                                        <p class="ct-state-desc">Xác minh CCCD là bắt buộc để đăng ký làm chủ xe. Bổ
+                                            sung thêm GPLX để có thể thuê xe.</p>
+                                    </div>
+                                </div>
+                                <a th:href="@{/verification/cccd}" class="ct-btn-save d-inline-flex mt-3"
+                                    style="text-decoration:none">
+                                    <i class="fa-solid fa-id-card"></i> Xác minh CCCD ngay
+                                </a>
+                            </div>
+
+                            <!-- ── BƯỚC 1: CCCD đang chờ duyệt ── -->
+                            <div th:if="${identityStatus != null and identityStatus.name() == 'Pending'}">
+                                <div class="ct-state-card pending">
+                                    <div class="ct-state-icon"><i class="fa-solid fa-clock"></i></div>
+                                    <div>
+                                        <p class="ct-state-title">CCCD đang chờ Admin duyệt</p>
+                                        <p class="ct-state-desc">
+                                            Đã gửi lúc <strong
+                                                th:text="${identity != null ? #temporals.format(identity.submittedAt, 'dd/MM/yyyy HH:mm') : ''}"></strong>.
+                                            Vui lòng chờ 1–3 ngày làm việc.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ── BƯỚC 1: CCCD bị từ chối ── -->
+                            <div th:if="${identityStatus != null and identityStatus.name() == 'Rejected'}">
+                                <div class="ct-state-card rejected">
+                                    <div class="ct-state-icon"><i class="fa-solid fa-circle-xmark"></i></div>
+                                    <div>
+                                        <p class="ct-state-title">Hồ sơ CCCD bị từ chối</p>
+                                        <p class="ct-state-desc">
+                                            Lý do: <strong
+                                                th:text="${identity != null ? identity.rejectReason : '—'}"></strong>.
+                                            Vui lòng nộp lại.
+                                        </p>
+                                    </div>
+                                </div>
+                                <a th:href="@{/verification/cccd}" class="ct-btn-save d-inline-flex mt-2"
+                                    style="text-decoration:none">
+                                    <i class="fa-solid fa-rotate-right"></i> Nộp lại CCCD
+                                </a>
+                            </div>
+
+                            <!-- ── BƯỚC 1 OK: CCCD đã duyệt ── -->
+                            <div th:if="${identityStatus != null and identityStatus.name() == 'Approved'}">
+
+                                <!-- Step indicator -->
+                                <div style="display:flex;gap:12px;margin-bottom:20px">
+                                    <div
+                                        style="flex:1;background:rgba(95,207,134,.08);border:1px solid rgba(95,207,134,.25);border-radius:var(--r-md);padding:12px 16px;display:flex;align-items:center;gap:10px">
+                                        <div
+                                            style="width:28px;height:28px;border-radius:50%;background:#16a34a;color:white;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0">
+                                            <i class="fa-solid fa-check"></i>
+                                        </div>
+                                        <div>
+                                            <div style="font-size:.78rem;font-weight:700;color:#16a34a">CCCD đã xác minh
+                                            </div>
+                                            <div style="font-size:.72rem;color:var(--ct-text-muted)"
+                                                th:text="${identity != null ? identity.nationalId : ''}"></div>
+                                        </div>
+                                    </div>
+                                    <div th:if="${identity != null and identity.licenseNumber != null}"
+                                        style="flex:1;background:rgba(95,207,134,.08);border:1px solid rgba(95,207,134,.25);border-radius:var(--r-md);padding:12px 16px;display:flex;align-items:center;gap:10px">
+                                        <div
+                                            style="width:28px;height:28px;border-radius:50%;background:#16a34a;color:white;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0">
+                                            <i class="fa-solid fa-check"></i>
+                                        </div>
+                                        <div>
+                                            <div style="font-size:.78rem;font-weight:700;color:#16a34a">GPLX đã có</div>
+                                            <div style="font-size:.72rem;color:var(--ct-text-muted)"
+                                                th:text="${identity.licenseNumber}"></div>
+                                        </div>
+                                    </div>
+                                    <div th:if="${identity == null or identity.licenseNumber == null}"
+                                        style="flex:1;background:var(--ct-gray-100);border:1px solid var(--ct-gray-200);border-radius:var(--r-md);padding:12px 16px;display:flex;align-items:center;gap:10px;opacity:.7">
+                                        <div
+                                            style="width:28px;height:28px;border-radius:50%;background:var(--ct-gray-200);color:var(--ct-text-muted);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0">
+                                            2</div>
+                                        <div>
+                                            <div style="font-size:.78rem;font-weight:600;color:var(--ct-text-muted)">
+                                                Chưa có GPLX</div>
+                                            <div style="font-size:.72rem;color:var(--ct-text-muted)">Cần để thuê xe
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Chưa bổ sung GPLX → nhắc bổ sung -->
+                                <div th:if="${identity == null or identity.licenseNumber == null}"
+                                    style="background:#fffbeb;border:1px solid #fde68a;border-radius:var(--r-md);padding:12px 16px;font-size:.85rem;color:#b45309;margin-bottom:16px;display:flex;gap:8px">
+                                    <i class="fa-solid fa-triangle-exclamation mt-1"></i>
+                                    <span>Bạn chưa bổ sung GPLX. Thêm GPLX để có thể thuê xe trên Carto.</span>
+                                </div>
+                                <a th:if="${identity == null or identity.licenseNumber == null}"
+                                    th:href="@{/verification/license}" class="ct-btn-save d-inline-flex"
+                                    style="text-decoration:none">
+                                    <i class="fa-solid fa-car"></i> Bổ sung GPLX ngay
+                                </a>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const editableFields = ['fullName', 'email', 'address'];
 
-<script>
-    function toggleEdit() {
-        const readonly = document.getElementById("fullName").readOnly;
-        const targetIds = ["fullName", "email", "address"];
-        
-        // Giữ nguyên logic đóng/mở thuộc tính chỉnh sửa
-        document.getElementById("fullName").readOnly = !readonly;
-        document.getElementById("email").readOnly = !readonly;
-        document.getElementById("address").readOnly = !readonly;
+        function toggleEdit() {
+            const isEditing = !document.getElementById('fullName-edit').classList.contains('d-none');
 
-        // Thêm hiệu ứng UI: Chuyển đổi qua lại giữa văn bản phẳng và hộp nhập liệu chuẩn khi gõ
-        targetIds.forEach(id => {
-            const inputEl = document.getElementById(id);
-            if (readonly) {
-                inputEl.classList.remove("border-0", "bg-transparent", "px-0", "form-control-plaintext");
-            } else {
-                inputEl.classList.add("border-0", "bg-transparent", "px-0", "form-control-plaintext");
+            editableFields.forEach(id => {
+                const view = document.getElementById(id + '-view');
+                const edit = document.getElementById(id + '-edit');
+                if (view && edit) {
+                    if (isEditing) {
+                        view.classList.remove('d-none');
+                        edit.classList.add('d-none');
+                    } else {
+                        view.classList.add('d-none');
+                        edit.classList.remove('d-none');
+                    }
+                }
+            });
+
+            document.getElementById('editBtn').classList.toggle('d-none', !isEditing);
+            document.getElementById('actionBar').classList.toggle('d-none', isEditing);
+
+            if (!isEditing) {
+                document.getElementById('fullName-edit').focus();
             }
-        });
-
-        // Toggle nút Chỉnh sửa và cụm phím lưu/hủy
-        document.getElementById("editBtn").classList.toggle("d-none");
-        const actionDiv = document.getElementById("actionButtons");
-        actionDiv.style.display = readonly ? "block" : "none";
-        
-        if(readonly) {
-            document.getElementById("fullName").focus();
         }
-    }
-</script>
+    </script>
 
 </body>
+
 </html>

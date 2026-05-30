@@ -23,130 +23,150 @@ public class IdentityVerificationController {
     private final IdentityVerificationService identityVerificationService;
     private final UserService userService;
 
-    // ====================== GET: Trang xác minh danh tính ======================
-    @GetMapping("/identity")
-    public String showIdentityVerification(
-            @RequestParam(required = false) String redirect,
-            Model model,
-            HttpServletRequest request) {
-
+    // ── Helper ──────────────────────────────────────────────────
+    private User getAuthUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
-            return "redirect:/auth/login";
-        }
-
-        String phone = auth.getName();
-        User user = userService.findByPhone(phone);
-        if (user == null) {
-            return "redirect:/auth/login";
-        }
-        request.getSession().setAttribute("user", user);
-
-        // Lưu redirect URL vào session nếu có (dùng khi verify xong cần về trang cũ)
-        if (redirect != null && !redirect.isEmpty()) {
-            request.getSession().setAttribute("redirectAfterVerification", redirect);
-        }
-
-        // Lấy hồ sơ xác minh mới nhất của user
-        IdentityVerification existing = identityVerificationService.findLatestByUser(user.getUserId());
-
-        // Nếu đã xác minh thành công → redirect về trang trước hoặc home
-        if (existing != null && existing.getStatus() == VerificationStatus.Approved) {
-            String redirectUrl = (String) request.getSession().getAttribute("redirectAfterVerification");
-            if (redirectUrl != null) {
-                request.getSession().removeAttribute("redirectAfterVerification");
-                return "redirect:" + redirectUrl;
-            }
-            return "redirect:/";
-        }
-
-        model.addAttribute("verificationRequest", new IdentityVerificationRequest());
-        model.addAttribute("user", user);
-
-        // Hồ sơ đang chờ duyệt
-        if (existing != null && existing.getStatus() == VerificationStatus.Pending) {
-            model.addAttribute("pending", true);
-            model.addAttribute("submittedAt", existing.getSubmittedAt());
-        }
-
-        // Hồ sơ bị từ chối → cho phép nộp lại
-        if (existing != null && existing.getStatus() == VerificationStatus.Rejected) {
-            model.addAttribute("rejected", true);
-            model.addAttribute("rejectReason", existing.getRejectReason());
-            model.addAttribute("rejectedAt", existing.getReviewedAt());
-        }
-
-        // Flash message từ redirect trước đó (success/error)
-        // (Thymeleaf tự lấy từ model nếu dùng RedirectAttributes)
-
-        return "pages/verification/identity-verification";
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal()))
+            return null;
+        return userService.findByPhone(auth.getName());
     }
 
-    // ====================== POST: Nộp hồ sơ xác minh ======================
-    @PostMapping("/identity")
-    public String submitIdentityVerification(
-            @ModelAttribute IdentityVerificationRequest request,
-            HttpServletRequest httpRequest,
-            RedirectAttributes redirectAttributes) {
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+    // ════════════════════════════════════════════════════════════
+    // BƯỚC 1: Xác minh CCCD → /verification/cccd
+    // ════════════════════════════════════════════════════════════
+    @GetMapping("/cccd")
+    public String showCccd(Model model, HttpServletRequest req) {
+        User user = getAuthUser();
+        if (user == null)
             return "redirect:/auth/login";
+        req.getSession().setAttribute("user", user);
+
+        IdentityVerification iv = identityVerificationService.findLatestByUser(user.getUserId());
+
+        // Đã xác minh CCCD rồi → chuyển sang bước 2 (GPLX)
+        if (iv != null && iv.getStatus() == VerificationStatus.Approved) {
+            return "redirect:/verification/license";
         }
 
-        String phone = auth.getName();
-        User user = userService.findByPhone(phone);
-        if (user == null) {
-            return "redirect:/auth/login";
+        model.addAttribute("user", user);
+        model.addAttribute("verificationRequest", new IdentityVerificationRequest());
+
+        if (iv != null && iv.getStatus() == VerificationStatus.Pending) {
+            model.addAttribute("pending", true);
+            model.addAttribute("submittedAt", iv.getSubmittedAt());
+        }
+        if (iv != null && iv.getStatus() == VerificationStatus.Rejected) {
+            model.addAttribute("rejected", true);
+            model.addAttribute("rejectReason", iv.getRejectReason());
         }
 
-        // Validate thủ công các trường bắt buộc
+        return "pages/verification/cccd-verification";
+    }
+
+    @PostMapping("/cccd")
+    public String submitCccd(@ModelAttribute IdentityVerificationRequest request,
+            RedirectAttributes ra) {
+        User user = getAuthUser();
+        if (user == null)
+            return "redirect:/auth/login";
+
         if (request.getNationalId() == null || request.getNationalId().isBlank()) {
-            redirectAttributes.addFlashAttribute("error", "Số CCCD/CMND không được để trống");
-            return "redirect:/verification/identity";
+            ra.addFlashAttribute("error", "Số CCCD/CMND không được để trống");
+            return "redirect:/verification/cccd";
         }
         if (!request.getNationalId().matches("^[0-9]{9,12}$")) {
-            redirectAttributes.addFlashAttribute("error", "Số CCCD/CMND không hợp lệ (9-12 chữ số)");
-            return "redirect:/verification/identity";
+            ra.addFlashAttribute("error", "Số CCCD/CMND không hợp lệ (9–12 chữ số)");
+            return "redirect:/verification/cccd";
         }
-        if (request.getLicenseNumber() == null || request.getLicenseNumber().isBlank()) {
-            redirectAttributes.addFlashAttribute("error", "Số GPLX không được để trống");
-            return "redirect:/verification/identity";
-        }
-        if (!request.getLicenseNumber().matches("^[A-Za-z0-9]{8,15}$")) {
-            redirectAttributes.addFlashAttribute("error", "Số GPLX không hợp lệ (8-15 ký tự)");
-            return "redirect:/verification/identity";
-        }
-
-        // Validate ảnh upload
         if (request.getNationalIdFrontImage() == null || request.getNationalIdFrontImage().isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "Vui lòng upload ảnh CCCD mặt trước");
-            return "redirect:/verification/identity";
+            ra.addFlashAttribute("error", "Vui lòng upload ảnh CCCD mặt trước");
+            return "redirect:/verification/cccd";
         }
         if (request.getNationalIdBackImage() == null || request.getNationalIdBackImage().isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "Vui lòng upload ảnh CCCD mặt sau");
-            return "redirect:/verification/identity";
-        }
-        if (request.getFrontImage() == null || request.getFrontImage().isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "Vui lòng upload ảnh GPLX mặt trước");
-            return "redirect:/verification/identity";
-        }
-        if (request.getBackImage() == null || request.getBackImage().isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "Vui lòng upload ảnh GPLX mặt sau");
-            return "redirect:/verification/identity";
+            ra.addFlashAttribute("error", "Vui lòng upload ảnh CCCD mặt sau");
+            return "redirect:/verification/cccd";
         }
 
         try {
-            identityVerificationService.submitVerification(user.getUserId(), request);
-            redirectAttributes.addFlashAttribute("success",
-                "Hồ sơ xác minh danh tính đã được gửi thành công! Vui lòng chờ admin duyệt.");
-            // Xóa redirect URL sau khi submit (không redirect về trang cũ, chờ admin duyệt)
-            httpRequest.getSession().removeAttribute("redirectAfterVerification");
+            identityVerificationService.submitCccd(user.getUserId(), request);
+            ra.addFlashAttribute("success",
+                    "Hồ sơ CCCD đã được gửi thành công! Admin sẽ duyệt trong 1–3 ngày làm việc.");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            ra.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/verification/cccd";
+    }
+
+    // ════════════════════════════════════════════════════════════
+    // BƯỚC 2: Bổ sung GPLX → /verification/license
+    // (chỉ truy cập được sau khi CCCD Approved)
+    // ════════════════════════════════════════════════════════════
+    @GetMapping("/license")
+    public String showLicense(Model model, HttpServletRequest req) {
+        User user = getAuthUser();
+        if (user == null)
+            return "redirect:/auth/login";
+        req.getSession().setAttribute("user", user);
+
+        IdentityVerification iv = identityVerificationService.findLatestByUser(user.getUserId());
+
+        // Chưa xác minh CCCD → quay về bước 1
+        if (iv == null || iv.getStatus() != VerificationStatus.Approved) {
+            return "redirect:/verification/cccd";
         }
 
-        // PRG Pattern: redirect về GET để tránh resubmit form khi F5
-        return "redirect:/verification/identity";
+        // Đã có GPLX rồi
+        if (iv.hasLicense()) {
+            model.addAttribute("alreadyHasLicense", true);
+        }
+
+        model.addAttribute("user", user);
+        model.addAttribute("identity", iv);
+        model.addAttribute("verificationRequest", new IdentityVerificationRequest());
+        return "pages/verification/license-verification";
+    }
+
+    @PostMapping("/license")
+    public String submitLicense(@ModelAttribute IdentityVerificationRequest request,
+            RedirectAttributes ra) {
+        User user = getAuthUser();
+        if (user == null)
+            return "redirect:/auth/login";
+
+        if (request.getLicenseNumber() == null || request.getLicenseNumber().isBlank()) {
+            ra.addFlashAttribute("error", "Số GPLX không được để trống");
+            return "redirect:/verification/license";
+        }
+        if (!request.getLicenseNumber().matches("^[A-Za-z0-9\\-]{6,20}$")) {
+            ra.addFlashAttribute("error", "Số GPLX không hợp lệ (6–20 ký tự)");
+            return "redirect:/verification/license";
+        }
+        if (request.getFrontImage() == null || request.getFrontImage().isEmpty()) {
+            ra.addFlashAttribute("error", "Vui lòng upload ảnh GPLX mặt trước");
+            return "redirect:/verification/license";
+        }
+        if (request.getBackImage() == null || request.getBackImage().isEmpty()) {
+            ra.addFlashAttribute("error", "Vui lòng upload ảnh GPLX mặt sau");
+            return "redirect:/verification/license";
+        }
+
+        try {
+            identityVerificationService.submitLicense(user.getUserId(), request);
+            ra.addFlashAttribute("success", "GPLX đã được lưu thành công! Bạn có thể thuê xe ngay bây giờ.");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/verification/license";
+    }
+
+    // ── Redirect cũ sang route mới (backward compat) ────────────
+    @GetMapping("/identity")
+    public String redirectIdentity() {
+        return "redirect:/verification/cccd";
+    }
+
+    @GetMapping("/full")
+    public String redirectFull() {
+        return "redirect:/verification/license";
     }
 }

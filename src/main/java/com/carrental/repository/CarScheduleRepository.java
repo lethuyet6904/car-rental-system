@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CarScheduleRepository extends JpaRepository<CarSchedule, Long> {
@@ -21,4 +22,7 @@ public interface CarScheduleRepository extends JpaRepository<CarSchedule, Long> 
         AND s.endDate >= :startDate
     """)
     boolean existsConflict(Long carId, LocalDate startDate, LocalDate endDate);
+
+    // Tìm CarSchedule theo orderId — dùng khi hủy đơn để xóa lịch xe
+    Optional<CarSchedule> findByRentalOrderOrderId(Long orderId);
 }

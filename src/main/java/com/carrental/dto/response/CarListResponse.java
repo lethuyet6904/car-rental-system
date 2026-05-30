@@ -52,7 +52,6 @@ public class CarListResponse {
         this.thumbnailUrl = images.stream()
                 .min(Comparator.comparingInt(CarImage::getSortOrder))
                 .map(CarImage::getImageUrl)
-                .map(url -> url.startsWith("http") || url.startsWith("/") ? url : "/assets/images/cars/" + url)
                 .orElse(null);
     }
 }

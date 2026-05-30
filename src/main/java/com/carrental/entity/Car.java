@@ -81,6 +81,16 @@ public class Car {
     @Column(name = "rejectReason", length = 300)
     private String rejectReason;
 
+    // Giấy tờ xe (ảnh chụp — lưu đường dẫn file)
+    @Column(name = "registrationImage", length = 200)
+    private String registrationImage;   // Cà vẹt (đăng ký xe)
+
+    @Column(name = "inspectionImage", length = 200)
+    private String inspectionImage;     // Đăng kiểm
+
+    @Column(name = "insuranceImage", length = 200)
+    private String insuranceImage;      // Bảo hiểm vật chất
+
     // decimal(2,1) — ví dụ: 4.5, 3.0
     @Column(name = "avgRating", nullable = false, precision = 2, scale = 1)
     private BigDecimal avgRating;

@@ -37,15 +37,12 @@ public class AdminCarDetailResponse {
     private final String ownerName;
     private final String ownerPhone;
 
-    // Giấy tờ xe (nullable — chưa có entity rõ ràng)
-    private final String registrationFrontImage;
-    private final String registrationBackImage;
-    private final String insuranceImage;
+    // Giấy tờ xe
+    private final String registrationImage;
     private final String inspectionImage;
+    private final String insuranceImage;
 
-    private AdminCarDetailResponse(Car c, List<String> images,
-                                   String regFront, String regBack,
-                                   String insurance, String inspection) {
+    private AdminCarDetailResponse(Car c, List<String> images) {
         this.carId             = c.getCarId();
         this.modelName         = c.getModelName();
         this.licensePlate      = c.getLicensePlate();
@@ -66,13 +63,12 @@ public class AdminCarDetailResponse {
         this.ownerId           = c.getOwner().getUserId();
         this.ownerName         = c.getOwner().getFullName();
         this.ownerPhone        = c.getOwner().getPhone();
-        this.registrationFrontImage = regFront;
-        this.registrationBackImage  = regBack;
-        this.insuranceImage         = insurance;
-        this.inspectionImage        = inspection;
+        this.registrationImage = c.getRegistrationImage();
+        this.inspectionImage   = c.getInspectionImage();
+        this.insuranceImage    = c.getInsuranceImage();
     }
 
     public static AdminCarDetailResponse from(Car c, List<String> images) {
-        return new AdminCarDetailResponse(c, images, null, null, null, null);
+        return new AdminCarDetailResponse(c, images);
     }
 }

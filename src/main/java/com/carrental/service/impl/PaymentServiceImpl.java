@@ -16,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -28,85 +29,48 @@ public class PaymentServiceImpl implements PaymentService {
     private final RentalOrderRepository rentalOrderRepository;
 
     @Override
-    public Payment createDepositPayment(RentalOrder order) {
-        // Kiểm tra đã có payment cọc chưa - DÙNG ĐÚNG METHOD CỦA BẠN
-        if (paymentRepository.findByRentalOrderOrderIdAndTransactionType(order.getOrderId(), TransactionType.Deposit).isPresent()) {
-            throw new RuntimeException("Đơn hàng đã có payment cọc");
-        }
-
-        Payment payment = Payment.builder()
-                .rentalOrder(order)
-                .transactionType(TransactionType.Deposit)
-                .amount(order.getDepositAmount())
-                .paymentMethod(null) // Sẽ cập nhật sau khi khách chọn
-                .status(PaymentStatus.Processing)
-                .isPaid(false)
-                .createdAt(LocalDateTime.now())
-                .build();
-
-        return paymentRepository.save(payment);
-    }
-
-    @Override
-    public boolean processDepositPayment(Long orderId, PaymentMethod method, String transactionId, RedirectAttributes ra) {
+    public boolean processDepositPayment(Long orderId, PaymentMethod method,
+            String transactionId, RedirectAttributes ra) {
         RentalOrder order = rentalOrderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
 
-        // SỬA: Cho phép cả PENDING_PAYMENT và Confirmed
-        if (order.getStatus() != OrderStatus.PENDING_PAYMENT && order.getStatus() != OrderStatus.Confirmed) {
-            ra.addFlashAttribute("error", "Đơn hàng không ở trạng thái chờ thanh toán");
+        // Chỉ cho thanh toán khi đang ở trạng thái chờ cọc
+        if (order.getStatus() != OrderStatus.Pending) {
+            ra.addFlashAttribute("error", "Đơn hàng không ở trạng thái chờ thanh toán cọc");
             return false;
         }
 
-        // Tìm payment cọc - nếu không có thì tạo mới
-        Payment payment = paymentRepository.findByRentalOrderOrderIdAndTransactionType(orderId, TransactionType.Deposit)
-                .orElse(null);
-        
-        // Nếu chưa có payment (trường hợp Confirmed chưa thanh toán)
-        if (payment == null) {
-            payment = Payment.builder()
-                    .rentalOrder(order)
-                    .transactionType(TransactionType.Deposit)
-                    .amount(order.getDepositAmount())
-                    .paymentMethod(method)
-                    .status(PaymentStatus.Processing)
-                    .isPaid(false)
-                    .createdAt(LocalDateTime.now())
-                    .build();
-            payment = paymentRepository.save(payment);
-        }
+        // Tạo payment record nếu chưa có — paymentMethod KHÔNG bao giờ null (DB NOT NULL)
+        Payment payment = paymentRepository
+                .findByRentalOrderOrderIdAndTransactionType(orderId, TransactionType.Deposit)
+                .orElseGet(() -> Payment.builder()
+                        .rentalOrder(order)
+                        .transactionType(TransactionType.Deposit)
+                        .amount(order.getDepositAmount())
+                        .paymentMethod(method)
+                        .status(PaymentStatus.Processing)
+                        .isPaid(false)
+                        .createdAt(LocalDateTime.now())
+                        .transactionCode("DEPOSIT_" + UUID.randomUUID().toString())
+                        .build());
 
-        // Giả lập thanh toán thành công
-        boolean paymentSuccess = true; // Giả lập thành công
+        // Mock: luôn thành công
+        payment.setPaymentMethod(method);
+        payment.setStatus(PaymentStatus.Success);
+        payment.setIsPaid(true);
+        paymentRepository.save(payment);
 
-        if (paymentSuccess) {
-            payment.setPaymentMethod(method);
-            payment.setStatus(PaymentStatus.Success);
-            payment.setIsPaid(true);
-            paymentRepository.save(payment);
+        // Cọc xong → chờ Owner duyệt
+        order.setStatus(OrderStatus.PendingApproval);
+        rentalOrderRepository.save(order);
 
-            // Nếu đang ở trạng thái PENDING_PAYMENT -> chuyển thành Pending
-            if (order.getStatus() == OrderStatus.PENDING_PAYMENT) {
-                order.setStatus(OrderStatus.Pending);
-            } 
-            // Nếu đang ở trạng thái Confirmed -> chuyển thành Completed
-            else if (order.getStatus() == OrderStatus.Confirmed) {
-                order.setStatus(OrderStatus.Completed);
-            }
-            
-            rentalOrderRepository.save(order);
-
-            ra.addFlashAttribute("success", "Thanh toán thành công!");
-            return true;
-        } else {
-            payment.setStatus(PaymentStatus.Failed);
-            paymentRepository.save(payment);
-            ra.addFlashAttribute("error", "Thanh toán thất bại. Vui lòng thử lại.");
-            return false;
-        }
+        ra.addFlashAttribute("success", "Đặt cọc thành công! Vui lòng chờ chủ xe xác nhận.");
+        return true;
     }
+
     @Override
-    public boolean processFinalPayment(Long orderId, PaymentMethod method, BigDecimal extraFee, String damages, RedirectAttributes ra) {
+    public boolean processFinalPayment(Long orderId, PaymentMethod method,
+            BigDecimal extraFee, String damages, RedirectAttributes ra) {
         RentalOrder order = rentalOrderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
 
@@ -117,35 +81,72 @@ public class PaymentServiceImpl implements PaymentService {
 
         BigDecimal remainingAmount = calculateRemainingAmount(order, extraFee);
 
-        // Giả lập thanh toán
-        boolean paymentSuccess = simulatePayment(method);
+        Payment finalPayment = Payment.builder()
+                .rentalOrder(order)
+                .transactionType(TransactionType.FinalPayment)
+                .amount(remainingAmount)
+                .paymentMethod(method)
+                .status(PaymentStatus.Success)
+                .isPaid(true)
+                .createdAt(LocalDateTime.now())
+                .transactionCode("FINAL_" + UUID.randomUUID().toString())
+                .build();
+        paymentRepository.save(finalPayment);
 
-        if (paymentSuccess) {
-            // Tạo payment cho thanh toán lần cuối
-            Payment finalPayment = Payment.builder()
-                    .rentalOrder(order)
-                    .transactionType(TransactionType.FinalPayment)
-                    .amount(remainingAmount)
-                    .paymentMethod(method)
-                    .status(PaymentStatus.Success)
-                    .isPaid(true)
-                    .createdAt(LocalDateTime.now())
-                    .build();
-            paymentRepository.save(finalPayment);
-
-            // Cập nhật đơn hàng thành Completed
-            order.setStatus(OrderStatus.Completed);
-            if (damages != null && !damages.isEmpty()) {
-                order.setReturnChecklistNote("Hư hỏng/phụ thu: " + damages + " | Số tiền: " + extraFee + "đ");
-            }
-            rentalOrderRepository.save(order);
-
-            ra.addFlashAttribute("success", "Thanh toán thành công! Cảm ơn bạn đã sử dụng dịch vụ.");
-            return true;
-        } else {
-            ra.addFlashAttribute("error", "Thanh toán thất bại. Vui lòng thử lại.");
-            return false;
+        order.setStatus(OrderStatus.Completed);
+        order.setActualReturnTime(LocalDateTime.now());
+        if (damages != null && !damages.isEmpty()) {
+            order.setReturnChecklistNote("Hư hỏng/phụ thu: " + damages + " | Số tiền: " + extraFee + "đ");
         }
+        rentalOrderRepository.save(order);
+
+        ra.addFlashAttribute("success", "Thanh toán thành công! Cảm ơn bạn đã sử dụng dịch vụ.");
+        return true;
+    }
+
+    /**
+     * Hoàn tiền khi hủy đơn (mock).
+     * - refundPercent = 0   → không tạo Refund record (mất cọc, ghi nhận lý do)
+     * - refundPercent > 0   → tạo Refund record, amount = depositAmount * refundPercent%
+     * paymentMethod lấy từ Deposit gốc để đảm bảo DB NOT NULL.
+     */
+    @Override
+    public boolean processRefund(Long orderId, int refundPercent, RedirectAttributes ra) {
+        if (refundPercent == 0) {
+            // Mất cọc — không tạo Refund record
+            return true;
+        }
+
+        // Lấy Payment cọc gốc để biết paymentMethod (DB NOT NULL)
+        Payment deposit = paymentRepository
+                .findByRentalOrderOrderIdAndTransactionType(orderId, TransactionType.Deposit)
+                .orElse(null);
+
+        if (deposit == null) {
+            // Chưa có deposit record → không cần hoàn tiền
+            return true;
+        }
+
+        RentalOrder order = rentalOrderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+
+        BigDecimal refundAmount = deposit.getAmount()
+                .multiply(BigDecimal.valueOf(refundPercent))
+                .divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
+
+        Payment refund = Payment.builder()
+                .rentalOrder(order)
+                .transactionType(TransactionType.Refund)
+                .amount(refundAmount)
+                .paymentMethod(deposit.getPaymentMethod()) // lấy từ Deposit gốc — không null
+                .status(PaymentStatus.Success)
+                .isPaid(true)
+                .createdAt(LocalDateTime.now())
+                .transactionCode("REFUND_" + UUID.randomUUID().toString())
+                .build();
+        paymentRepository.save(refund);
+
+        return true;
     }
 
     @Override
@@ -159,13 +160,11 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Payment getPaymentByOrderAndType(Long orderId, TransactionType type) {
-        // DÙNG ĐÚNG METHOD CỦA BẠN
         return paymentRepository.findByRentalOrderOrderIdAndTransactionType(orderId, type).orElse(null);
     }
 
     @Override
     public boolean isDepositPaid(Long orderId) {
-        // DÙNG ĐÚNG METHOD CỦA BẠN
         return paymentRepository.findByRentalOrderOrderIdAndTransactionType(orderId, TransactionType.Deposit)
                 .map(p -> p.getIsPaid() && p.getStatus() == PaymentStatus.Success)
                 .orElse(false);
@@ -176,9 +175,8 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy payment"));
         payment.setStatus(status);
-        if (status == PaymentStatus.Success) {
+        if (status == PaymentStatus.Success)
             payment.setIsPaid(true);
-        }
         return paymentRepository.save(payment);
     }
 
@@ -189,50 +187,28 @@ public class PaymentServiceImpl implements PaymentService {
             ra.addFlashAttribute("error", "Không tìm thấy đơn hàng");
             return "redirect:/";
         }
-
-        if (order.getStatus() != OrderStatus.PENDING_PAYMENT) {
+        if (order.getStatus() != OrderStatus.Pending) {
             ra.addFlashAttribute("error", "Đơn hàng không cần thanh toán hoặc đã được thanh toán");
             return "redirect:/booking/order/" + orderId;
         }
-
-        // DÙNG ĐÚNG METHOD CỦA BẠN
-        Payment depositPayment = paymentRepository.findByRentalOrderOrderIdAndTransactionType(orderId, TransactionType.Deposit)
-                .orElse(null);
-                
-        if (depositPayment == null) {
-            ra.addFlashAttribute("error", "Có lỗi xảy ra, vui lòng liên hệ hỗ trợ");
-            return "redirect:/booking/order/" + orderId;
-        }
-
         model.addAttribute("order", order);
-        model.addAttribute("payment", depositPayment);
-        model.addAttribute("paymentMethods", PaymentMethod.values());
+        model.addAttribute("amountToPay", order.getDepositAmount());
+        model.addAttribute("paymentMethods", com.carrental.enums.PaymentMethod.values());
         return "pages/payment/checkout";
     }
 
     @Override
     public String showFinalPaymentPage(Long orderId, BigDecimal extraFee, String damages, Model model) {
         RentalOrder order = rentalOrderRepository.findDetailedById(orderId).orElse(null);
-        if (order == null) {
+        if (order == null)
             return "redirect:/owner/orders";
-        }
 
         BigDecimal remainingAmount = calculateRemainingAmount(order, extraFee);
-
         model.addAttribute("order", order);
         model.addAttribute("remainingAmount", remainingAmount);
         model.addAttribute("extraFee", extraFee != null ? extraFee : BigDecimal.ZERO);
         model.addAttribute("damages", damages);
-        model.addAttribute("paymentMethods", PaymentMethod.values());
-
+        model.addAttribute("paymentMethods", com.carrental.enums.PaymentMethod.values());
         return "pages/payment/final-payment";
     }
-
-    /**
-     * Giả lập thanh toán - trong thực tế sẽ gọi API của Momo/VNPay
-     */
-    private boolean simulatePayment(PaymentMethod method) {
-        // Giả lập luôn thành công
-        return true;
-    }
-}
+}

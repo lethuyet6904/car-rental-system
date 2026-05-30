@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Chi tiết đơn hàng - Chủ xe', ~{::link})}">
+    <link rel="stylesheet" th:href="@{/assets/css/owner.css}"/>
+</head>
+<body class="bg-light">
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container-fluid" style="padding-top: 80px;">
+    <div class="row">
+        <nav class="col-md-3 col-lg-2 d-md-block bg-white border-end sidebar" style="min-height: calc(100vh - 80px);">
+            <div class="position-sticky pt-4 px-2">
+                <div class="px-3 mb-3 text-muted fw-bold small text-uppercase tracking-wider">Bảng điều khiển</div>
+
+                <ul class="nav flex-column gap-1">
+                    <li class="nav-item">
+                        <a class="nav-link rounded-3 py-2.5 px-3 d-flex align-items-center gap-3 fw-medium text-secondary hover-bg-light"
+                           th:href="@{/owner/dashboard}">
+                            <i class="fa-solid fa-chart-line fs-5"></i> <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link rounded-3 py-2.5 px-3 d-flex align-items-center gap-3 fw-medium text-secondary hover-bg-light"
+                           th:href="@{/owner/cars}">
+                            <i class="fa-solid fa-car-rear fs-5"></i> <span>Quản lý xe</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link rounded-3 py-2.5 px-3 d-flex align-items-center gap-3 fw-medium text-primary bg-primary bg-opacity-10"
+                           th:href="@{/owner/orders}">
+                            <i class="fa-solid fa-list-check fs-5"></i> <span>Quản lý đơn hàng</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item" th:if="${session.user != null and session.user.role.name() == 'Customer'}">
+                        <hr class="my-3 text-muted opacity-20" />
+                        <a class="nav-link rounded-3 py-2.5 px-3 d-flex align-items-center gap-3 fw-medium text-success hover-bg-light"
+                           th:href="@{/owner/owner-registration}">
+                            <i class="fa-solid fa-user-plus fs-5"></i> <span>Đăng ký làm chủ xe</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-4 pb-5">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pb-3 mb-4 border-bottom">
+                <div>
+                    <span class="text-primary fw-semibold small text-uppercase">QUẢN LÝ ĐƠN HÀNG</span>
+                    <h1 class="h3 fw-bold mb-0 text-dark" style="font-family: 'Outfit', sans-serif;">
+                        Chi tiết đơn #<span th:text="${order.orderId}"></span>
+                    </h1>
+                </div>
+                <div>
+                    <span th:if="${order.status.name() == 'Pending'}" class="badge rounded-pill bg-warning bg-opacity-10 text-warning px-3 py-2 fw-semibold">Chờ thanh toán cọc</span>
+                    <span th:if="${order.status.name() == 'PendingApproval'}" class="badge rounded-pill bg-warning bg-opacity-10 text-warning px-3 py-2 fw-semibold">Chờ xác nhận</span>
+                    <span th:if="${order.status.name() == 'Confirmed'}" class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3 py-2 fw-semibold">Đã xác nhận</span>
+                    <span th:if="${order.status.name() == 'InProgress'}" class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3 py-2 fw-semibold">Đang thuê</span>
+                    <span th:if="${order.status.name() == 'Completed'}" class="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2 fw-semibold">Hoàn tất</span>
+                    <span th:if="${order.status.name() == 'Cancelled'}" class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary px-3 py-2 fw-semibold">Đã hủy</span>
+                    <span th:if="${order.status.name() == 'Rejected'}" class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary px-3 py-2 fw-semibold">Đã từ chối</span>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-body p-4">
+                            <span class="text-muted small fw-semibold text-uppercase">Tổng tiền</span>
+                            <h2 class="fw-bold text-primary mt-1 mb-0" th:text="${#numbers.formatInteger(order.totalAmount, 0, 'COMMA')} + 'đ'">0đ</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-body p-4">
+                            <span class="text-muted small fw-semibold text-uppercase">Tiền cọc</span>
+                            <h2 class="fw-bold text-dark mt-1 mb-0" th:text="${#numbers.formatInteger(order.depositAmount, 0, 'COMMA')} + 'đ'">0đ</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold text-dark mb-4" style="font-family: 'Outfit', sans-serif;">Khách hàng</h5>
+                            <div class="d-flex align-items-center gap-3 mb-4">
+                                <div class="rounded-circle bg-primary bg-opacity-10 text-primary fw-bold d-flex align-items-center justify-content-center"
+                                     style="width:52px;height:52px;"
+                                     th:text="${#strings.substring(order.customer.fullName, 0, 1)}">K</div>
+                                <div>
+                                    <div class="fw-bold text-dark" th:text="${order.customer.fullName}">Khách hàng</div>
+                                    <div class="text-muted small" th:text="${order.customer.phone}">0000000000</div>
+                                </div>
+                            </div>
+                            <div class="border-top pt-3">
+                                <div class="text-muted small fw-semibold text-uppercase mb-1">Phương thức nhận xe</div>
+                                <div th:if="${order.pickupMethod.name() == 'Delivery'}" class="fw-medium text-dark" th:text="${order.deliveryAddress}">Địa chỉ giao xe</div>
+                                <div th:if="${order.pickupMethod.name() == 'SelfPickup'}" class="fw-medium text-dark">Tự đến lấy xe</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold text-dark mb-4" style="font-family: 'Outfit', sans-serif;">Phương tiện</h5>
+                            <div class="fw-bold text-dark fs-5 mb-1"
+                                 th:text="${order.car.brand.brandName + ' ' + order.car.modelName + ' ' + order.car.yearOfManufacture}">Xe</div>
+                            <div class="text-muted font-monospace mb-4" th:text="${order.car.licensePlate}">00A-00000</div>
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <div class="text-muted small fw-semibold text-uppercase">Nhận xe</div>
+                                    <div class="fw-medium" th:text="${#temporals.format(order.pickupDate, 'dd/MM/yyyy') + ' ' + order.pickupTime}">--</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="text-muted small fw-semibold text-uppercase">Trả xe</div>
+                                    <div class="fw-medium" th:text="${#temporals.format(order.returnDate, 'dd/MM/yyyy') + ' ' + order.returnTime}">--</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="text-muted small fw-semibold text-uppercase">Số ngày thuê</div>
+                                    <div class="fw-medium"><span th:text="${order.totalDays}">0</span> ngày</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-dark mb-4" style="font-family: 'Outfit', sans-serif;">Trạng thái thanh toán</h5>
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                        <div class="fw-semibold text-dark">Tiền cọc</div>
+                        <span th:if="${depositPayment != null and depositPayment.getIsPaid() == true}"
+                              class="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2 fw-semibold"
+                              th:text="|Đã thanh toán · ${#numbers.formatInteger(depositPayment.amount, 0, 'COMMA')}đ|">Đã thanh toán</span>
+                        <span th:if="${depositPayment == null or depositPayment.getIsPaid() != true}"
+                              class="badge rounded-pill bg-warning bg-opacity-10 text-warning px-3 py-2 fw-semibold">Chưa thanh toán</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="fw-semibold text-dark">Thanh toán cuối</div>
+                        <span th:if="${finalPayment != null}"
+                              class="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2 fw-semibold"
+                              th:text="|Đã thanh toán · ${#numbers.formatInteger(finalPayment.amount, 0, 'COMMA')}đ|">Đã thanh toán</span>
+                        <span th:if="${finalPayment == null}"
+                              class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary px-3 py-2 fw-semibold"
+                              th:text="|Chờ trả xe · ${#numbers.formatInteger(order.totalAmount.subtract(order.depositAmount), 0, 'COMMA')}đ|">Chờ trả xe</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold text-dark mb-4" style="font-family: 'Outfit', sans-serif;">Checklist giao xe</h5>
+                            <div class="bg-light rounded-3 p-3 mb-4">
+                                <div th:if="${order.pickupChecklistNote != null and !order.pickupChecklistNote.isBlank()}" th:text="${order.pickupChecklistNote}">Ghi chú</div>
+                                <div th:if="${order.pickupChecklistNote == null or order.pickupChecklistNote.isBlank()}" class="text-muted fst-italic">Chưa có ghi chú</div>
+                            </div>
+                            <div class="row g-2 mb-4" th:if="${pickupImages != null and !pickupImages.isEmpty()}">
+                                <div class="col-4" th:each="image : ${pickupImages}">
+                                    <img th:src="@{${image.imageUrl}}" class="img-fluid rounded-3 border" alt="Ảnh giao xe">
+                                </div>
+                            </div>
+                            <div th:if="${pickupImages == null or pickupImages.isEmpty()}" class="text-muted fst-italic mb-4">Chưa có ảnh</div>
+                            <div class="border-top pt-3">
+                                <span class="text-muted small fw-semibold text-uppercase">Thời gian thực tế</span>
+                                <div class="fw-medium" th:text="${order.actualPickupTime != null ? #temporals.format(order.actualPickupTime, 'dd/MM/yyyy HH:mm') : '—'}">—</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold text-dark mb-4" style="font-family: 'Outfit', sans-serif;">Checklist trả xe</h5>
+                            <div class="bg-light rounded-3 p-3 mb-4"
+                                 th:classappend="${order.returnChecklistNote != null and !order.returnChecklistNote.isBlank() ? ' border-start border-4 border-warning' : ''}">
+                                <div th:if="${order.returnChecklistNote != null and !order.returnChecklistNote.isBlank()}" th:text="${order.returnChecklistNote}">Ghi chú</div>
+                                <div th:if="${order.returnChecklistNote == null or order.returnChecklistNote.isBlank()}" class="text-muted fst-italic">Chưa có ghi chú</div>
+                            </div>
+                            <div class="row g-2 mb-4" th:if="${returnImages != null and !returnImages.isEmpty()}">
+                                <div class="col-4" th:each="image : ${returnImages}">
+                                    <img th:src="@{${image.imageUrl}}" class="img-fluid rounded-3 border" alt="Ảnh trả xe">
+                                </div>
+                            </div>
+                            <div th:if="${returnImages == null or returnImages.isEmpty()}" class="text-muted fst-italic mb-4">Chưa có ảnh</div>
+                            <div class="border-top pt-3">
+                                <span class="text-muted small fw-semibold text-uppercase">Thời gian thực tế</span>
+                                <div class="fw-medium" th:text="${order.actualReturnTime != null ? #temporals.format(order.actualReturnTime, 'dd/MM/yyyy HH:mm') : '—'}">—</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <a th:href="@{/owner/orders}" class="btn btn-outline-secondary rounded-3 px-3">← Quay lại</a>
+                <form th:if="${order.status.name() == 'PendingApproval'}" th:action="@{/owner/orders/{orderId}/confirm(orderId=${order.orderId})}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf != null}"/>
+                    <button type="submit" class="btn btn-success rounded-3 px-3">Xác nhận</button>
+                </form>
+                <button th:if="${order.status.name() == 'PendingApproval'}" type="button" class="btn btn-outline-danger rounded-3 px-3"
+                        data-bs-toggle="modal" data-bs-target="#rejectModal">Từ chối</button>
+                <button th:if="${order.status.name() == 'Confirmed'}" type="button" class="btn btn-primary rounded-3 px-3"
+                        data-bs-toggle="modal" data-bs-target="#pickupModal">Giao xe</button>
+                <button th:if="${order.status.name() == 'InProgress'}" type="button" class="btn btn-info text-white rounded-3 px-3"
+                        data-bs-toggle="modal" data-bs-target="#returnModal">Hoàn tất trả xe</button>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow rounded-4">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold">Từ chối đơn hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form th:action="@{/owner/orders/{orderId}/reject(orderId=${order.orderId})}" method="post">
+                <div class="modal-body">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf != null}"/>
+                    <label class="form-label fw-semibold">Lý do từ chối</label>
+                    <textarea class="form-control rounded-3" name="reason" rows="4" required></textarea>
+                </div>
+                <div class="modal-footer border-top-0">
+                    <button type="button" class="btn btn-light border rounded-3" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="submit" class="btn btn-danger rounded-3">Xác nhận từ chối</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="pickupModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow rounded-4">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold">Giao xe</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form th:action="@{/owner/orders/{orderId}/start(orderId=${order.orderId})}" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf != null}"/>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Ảnh giao xe</label>
+                        <input type="file" class="form-control rounded-3" name="images" accept="image/*" multiple required>
+                    </div>
+                    <label class="form-label fw-semibold">Ghi chú checklist</label>
+                    <textarea class="form-control rounded-3" name="note" rows="3"></textarea>
+                </div>
+                <div class="modal-footer border-top-0">
+                    <button type="button" class="btn btn-light border rounded-3" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="submit" class="btn btn-primary rounded-3">Xác nhận giao xe</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="returnModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow rounded-4">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold">Hoàn tất trả xe</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form th:action="@{/owner/orders/{orderId}/complete(orderId=${order.orderId})}" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf != null}"/>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Ảnh trả xe</label>
+                        <input type="file" class="form-control rounded-3" name="images" accept="image/*" multiple required>
+                    </div>
+                    <label class="form-label fw-semibold">Ghi chú checklist</label>
+                    <textarea class="form-control rounded-3" name="note" rows="3"></textarea>
+                </div>
+                <div class="modal-footer border-top-0">
+                    <button type="button" class="btn btn-light border rounded-3" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="submit" class="btn btn-info text-white rounded-3">Hoàn tất trả xe</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

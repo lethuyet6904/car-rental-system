@@ -10,8 +10,10 @@ import java.time.LocalTime;
 
 @Entity
 @Table(name = "RentalOrder")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class RentalOrder {
 
@@ -66,7 +68,7 @@ public class RentalOrder {
     private String note;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
+    @Column(name = "status", nullable = false, columnDefinition = "varchar(20)")
     private OrderStatus status;
 
     @Column(name = "cancelReason", length = 300)
@@ -93,7 +95,9 @@ public class RentalOrder {
 
     @PrePersist
     public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-        if (this.status == null) this.status = OrderStatus.Pending;
+        if (this.createdAt == null)
+            this.createdAt = LocalDateTime.now();
+        if (this.status == null)
+            this.status = OrderStatus.Pending;
     }
 }
