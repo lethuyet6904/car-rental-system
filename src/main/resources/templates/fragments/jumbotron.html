@@ -59,8 +59,13 @@
                             <label class="ct-field__label" for="dateFrom">
                                 <i class="fa-regular fa-calendar-plus"></i> Nhận xe
                             </label>
-                            <input class="ct-field__input" type="date" id="dateFrom" name="dateFrom"
-                                   th:attr="min=${#temporals.format(#temporals.createToday().plusDays(1), 'yyyy-MM-dd')}" />
+                            <div class="ct-field__input" id="homeDateFromTrigger"
+                                 style="cursor:pointer; min-height:24px; display:flex;
+                                        align-items:center;"
+                                 data-bs-toggle="modal" data-bs-target="#homeDateModal">
+                                <span id="homePickupText" style="color:#A1A1AA;">mm/dd/yyyy</span>
+                            </div>
+                            <input type="hidden" name="dateFrom" id="homeDateFrom">
                         </div>
 
                         <div class="ct-field-divider"></div>
@@ -69,7 +74,13 @@
                             <label class="ct-field__label" for="dateTo">
                                 <i class="fa-regular fa-calendar-check"></i> Trả xe
                             </label>
-                            <input class="ct-field__input" type="date" id="dateTo" name="dateTo" />
+                            <div class="ct-field__input" id="homeDateToTrigger"
+                                 style="cursor:pointer; min-height:24px; display:flex;
+                                        align-items:center;"
+                                 data-bs-toggle="modal" data-bs-target="#homeDateModal">
+                                <span id="homeReturnText" style="color:#A1A1AA;">mm/dd/yyyy</span>
+                            </div>
+                            <input type="hidden" name="dateTo" id="homeDateTo">
                         </div>
 
                         <button type="submit" class="ct-search-btn">
@@ -77,6 +88,56 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="homeDateModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold mx-auto">Thời gian</h5>
+                    <button type="button" class="btn-close ms-0"
+                            data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <label class="form-label text-muted small fw-bold mb-1">
+                                Nhận xe
+                            </label>
+                            <input type="date" id="homeModalPickupDate"
+                                   class="form-control mb-2 rounded-3">
+                            <input type="time" id="homeModalPickupTime"
+                                   class="form-control rounded-3" value="09:00">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-muted small fw-bold mb-1">
+                                Trả xe
+                            </label>
+                            <input type="date" id="homeModalReturnDate"
+                                   class="form-control mb-2 rounded-3">
+                            <input type="time" id="homeModalReturnTime"
+                                   class="form-control rounded-3" value="09:00">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center
+                                bg-light p-3 rounded-3">
+                        <div>
+                            <div class="fw-semibold text-dark" id="homeModalDateSummary">
+                                Chưa chọn ngày
+                            </div>
+                            <div class="text-muted small">Thời gian thuê:
+                                <span id="homeModalDaysSummary"
+                                      class="text-success fw-bold">-- ngày</span>
+                            </div>
+                        </div>
+                        <button type="button"
+                                class="btn btn-success fw-bold px-4 rounded-3 shadow-sm"
+                                id="homeBtnConfirmDate"
+                                data-bs-dismiss="modal">Tiếp tục</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
