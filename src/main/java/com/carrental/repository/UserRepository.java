@@ -3,6 +3,7 @@ package com.carrental.repository;
 import com.carrental.entity.User;
 import com.carrental.enums.UserRole;
 import com.carrental.enums.UserStatus;
+import com.carrental.enums.VerificationStatus;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +43,25 @@ public interface UserRepository extends JpaRepository<User, Long> {
             @Param("status")  UserStatus status,
             Pageable pageable);
  
+    @Query("""
+    	    SELECT u FROM User u
+    	    LEFT JOIN IdentityVerification iv ON iv.user.userId = u.userId
+    	      AND iv.submittedAt = (
+    	          SELECT MAX(iv2.submittedAt) FROM IdentityVerification iv2
+    	          WHERE iv2.user.userId = u.userId)
+    	    WHERE (:keyword IS NULL
+    	           OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    	           OR LOWER(u.phone)    LIKE LOWER(CONCAT('%', :keyword, '%')))
+    	      AND (:role   IS NULL OR u.role   = :role)
+    	      AND (:status IS NULL OR u.status = :status)
+    	      AND (:identityStatus IS NULL OR iv.status = :identityStatus)
+    	    """)
+    	Page<User> searchUsers(
+    	    @Param("keyword")        String keyword,
+    	    @Param("role")           UserRole role,
+    	    @Param("status")         UserStatus status,
+    	    @Param("identityStatus") VerificationStatus identityStatus,
+    	    Pageable pageable);
     // ---------- Thống kê ----------
     long countByRole(UserRole role);
  

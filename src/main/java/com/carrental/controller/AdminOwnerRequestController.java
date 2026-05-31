@@ -63,7 +63,7 @@
 	    }
 	
 	    @PostMapping("/{id}/approve")
-	    public String approve(@PathVariable Long id, RedirectAttributes ra) {
+	    public String approve(@PathVariable Long id, @RequestParam(defaultValue = "0") int returnPage, RedirectAttributes ra) {
 	        try {
 	            adminOwnerRequestService.approveOwnerRequest(id);
 	            ra.addFlashAttribute("successMessage",
@@ -71,7 +71,7 @@
 	        } catch (IllegalStateException e) {
 	            ra.addFlashAttribute("errorMessage", e.getMessage());
 	        }
-	        return "redirect:/admin/owner-requests/" + id;
+	        return "redirect:/admin/owner-requests/" + id + "?returnPage=" + returnPage;
 	    }
 	
 	    @PostMapping("/{id}/reject")

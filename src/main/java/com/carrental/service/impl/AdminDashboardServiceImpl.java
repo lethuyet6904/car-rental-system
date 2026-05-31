@@ -23,6 +23,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
     private final CarRepository               carRepository;
     private final RentalOrderRepository       rentalOrderRepository;
     private final ComplaintRepository         complaintRepository;
+    private final IdentityVerificationRepository identityVerificationRepository;
 
     @Override
     public DashboardResponse getStats(String period) {
@@ -37,6 +38,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         // Row 2
         long pendingCars       = carRepository.countByStatus(CarStatus.Pending);
         long pendingComplaints = complaintRepository.countByStatus(ComplaintStatus.Pending);
+        long pendingIdentities = identityVerificationRepository.countByStatus(VerificationStatus.Pending);
 
         // Pie
      // Sau khi fix — lọc theo fromDate
@@ -97,6 +99,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                 .totalRevenue(totalRevenue)
                 .pendingCars(pendingCars)
                 .pendingComplaints(pendingComplaints)
+                .pendingIdentities(pendingIdentities)
                 .completedOrders(completedOrders)
                 .cancelledOrders(cancelledOrders)
                 .inProgressOrders(inProgressOrders)

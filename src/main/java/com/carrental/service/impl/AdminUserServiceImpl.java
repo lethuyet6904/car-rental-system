@@ -31,10 +31,10 @@ public class AdminUserServiceImpl implements AdminUserService {
     private final IdentityVerificationService identityVerificationService;
 
     @Override
-    public Page<AdminUserListResponse> getUserList(String keyword, UserRole role, UserStatus status,
+    public Page<AdminUserListResponse> getUserList(String keyword, UserRole role, UserStatus status, VerificationStatus identityStatus,
             Pageable pageable) {
         String kw = (keyword != null && !keyword.isBlank()) ? keyword.trim() : null;
-        return userRepository.searchUsers(kw, role, status, pageable).map(AdminUserListResponse::from);
+        return userRepository.searchUsers(kw, role, status, identityStatus, pageable).map(AdminUserListResponse::from);
     }
 
     @Override

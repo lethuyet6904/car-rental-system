@@ -54,8 +54,9 @@ public class AdminOrderController {
     }
     
     @GetMapping("/{id}")
-    public String detail(@PathVariable Long id, Model model) {
+    public String detail(@PathVariable Long id, @RequestParam(defaultValue = "0") int returnPage, Model model) {
         model.addAttribute("order", adminOrderService.getOrderDetail(id));
+        model.addAttribute("returnPage", returnPage);
         return "pages/admin/order-detail";
     }
 

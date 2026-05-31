@@ -62,7 +62,7 @@ public class AdminCarController {
     }
 
     @PostMapping("/{id}/approve")
-    public String approve(@PathVariable Long id, RedirectAttributes ra) {
+    public String approve(@PathVariable Long id,  @RequestParam(defaultValue = "0") int returnPage, RedirectAttributes ra) {
         try {
             adminCarService.approve(id);
             ra.addFlashAttribute("successMessage",
@@ -70,12 +70,13 @@ public class AdminCarController {
         } catch (IllegalStateException e) {
             ra.addFlashAttribute("errorMessage", e.getMessage());
         }
-        return "redirect:/admin/cars/" + id;
+        return "redirect:/admin/cars/" + id+ "?returnPage=" + returnPage;
     }
 
     @PostMapping("/{id}/reject")
     public String reject(@PathVariable Long id,
                          @RequestParam String rejectReason,
+                         @RequestParam(defaultValue = "0") int returnPage,
                          RedirectAttributes ra) {
         if (rejectReason == null || rejectReason.isBlank()) {
             ra.addFlashAttribute("errorMessage", "Vui lòng nhập lý do từ chối");
@@ -87,7 +88,7 @@ public class AdminCarController {
         } catch (IllegalStateException e) {
             ra.addFlashAttribute("errorMessage", e.getMessage());
         }
-        return "redirect:/admin/cars/" + id;
+        return "redirect:/admin/cars/" + id + "?returnPage=" + returnPage;
     }
 
     private String buildExtraParams(String status, String keyword) {

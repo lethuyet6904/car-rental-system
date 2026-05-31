@@ -18,6 +18,7 @@ public class DashboardResponse {
     // Row 2 — Alerts
     private final long pendingComplaints;
     private final long pendingCars;
+    private final long pendingIdentities;
 
     // Pie chart
     private final long completedOrders;

@@ -242,6 +242,7 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <form th:action="@{/admin/cars/{id}/approve(id=${car.carId})}" method="post">
+		<input type="hidden" name="returnPage" th:value="${returnPage}"/>
         <div class="modal-header">
           <h6 class="modal-title">
             <i class="bi bi-check-circle"></i> Duyệt xe đăng mới
@@ -278,6 +279,7 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <form th:action="@{/admin/cars/{id}/reject(id=${car.carId})}" method="post">
+		<input type="hidden" name="returnPage" th:value="${returnPage}"/>
         <div class="modal-header">
           <h6 class="modal-title">Từ chối xe đăng mới</h6>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>

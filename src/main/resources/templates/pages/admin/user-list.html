@@ -107,7 +107,7 @@
                 </span>
               </td>
               <td>
-                <a th:href="@{/admin/users/{id}(id=${u.userId})}"
+                <a th:href="@{/admin/users/{id}(id=${u.userId}, returnPage=${users.number})}"
                    style="font-size:12px;color:#7F77DD;text-decoration:none;
                           border:1px solid #7F77DD;padding:3px 10px;border-radius:6px">
                   Xem

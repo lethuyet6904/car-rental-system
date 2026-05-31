@@ -111,7 +111,8 @@
                 <div style="font-size:11px;color:#9ca3af;margin-bottom:4px">Mặt trước</div>
                 <div th:if="${user.nationalIdFrontImage != null}"
                   style="position:relative;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;cursor:pointer"
-                  th:onclick="|openLightbox('${user.nationalIdFrontImage}')|">
+				  th:data-src="${user.nationalIdFrontImage}" 
+				       onclick="openLightbox(this.dataset.src)">
                   <img th:src="${user.nationalIdFrontImage}" style="width:100%;height:110px;object-fit:cover"
                     alt="CCCD mặt trước" />
                   <div
@@ -132,7 +133,8 @@
                 <div style="font-size:11px;color:#9ca3af;margin-bottom:4px">Mặt sau</div>
                 <div th:if="${user.nationalIdBackImage != null}"
                   style="position:relative;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;cursor:pointer"
-                  th:onclick="|openLightbox('${user.nationalIdBackImage}')|">
+				  th:data-src="${user.nationalIdBackImage}" 
+				       onclick="openLightbox(this.dataset.src)">
                   <img th:src="${user.nationalIdBackImage}" style="width:100%;height:110px;object-fit:cover"
                     alt="CCCD mặt sau" />
                 </div>
@@ -161,7 +163,8 @@
                 <div style="font-size:11px;color:#9ca3af;margin-bottom:4px">Mặt trước</div>
                 <div th:if="${user.licenseFrontImage != null}"
                   style="position:relative;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;cursor:pointer"
-                  th:onclick="|openLightbox('${user.licenseFrontImage}')|">
+				  th:data-src="${user.licenseFrontImage}" 
+				  		onclick="openLightbox(this.dataset.src)">
                   <img th:src="${user.licenseFrontImage}" style="width:100%;height:110px;object-fit:cover"
                     alt="GPLX mặt trước" />
                 </div>
@@ -175,7 +178,8 @@
                 <div style="font-size:11px;color:#9ca3af;margin-bottom:4px">Mặt sau</div>
                 <div th:if="${user.licenseBackImage != null}"
                   style="position:relative;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;cursor:pointer"
-                  th:onclick="|openLightbox('${user.licenseBackImage}')|">
+				  th:data-src="${user.licenseBackImage}" 
+				  		onclick="openLightbox(this.dataset.src)">
                   <img th:src="${user.licenseBackImage}" style="width:100%;height:110px;object-fit:cover"
                     alt="GPLX mặt sau" />
                 </div>

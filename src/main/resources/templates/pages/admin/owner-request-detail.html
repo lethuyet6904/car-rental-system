@@ -153,6 +153,7 @@
     <div class="modal-content">
       <form th:action="@{/admin/owner-requests/{id}/approve(id=${request.registrationId})}"
             method="post">
+		<input type="hidden" name="returnPage" th:value="${returnPage}"/>
         <div class="modal-header">
           <h6 class="modal-title">
             <i class="bi bi-check-circle"></i> Duyệt đăng ký chủ xe
@@ -188,6 +189,7 @@
     <div class="modal-content">
       <form th:action="@{/admin/owner-requests/{id}/reject(id=${request.registrationId})}"
             method="post">
+		<input type="hidden" name="returnPage" th:value="${returnPage}"/>
         <div class="modal-header">
           <h6 class="modal-title">Từ chối đăng ký chủ xe</h6>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>

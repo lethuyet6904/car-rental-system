@@ -3,6 +3,7 @@ package com.carrental.controller;
 import com.carrental.dto.request.LockAccountRequest;
 import com.carrental.enums.UserRole;
 import com.carrental.enums.UserStatus;
+import com.carrental.enums.VerificationStatus;
 import com.carrental.service.AdminUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -28,20 +29,23 @@ public class AdminUserController {
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String role,
             @RequestParam(required = false) String status,
+            @RequestParam(required = false) String identityStatus,
             @RequestParam(defaultValue = "0") int page,
             Model model) {
 
         UserRole   roleEnum   = parseEnum(UserRole.class,   role);
         UserStatus statusEnum = parseEnum(UserStatus.class, status);
+        VerificationStatus identityStatusEnum = parseEnum(VerificationStatus.class, identityStatus);
 
         var pageResult = adminUserService.getUserList(
-                keyword, roleEnum, statusEnum,
+                keyword, roleEnum, statusEnum, identityStatusEnum,
                 PageRequest.of(page, PAGE_SIZE, Sort.by("createdAt").descending()));
 
         model.addAttribute("users",       pageResult);
         model.addAttribute("keyword",     keyword);
         model.addAttribute("role",        role);
         model.addAttribute("status",      status);
+        model.addAttribute("identityStatus", identityStatus);
         model.addAttribute("roles",       UserRole.values());
         model.addAttribute("statuses",    UserStatus.values());
         model.addAttribute("extraParams", buildExtraParams(keyword, role, status));
@@ -51,8 +55,9 @@ public class AdminUserController {
 
     // ── GET: Chi tiết ────────────────────────────────────────────
     @GetMapping("/{id}")
-    public String userDetail(@PathVariable Long id, Model model) {
+    public String userDetail(@PathVariable Long id, @RequestParam(defaultValue = "0") int returnPage, Model model) {
         model.addAttribute("user", adminUserService.getUserDetail(id));
+        model.addAttribute("returnPage", returnPage);
         return "pages/admin/user-detail";
     }
 

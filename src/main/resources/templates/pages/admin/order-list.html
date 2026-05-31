@@ -32,11 +32,12 @@
               <option th:each="s : ${statuses}"
                       th:value="${s.name()}"
                       th:selected="${s.name() == status}"
-                      th:text="${s.name() == 'Pending'    ? 'Chờ xác nhận'  :
-                                 s.name() == 'Confirmed'  ? 'Đã xác nhận'   :
-                                 s.name() == 'InProgress' ? 'Đang thuê'      :
-                                 s.name() == 'Completed'  ? 'Hoàn thành'    :
-                                 s.name() == 'Cancelled'  ? 'Đã hủy'        : 'Đã từ chối'}">
+                      th:text="${s.name() == 'Pending'         ? 'Chờ đặt cọc'      :
+								 s.name() == 'PendingApproval' ? 'Chờ chủ xe duyệt' :
+								 s.name() == 'Confirmed'       ? 'Đã xác nhận'      :
+								 s.name() == 'InProgress'      ? 'Đang thuê'         :
+								 s.name() == 'Completed'       ? 'Hoàn thành'        :
+								 s.name() == 'Cancelled'       ? 'Đã hủy'            : 'Đã từ chối'}">
               </option>
             </select>
             <input type="text" name="keyword"
@@ -111,20 +112,22 @@
                       style="color:#d1d5db;font-size:12px">—</span>
               </td>
               <td>
-                <span th:class="${o.status.name() == 'Completed'  ? 'badge-approved'  :
-                                  o.status.name() == 'Cancelled'  ? 'badge-rejected'  :
-                                  o.status.name() == 'Rejected'   ? 'badge-rejected'  :
-                                  o.status.name() == 'InProgress' ? 'badge-none'      :
-                                  o.status.name() == 'Confirmed'  ? 'badge-confirmed'   : 'badge-pending'}"
-                      th:text="${o.status.name() == 'Pending'    ? 'Chờ xác nhận'  :
-                                 o.status.name() == 'Confirmed'  ? 'Đã xác nhận'   :
-                                 o.status.name() == 'InProgress' ? 'Đang thuê'      :
-                                 o.status.name() == 'Completed'  ? 'Hoàn thành'    :
-                                 o.status.name() == 'Cancelled'  ? 'Đã hủy'        : 'Đã từ chối'}">
+                <span th:class="${o.status.name() == 'Completed'      ? 'badge-approved'   :
+								  o.status.name() == 'Cancelled'      ? 'badge-cancelled'  :
+								  o.status.name() == 'Rejected'       ? 'badge-rejected'   :
+								  o.status.name() == 'InProgress'     ? 'badge-none'       :
+								  o.status.name() == 'Confirmed'      ? 'badge-confirmed'  :
+								  o.status.name() == 'PendingApproval'? 'badge-owner'      : 'badge-pending'}"
+                      th:text="${o.status.name() == 'Pending'         ? 'Chờ đặt cọc'     :
+								 o.status.name() == 'PendingApproval' ? 'Chờ chủ xe duyệt':
+								 o.status.name() == 'Confirmed'       ? 'Đã xác nhận'     :
+								 o.status.name() == 'InProgress'      ? 'Đang thuê'       :
+								 o.status.name() == 'Completed'       ? 'Hoàn thành'      :
+								 o.status.name() == 'Cancelled'       ? 'Đã hủy'          : 'Đã từ chối'}">
                 </span>
               </td>
               <td>
-                <a th:href="@{/admin/orders/{id}(id=${o.orderId})}"
+                <a th:href="@{/admin/orders/{id}(id=${o.orderId}, returnPage=${orders.number})}"
                    style="font-size:12px;color:#7F77DD;text-decoration:none;
                           border:1px solid #7F77DD;padding:3px 10px;border-radius:6px">
                   Xem

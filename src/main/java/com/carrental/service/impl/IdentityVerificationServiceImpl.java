@@ -51,6 +51,7 @@ public class IdentityVerificationServiceImpl implements IdentityVerificationServ
                     }
                     // Rejected → xóa record cũ để tạo mới
                     identityVerificationRepository.delete(iv);
+                    identityVerificationRepository.flush();
                 });
 
         String frontPath = saveImage(request.getNationalIdFrontImage(), "cccd/front");

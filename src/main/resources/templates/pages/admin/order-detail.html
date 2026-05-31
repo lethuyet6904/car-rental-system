@@ -18,7 +18,7 @@
       <div class="admin-content">
 
         <div style="margin-bottom:16px">
-          <a th:href="@{/admin/orders}" style="font-size:13px;color:#6b7280;text-decoration:none">
+          <a th:href="@{/admin/orders(page=${returnPage})}" style="font-size:13px;color:#6b7280;text-decoration:none">
             <i class="bi bi-arrow-left"></i> Quay lại danh sách
           </a>
         </div>
@@ -82,15 +82,18 @@
             <div class="detail-row">
               <span class="detail-label">Trạng thái</span>
               <span class="detail-value">
-                <span th:class="${order.status.name() == 'Completed'  ? 'badge-approved' :
-                                order.status.name() == 'Cancelled'  ? 'badge-rejected' :
-                                order.status.name() == 'Rejected'   ? 'badge-rejected' :
-                                order.status.name() == 'InProgress' ? 'badge-none'     : 
-								order.status.name() == 'Confirmed'  ? 'badge-confirmed' : 'badge-pending'}" th:text="${order.status.name() == 'Pending'    ? 'Chờ xác nhận' :
-                               order.status.name() == 'Confirmed'  ? 'Đã xác nhận'  :
-                               order.status.name() == 'InProgress' ? 'Đang thuê'     :
-                               order.status.name() == 'Completed'  ? 'Hoàn thành'   :
-                               order.status.name() == 'Cancelled'  ? 'Đã hủy'       : 'Đã từ chối'}">
+                <span th:class="${order.status.name() == 'Completed'       ? 'badge-approved'  :
+								  order.status.name() == 'Cancelled'       ? 'badge-cancelled' :
+								  order.status.name() == 'Rejected'        ? 'badge-rejected'  :
+								  order.status.name() == 'InProgress'      ? 'badge-none'      :
+								  order.status.name() == 'Confirmed'       ? 'badge-confirmed' :
+								  order.status.name() == 'PendingApproval' ? 'badge-owner'     : 'badge-pending'}" 
+					  th:text="${order.status.name() == 'Pending'         ? 'Chờ đặt cọc'     :
+								 order.status.name() == 'PendingApproval' ? 'Chờ chủ xe duyệt':
+								 order.status.name() == 'Confirmed'       ? 'Đã xác nhận'     :
+								 order.status.name() == 'InProgress'      ? 'Đang thuê'       :
+								 order.status.name() == 'Completed'       ? 'Hoàn thành'      :
+								 order.status.name() == 'Cancelled'       ? 'Đã hủy'          : 'Đã từ chối'}">
                 </span>
               </span>
             </div>
@@ -239,23 +242,40 @@
             </div>
             <div style="display:flex;flex-direction:column;gap:12px">
 
-              <!-- Bước 1: Chờ xác nhận — luôn có -->
+              <!-- Bước 1: Khách đặt đơn — luôn có -->
               <div style="display:flex;gap:12px;align-items:flex-start">
-                <div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px"
-                  th:style="${true} ? 'background:#7F77DD' : 'background:#d1d5db'"></div>
+                <div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px;background:#7F77DD"></div>
                 <div>
                   <div style="font-size:12px;font-weight:600;color:#374151">Khách đặt đơn</div>
                   <div class="text-muted-small" th:text="${#temporals.format(order.createdAt,'dd/MM HH:mm')}"></div>
                 </div>
               </div>
 
-              <!-- Bước 2: Đã xác nhận -->
-              <div style="display:flex;gap:12px;align-items:flex-start" th:if="${order.status.name() != 'Rejected'}">
+              <!-- Bước 2: Đã đặt cọc (khi status != Pending) -->
+              <div style="display:flex;gap:12px;align-items:flex-start"
+                th:if="${order.status.name() != 'Rejected' and order.status.name() != 'Cancelled'}">
                 <div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px"
                   th:style="${order.status.name() != 'Pending'} ? 'background:#7F77DD' : 'background:#d1d5db'"></div>
                 <div>
                   <div style="font-size:12px;font-weight:500"
-                    th:style="${order.status.name() != 'Pending'} ? 'color:#374151' : 'color:#9ca3af'">
+                    th:style="${order.status.name() != 'Pending'} ? 'color:#374151' : 'color:#9ca3af'"
+                    th:text="${order.status.name() == 'PendingApproval' ? 'Đã đặt cọc — chờ Owner duyệt' :
+                              order.status.name() == 'Pending' ? 'Chờ đặt cọc' : 'Đã đặt cọc'}">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bước 3: Owner xác nhận (khi status >= Confirmed) -->
+              <div style="display:flex;gap:12px;align-items:flex-start"
+                th:if="${order.status.name() != 'Rejected' and order.status.name() != 'Cancelled'
+                         and order.status.name() != 'Pending' and order.status.name() != 'PendingApproval'}">
+                <div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px"
+                  th:style="${order.status.name() == 'Confirmed' or order.status.name() == 'InProgress'
+                              or order.status.name() == 'Completed'} ? 'background:#7F77DD' : 'background:#d1d5db'"></div>
+                <div>
+                  <div style="font-size:12px;font-weight:500"
+                    th:style="${order.status.name() == 'Confirmed' or order.status.name() == 'InProgress'
+                                or order.status.name() == 'Completed'} ? 'color:#374151' : 'color:#9ca3af'">
                     Owner xác nhận
                   </div>
                 </div>
@@ -279,9 +299,10 @@
                 </div>
               </div>
 
-              <!-- Bước 3: Đang thuê -->
+              <!-- Bước 4: Đang thuê -->
               <div style="display:flex;gap:12px;align-items:flex-start"
-                th:if="${order.status.name() != 'Rejected' and order.status.name() != 'Cancelled'}">
+                th:if="${order.status.name() != 'Rejected' and order.status.name() != 'Cancelled'
+                         and order.status.name() != 'Pending' and order.status.name() != 'PendingApproval'}">
                 <div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px"
                   th:style="${order.actualPickupTime != null} ? 'background:#7F77DD' : 'background:#d1d5db'"></div>
                 <div>
@@ -302,9 +323,10 @@
                 </div>
               </div>
 
-              <!-- Bước 4: Hoàn thành -->
+              <!-- Bước 5: Hoàn thành -->
               <div style="display:flex;gap:12px;align-items:flex-start"
-                th:if="${order.status.name() != 'Rejected' and order.status.name() != 'Cancelled'}">
+                th:if="${order.status.name() != 'Rejected' and order.status.name() != 'Cancelled'
+                         and order.status.name() != 'Pending' and order.status.name() != 'PendingApproval'}">
                 <div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px"
                   th:style="${order.status.name() == 'Completed'} ? 'background:#10b981' : 'background:#d1d5db'"></div>
                 <div>
