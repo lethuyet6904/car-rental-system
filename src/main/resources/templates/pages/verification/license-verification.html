@@ -106,11 +106,42 @@
                                     <i class="fa-solid fa-arrow-left me-1"></i> Quay lại hồ sơ cá nhân
                                 </a>
                             </div>
-
+							
+							<!-- Đang chờ admin duyệt -->
+							<div th:if="${licensePending}">
+							    <div class="ct-state-card pending">
+							        <div class="ct-state-icon"><i class="fa-solid fa-clock"></i></div>
+							        <div>
+							            <p class="ct-state-title">GPLX đang chờ Admin xét duyệt</p>
+							            <p class="ct-state-desc">
+							                Số GPLX: <strong th:text="${identity != null ? identity.licenseNumber : ''}"></strong><br>
+							                Admin sẽ xét duyệt trong 1–3 ngày làm việc.
+							            </p>
+							        </div>
+							    </div>
+							    <a th:href="@{/customer/profile}" class="ct-link-back">
+							        <i class="fa-solid fa-arrow-left me-1"></i> Quay lại hồ sơ cá nhân
+							    </a>
+							</div>
+							
+							<!-- GPLX bị từ chối -->
+							<div th:if="${licenseRejected}" class="mb-3">
+							    <div class="ct-state-card rejected">
+							        <div class="ct-state-icon"><i class="fa-solid fa-circle-xmark"></i></div>
+							        <div>
+							            <p class="ct-state-title">GPLX bị từ chối</p>
+							            <p class="ct-state-desc">
+							                Lý do: <strong th:text="${licenseRejectReason}"></strong><br>
+							                Vui lòng kiểm tra và nộp lại bên dưới.
+							            </p>
+							        </div>
+							    </div>
+							</div>
+							
                             <!-- Form bổ sung GPLX -->
-                            <div th:if="${alreadyHasLicense == null or !alreadyHasLicense}">
+                            <div th:if="${((alreadyHasLicense == null and licensePending == null) or licenseRejected) and success == null}">
                                 <form th:action="@{/verification/license}" method="post" enctype="multipart/form-data">
-
+									
                                     <div class="mb-3">
                                         <label class="ct-form-label">Số giấy phép lái xe <span
                                                 style="color:var(--ct-danger)">*</span></label>
@@ -156,8 +187,7 @@
 
                                     <div class="ct-info-note">
                                         <i class="fa-solid fa-circle-info mt-1"></i>
-                                        <span>GPLX được lưu trực tiếp vào hồ sơ của bạn (không cần Admin duyệt lại). Bạn
-                                            có thể thuê xe ngay sau khi bổ sung.</span>
+                                        <span>GPLX sẽ được Admin xét duyệt trong 1–3 ngày làm việc. Bạn sẽ có thể thuê xe sau khi GPLX được duyệt.</span>
                                     </div>
 
                                     <button type="submit" class="ct-btn-submit">

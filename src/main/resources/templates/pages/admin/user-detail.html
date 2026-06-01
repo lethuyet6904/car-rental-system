@@ -113,10 +113,12 @@
 				      class="badge-pending">Chờ xác minh</span>
 				<span th:if="${user.identityStatus != null and user.identityStatus.name() == 'Rejected'}" 
 				      class="badge-rejected">Đã từ chối</span>
-				<span th:if="${user.identityStatus != null and user.identityStatus.name() == 'Approved' and user.licenseNumber == null}" 
-				      class="badge-confirmed">Đã xác minh CCCD · Chờ GPLX</span>
-				<span th:if="${user.identityStatus != null and user.identityStatus.name() == 'Approved' and user.licenseNumber != null}" 
-				      class="badge-approved">Đã xác minh đầy đủ</span>
+			    <span th:if="${user.identityStatus != null and user.identityStatus.name() == 'Approved' 
+			                and (user.licenseStatus == null or user.licenseStatus.name() != 'Approved')}" 
+			          class="badge-confirmed">Đã xác minh CCCD · Chờ GPLX</span>
+			    <span th:if="${user.identityStatus != null and user.identityStatus.name() == 'Approved' 
+			                and user.licenseStatus != null and user.licenseStatus.name() == 'Approved'}" 
+			          class="badge-approved">Đã xác minh đầy đủ</span>
             </span>
           </div>
 

@@ -4,6 +4,7 @@ import com.carrental.dto.request.IdentityVerificationRequest;
 import com.carrental.entity.IdentityVerification;
 import com.carrental.entity.User;
 import com.carrental.enums.VerificationStatus;
+import com.carrental.enums.LicenseStatus;
 import com.carrental.service.IdentityVerificationService;
 import com.carrental.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -152,7 +153,7 @@ public class IdentityVerificationController {
 
         try {
             identityVerificationService.submitLicense(user.getUserId(), request);
-            ra.addFlashAttribute("success", "GPLX đã được lưu thành công! Bạn có thể thuê xe ngay bây giờ.");
+            ra.addFlashAttribute("success", "GPLX đã được gửi thành công! Admin sẽ xét duyệt trong 1–3 ngày làm việc.");
         } catch (Exception e) {
             ra.addFlashAttribute("error", e.getMessage());
         }

@@ -48,8 +48,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
                    OR (:identityStatus = 'None'             AND iv.userId IS NULL)
                    OR (:identityStatus = 'Pending'          AND iv.status = 'Pending')
                    OR (:identityStatus = 'Rejected'         AND iv.status = 'Rejected')
-                   OR (:identityStatus = 'Approved'         AND iv.status = 'Approved' AND iv.licenseNumber IS NOT NULL AND iv.licenseNumber != '')
-                   OR (:identityStatus = 'ApprovedNoLicense' AND iv.status = 'Approved' AND (iv.licenseNumber IS NULL OR iv.licenseNumber = '')))
+                   OR (:identityStatus = 'Approved' AND iv.status = 'Approved' AND iv.licenseStatus = 'Approved')
+                   OR (:identityStatus = 'ApprovedNoLicense' AND iv.status = 'Approved' AND iv.licenseStatus != 'Approved'))
             """,
            countQuery = """
             SELECT COUNT(*) FROM [User] u
@@ -67,8 +67,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
                    OR (:identityStatus = 'None'             AND iv.userId IS NULL)
                    OR (:identityStatus = 'Pending'          AND iv.status = 'Pending')
                    OR (:identityStatus = 'Rejected'         AND iv.status = 'Rejected')
-                   OR (:identityStatus = 'Approved'         AND iv.status = 'Approved' AND iv.licenseNumber IS NOT NULL AND iv.licenseNumber != '')
-                   OR (:identityStatus = 'ApprovedNoLicense' AND iv.status = 'Approved' AND (iv.licenseNumber IS NULL OR iv.licenseNumber = '')))
+                   OR (:identityStatus = 'Approved' AND iv.status = 'Approved' AND iv.licenseStatus = 'Approved')
+                   OR (:identityStatus = 'ApprovedNoLicense' AND iv.status = 'Approved' AND iv.licenseStatus != 'Approved'))
             """,
            nativeQuery = true)
     Page<User> searchUsers(
