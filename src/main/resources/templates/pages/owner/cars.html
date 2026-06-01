@@ -1,64 +1,32 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head('Quản lý danh sách xe', ~{::link})}">
-    <link rel="stylesheet" th:href="@{/assets/css/owner.css}"/>
+    <link rel="stylesheet" th:href="@{/assets/css/owner-dashboard.css}"/>
 </head>
-<body class="bg-light">
+<body class="owner-dashboard-page">
 
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<div class="container-fluid" style="padding-top: 80px;">
-    <div class="row">
+<div class="od-shell">
+    <div class="od-layout">
 
-        <nav class="col-md-3 col-lg-2 d-md-block bg-white border-end sidebar" style="min-height: calc(100vh - 80px);">
-            <div class="position-sticky pt-4 px-2">
-                <div class="px-3 mb-3 text-muted fw-bold small text-uppercase tracking-wider">Bảng điều khiển</div>
-                
-                <ul class="nav flex-column gap-1">
-                    <li class="nav-item">
-                        <a class="nav-link rounded-3 py-2.5 px-3 d-flex align-items-center gap-3 fw-medium text-secondary hover-bg-light" 
-                           th:href="@{/owner/dashboard}">
-                            <i class="fa-solid fa-chart-line fs-5"></i> <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link rounded-3 py-2.5 px-3 d-flex align-items-center gap-3 fw-medium text-primary bg-primary bg-opacity-10" 
-                           th:href="@{/owner/cars}">
-                            <i class="fa-solid fa-car-rear fs-5"></i> <span>Quản lý xe</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link rounded-3 py-2.5 px-3 d-flex align-items-center gap-3 fw-medium text-secondary hover-bg-light" 
-                           th:href="@{/owner/orders}">
-                            <i class="fa-solid fa-list-check fs-5"></i> <span>Quản lý đơn hàng</span>
-                        </a>
-                    </li>
-                    
-                    <li class="nav-item" th:if="${session.user != null and session.user.role.name() == 'Customer'}">
-                        <hr class="my-3 text-muted opacity-20" />
-                        <a class="nav-link rounded-3 py-2.5 px-3 d-flex align-items-center gap-3 fw-medium text-success hover-bg-light" 
-                           th:href="@{/owner/owner-registration}">
-                            <i class="fa-solid fa-user-plus fs-5"></i> <span>Đăng ký làm chủ xe</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+        <div th:replace="~{fragments/owner-sidebar :: ownerSidebar('cars')}"></div>
 
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-4 pb-5">
+        <main class="od-main">
 
-            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                    <div>
-                        <span class="text-primary fw-semibold small text-uppercase">Danh mục phương tiện</span>
-                        <h1 class="h3 fw-bold text-dark mb-1" style="font-family: 'Outfit', sans-serif;">Quản lý xe cho thuê</h1>
-                        <p class="text-muted small mb-0">Theo dõi trạng thái duyệt, bật tắt hoạt động và cập nhật hồ sơ xe.</p>
-                    </div>
-                    <a th:href="@{/owner/cars/create}" class="btn btn-dark rounded-3 px-4 py-2.5 fw-medium d-flex align-items-center gap-2 shadow-sm">
-                        <i class="fa-solid fa-plus"></i> Thêm xe mới
+            <header class="od-header">
+                <div>
+                    <span class="od-header__eyebrow">Danh mục phương tiện</span>
+                    <h1 class="od-header__title">Quản lý xe cho thuê</h1>
+                    <p class="od-header__subtitle">Theo dõi trạng thái duyệt, bật tắt hoạt động và cập nhật hồ sơ xe.</p>
+                </div>
+                <div>
+                    <a th:href="@{/owner/cars/create}" class="od-btn-primary">
+                        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                        Thêm xe mới
                     </a>
                 </div>
-            </div>
+            </header>
 
             <div th:if="${success}" class="alert alert-success border-0 shadow-sm rounded-3 alert-dismissible fade show mb-4" role="alert">
                 <i class="fa-solid fa-circle-check me-2"></i> <span th:text="${success}"></span>
@@ -72,17 +40,17 @@
             <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
                 <form method="get" class="row g-3 align-items-end">
                     <div class="col-md-4 col-lg-3">
-                        <label class="form-label fw-semibold text-secondary small text-uppercase">Bộ lọc trạng thái</label>
+                        <label class="form-label fw-semibold text-secondary small text-uppercase">Bộ lọc</label>
                         <select name="status" class="form-select rounded-3 py-2">
                             <option value="">Tất cả trạng thái</option>
-                            <option value="Pending" th:selected="${selectedStatus == 'Pending'}">⏳ Chờ duyệt thông tin</option>
-                            <option value="Active" th:selected="${selectedStatus == 'Active'}">✅ Đang hoạt động</option>
-                            <option value="Inactive" th:selected="${selectedStatus == 'Inactive'}">⏸️ Đang tạm ngừng</option>
-                            <option value="Rejected" th:selected="${selectedStatus == 'Rejected'}">❌ Từ chối kích hoạt</option>
+                            <option value="Pending" th:selected="${selectedStatus == 'Pending'}">Chờ duyệt</option>
+                            <option value="Active" th:selected="${selectedStatus == 'Active'}">Đang hoạt động</option>
+                            <option value="Inactive" th:selected="${selectedStatus == 'Inactive'}">Đang tạm ngừng</option>
+                            <option value="Rejected" th:selected="${selectedStatus == 'Rejected'}">Từ chối</option>
                         </select>
                     </div>
                     <div class="col-6 col-md-3 col-lg-2">
-                        <button type="submit" class="btn btn-primary w-100 rounded-3 py-2 fw-medium">
+                        <button type="submit" class="od-btn-primary w-100 border-0">
                             <i class="fa-solid fa-filter me-1 small"></i> Áp dụng
                         </button>
                     </div>
@@ -101,10 +69,10 @@
                             <tr>
                                 <th class="border-0 py-3 ps-4" style="width: 80px">Mã xe</th>
                                 <th class="border-0 py-3">Thông tin phương tiện</th>
-                                <th class="border-0 py-3">Biển kiểm soát</th>
-                                <th class="border-0 py-3">Quy mô</th>
+                                <th class="border-0 py-3">Biển số xe</th>
+                                <th class="border-0 py-3">Số chỗ ngồi</th>
                                 <th class="border-0 py-3">Đơn giá / ngày</th>
-                                <th class="border-0 py-3">Trạng thái duyệt</th>
+                                <th class="border-0 py-3">Trạng thái</th>
                                 <th class="border-0 py-3 text-end pe-4" style="width: 180px">Thao tác</th>
                             </tr>
                         </thead>
@@ -122,13 +90,13 @@
                                 <td class="text-secondary fw-medium">
                                     <i class="fa-solid fa-users me-1 text-muted small"></i> <span th:text="${car.seats}"></span> chỗ
                                 </td>
-                                <td class="fw-bold text-primary" th:text="${#numbers.formatInteger(car.pricePerDay, 0, 'COMMA') + 'đ'}"></td>
+                                <td class="fw-bold" style="color: #00C853;" th:text="${#numbers.formatInteger(car.pricePerDay, 0, 'COMMA') + 'đ'}"></td>
                                 <td>
                                     <span th:if="${car.status.name() == 'Pending'}" class="badge rounded-pill bg-warning bg-opacity-10 text-warning px-3 py-2 fw-semibold">
                                         <i class="fa-solid fa-hourglass-half me-1 small"></i> Chờ duyệt
                                     </span>
                                     <span th:if="${car.status.name() == 'Active'}" class="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2 fw-semibold">
-                                        <i class="fa-solid fa-circle-check me-1 small"></i> Đang chạy
+                                        <i class="fa-solid fa-circle-check me-1 small"></i> Đang hoạt động
                                     </span>
                                     <span th:if="${car.status.name() == 'Inactive'}" class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary px-3 py-2 fw-semibold">
                                         <i class="fa-solid fa-circle-pause me-1 small"></i> Tạm dừng
@@ -170,7 +138,7 @@
                                         </div>
                                         <h5 class="fw-bold text-dark" style="font-family: 'Outfit', sans-serif;">Chưa có xe nào được đăng ký</h5>
                                         <p class="text-muted small mx-auto" style="max-width: 360px;">Hãy tạo hồ sơ cho chiếc xe đầu tiên của bạn để tiếp cận hàng ngàn khách hàng trên hệ thống Carto.</p>
-                                        <a th:href="@{/owner/cars/create}" class="btn btn-dark btn-sm rounded-3 px-3 py-2 fw-medium mt-2">
+                                        <a th:href="@{/owner/cars/create}" class="od-btn-primary mt-2">
                                             <i class="fa-solid fa-plus me-1"></i> Thêm xe ngay
                                         </a>
                                     </div>
@@ -195,7 +163,7 @@
                             th:classappend="${i == pageInfo.number} ? 'active' : ''"
                             th:if="${i >= pageInfo.number - 2 and i <= pageInfo.number + 2}">
                             <a class="page-link rounded-3 border-0 bg-white shadow-sm px-3 fw-semibold" 
-                               th:classappend="${i == pageInfo.number} ? 'bg-primary text-white' : 'text-dark'"
+                               th:classappend="${i == pageInfo.number} ? 'owner-page-link-active' : 'text-dark'"
                                th:href="@{/owner/cars(page=${i}, status=${selectedStatus})}" th:text="${i + 1}"></a>
                         </li>
                         
@@ -212,9 +180,37 @@
     </div>
 </div>
 
+<button type="button" class="od-sidebar-toggle" id="odSidebarToggle" aria-label="Mở menu">
+    <i class="fa-solid fa-bars"></i>
+</button>
+
 <div th:replace="~{fragments/footer :: footer}"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function () {
+    var sidebar = document.getElementById('odSidebar');
+    var backdrop = document.getElementById('odSidebarBackdrop');
+    var toggle = document.getElementById('odSidebarToggle');
+    if (!sidebar || !toggle) return;
+    function closeSidebar() {
+        sidebar.classList.remove('od-sidebar--open');
+        if (backdrop) backdrop.classList.remove('od-sidebar-backdrop--visible');
+    }
+    function openSidebar() {
+        sidebar.classList.add('od-sidebar--open');
+        if (backdrop) backdrop.classList.add('od-sidebar-backdrop--visible');
+    }
+    toggle.addEventListener('click', function () {
+        if (sidebar.classList.contains('od-sidebar--open')) closeSidebar();
+        else openSidebar();
+    });
+    if (backdrop) backdrop.addEventListener('click', closeSidebar);
+    window.addEventListener('resize', function () {
+        if (window.innerWidth >= 992) closeSidebar();
+    });
+})();
+</script>
 <script>
     // Xử lý gửi yêu cầu xóa xe ẩn qua phương thức POST an toàn
     function confirmDelete(button) {

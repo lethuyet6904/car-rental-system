@@ -51,7 +51,8 @@ public interface RentalOrderRepository extends JpaRepository<RentalOrder, Long> 
     @EntityGraph(attributePaths = {
         "customer", 
         "car", 
-        "car.brand", 
+        "car.brand",
+        "car.owner",
         "car.carType", 
         "car.region"
     })
@@ -192,4 +193,12 @@ public interface RentalOrderRepository extends JpaRepository<RentalOrder, Long> 
             ORDER BY COUNT(o.orderId) DESC
             """)
     List<Object[]> findTop5Regions(Pageable pageable);
+
+    @Query("""
+            SELECT o FROM RentalOrder o
+            WHERE o.status = 'Pending'
+            AND o.createdAt < :cutoff
+            """)
+    List<RentalOrder> findAbandonedPendingOrders(
+            @Param("cutoff") LocalDateTime cutoff);
 }

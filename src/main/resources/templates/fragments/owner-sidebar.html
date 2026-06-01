@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<th:block th:fragment="ownerSidebar(activePage)">
+    <div class="od-sidebar-backdrop" id="odSidebarBackdrop" aria-hidden="true"></div>
+    <aside class="od-sidebar" id="odSidebar" aria-label="Menu chủ xe">
+        <div class="od-sidebar__inner">
+            <p class="od-sidebar__label">Bảng điều khiển</p>
+            <nav class="od-sidebar__nav">
+                <a class="od-sidebar__link"
+                   th:classappend="${activePage == 'dashboard'} ? 'od-sidebar__link--active'"
+                   th:href="@{/owner/dashboard}">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a class="od-sidebar__link"
+                   th:classappend="${activePage == 'cars'} ? 'od-sidebar__link--active'"
+                   th:href="@{/owner/cars}">
+                    <i class="fa-solid fa-car-rear"></i>
+                    <span>Quản lý xe</span>
+                </a>
+                <a class="od-sidebar__link"
+                   th:classappend="${activePage == 'orders'} ? 'od-sidebar__link--active'"
+                   th:href="@{/owner/orders}">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>Quản lý đơn hàng</span>
+                </a>
+                <a class="od-sidebar__link"
+                   th:classappend="${activePage == 'complaints'} ? 'od-sidebar__link--active'"
+                   th:href="@{/complaint/my-complaints}">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>Khiếu nại của tôi</span>
+                </a>
+                <hr class="od-sidebar__divider"
+                    th:if="${session.user != null and session.user.role.name() == 'Customer'}"/>
+                <a class="od-sidebar__link od-sidebar__link--accent"
+                   th:if="${session.user != null and session.user.role.name() == 'Customer'}"
+                   th:href="@{/owner/owner-registration}">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Đăng ký làm chủ xe</span>
+                </a>
+            </nav>
+        </div>
+    </aside>
+</th:block>
+
+</body>
+</html>

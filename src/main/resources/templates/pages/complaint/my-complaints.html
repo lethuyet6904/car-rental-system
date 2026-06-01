@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head('Khiếu nại của tôi - Carto', ~{::link})}">
+    <link rel="stylesheet" th:href="@{/assets/css/customer.css}"/>
+</head>
+
+<body class="bg-light">
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container py-5" style="padding-top: 100px !important;">
+    <div class="mb-4">
+        <span class="text-primary fw-semibold small text-uppercase">Hỗ trợ</span>
+        <h1 class="h3 fw-bold text-dark mb-1" style="font-family: 'Outfit', sans-serif;">
+            <i class="fa-solid fa-triangle-exclamation me-2 text-danger fs-4"></i>Khiếu nại của tôi
+        </h1>
+        <p class="text-muted small mb-0">Theo dõi trạng thái các khiếu nại bạn đã gửi.</p>
+    </div>
+
+    <div th:if="${success}"
+         class="alert alert-success border-0 shadow-sm rounded-3 alert-dismissible fade show mb-4">
+        <i class="fa-solid fa-circle-check me-2"></i><span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${complaints == null or complaints.content.isEmpty()}"
+         class="text-center py-5 card border-0 shadow-sm rounded-4 bg-white">
+        <div class="bg-light d-inline-block p-4 rounded-circle mb-3 mx-auto" style="width: fit-content;">
+            <i class="fa-solid fa-inbox fa-3x text-muted opacity-40"></i>
+        </div>
+        <h5 class="fw-bold text-dark">Bạn chưa có khiếu nại nào</h5>
+        <p class="text-muted small mb-0">Khiếu nại sẽ xuất hiện tại đây sau khi bạn gửi từ trang chi tiết đơn hàng.</p>
+    </div>
+
+    <div th:if="${complaints != null and !complaints.content.isEmpty()}" class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th>Mã đơn</th>
+                    <th>Loại khiếu nại</th>
+                    <th>Ngày gửi</th>
+                    <th>Trạng thái</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="c : ${complaints.content}">
+                    <td class="font-monospace fw-semibold" th:text="'#' + ${c.orderId}"></td>
+                    <td th:switch="${c.type.name()}">
+                        <span th:case="'VehicleCondition'">Tình trạng xe</span>
+                        <span th:case="'OwnerBehavior'">Thái độ chủ xe</span>
+                        <span th:case="'PricingIssue'">Giá/phí phát sinh</span>
+                        <span th:case="'LatePickup'">Giao xe trễ</span>
+                        <span th:case="*">Khác</span>
+                    </td>
+                    <td class="text-muted small" th:text="${#temporals.format(c.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td>
+                        <span th:if="${c.status.name() == 'Pending'}" class="badge bg-warning bg-opacity-10 text-warning">Chờ xử lý</span>
+                        <span th:if="${c.status.name() == 'Processing'}" class="badge bg-info bg-opacity-10 text-info">Đang xử lý</span>
+                        <span th:if="${c.status.name() == 'Resolved'}" class="badge bg-success bg-opacity-10 text-success">Đã xử lý</span>
+                        <span th:if="${c.status.name() == 'Rejected'}" class="badge bg-danger bg-opacity-10 text-danger">Từ chối</span>
+                    </td>
+                    <td>
+                        <a th:href="@{/complaint/{id}(id=${c.complaintId})}"
+                           class="btn btn-sm btn-outline-primary rounded-3">Xem chi tiết</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${totalPages > 1}" class="d-flex justify-content-center gap-2 p-3 border-top">
+            <a th:if="${currentPage > 0}"
+               th:href="@{/complaint/my-complaints(page=${currentPage - 1})}"
+               class="btn btn-sm btn-outline-secondary rounded-3">← Trước</a>
+            <span class="align-self-center small text-muted"
+                  th:text="'Trang ' + (${currentPage} + 1) + ' / ' + ${totalPages}"></span>
+            <a th:if="${currentPage + 1 < totalPages}"
+               th:href="@{/complaint/my-complaints(page=${currentPage + 1})}"
+               class="btn btn-sm btn-outline-secondary rounded-3">Sau →</a>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

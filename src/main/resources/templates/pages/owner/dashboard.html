@@ -2,193 +2,193 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
 <head th:replace="~{fragments/head :: head('Dashboard - Chủ xe', ~{::link})}">
-    <link rel="stylesheet" th:href="@{/assets/css/owner.css}"/>
+    <link rel="stylesheet" th:href="@{/assets/css/owner-dashboard.css}"/>
 </head>
 
-<body class="bg-light">
+<body class="owner-dashboard-page">
 
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<div class="container-fluid" style="padding-top: 80px;">
-    <div class="row">
-        
-        <nav class="col-md-3 col-lg-2 d-md-block bg-white border-end sidebar" style="min-height: calc(100vh - 80px);">
-            <div class="position-sticky pt-4 px-2">
-                <div class="px-3 mb-3 text-muted fw-bold small text-uppercase tracking-wider">Bảng điều khiển</div>
-                
-                <ul class="nav flex-column gap-1">
-                    <li class="nav-item">
-                        <a class="nav-link rounded-3 py-2.5 px-3 d-flex align-items-center gap-3 fw-medium text-primary bg-primary bg-opacity-10" 
-                           th:href="@{/owner/dashboard}">
-                            <i class="fa-solid fa-chart-line fs-5"></i> <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link rounded-3 py-2.5 px-3 d-flex align-items-center gap-3 fw-medium text-secondary hover-bg-light" 
-                           th:href="@{/owner/cars}">
-                            <i class="fa-solid fa-car-rear fs-5"></i> <span>Quản lý xe</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link rounded-3 py-2.5 px-3 d-flex align-items-center gap-3 fw-medium text-secondary hover-bg-light" 
-                           th:href="@{/owner/orders}">
-                            <i class="fa-solid fa-list-check fs-5"></i> <span>Quản lý đơn hàng</span>
-                        </a>
-                    </li>
-                    
-                    <li class="nav-item" th:if="${session.user != null and session.user.role.name() == 'Customer'}">
-                        <hr class="my-3 text-muted opacity-20" />
-                        <a class="nav-link rounded-3 py-2.5 px-3 d-flex align-items-center gap-3 fw-medium text-success hover-bg-light" 
-                           th:href="@{/owner/owner-registration}">
-                            <i class="fa-solid fa-user-plus fs-5"></i> <span>Đăng ký làm chủ xe</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+<div class="od-shell">
+    <div class="od-layout">
 
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-4 pb-5">
-            
-            <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom">
+        <div th:replace="~{fragments/owner-sidebar :: ownerSidebar('dashboard')}"></div>
+
+        <main class="od-main">
+
+            <header class="od-header">
                 <div>
-                    <span class="text-primary fw-semibold small text-uppercase">Tổng quan đối tác</span>
-                    <h1 class="h3 fw-bold mb-0 text-dark" style="font-family: 'Outfit', sans-serif;">Bảng điều khiển chủ xe</h1>
+                    <span class="od-header__eyebrow">Tổng quan đối tác</span>
+                    <h1 class="od-header__title">Bảng điều khiển chủ xe</h1>
                 </div>
                 <div>
-                    <a th:href="@{/owner/cars/create}" class="btn btn-dark rounded-3 px-3 py-2 fw-medium shadow-sm d-flex align-items-center gap-2">
-                        <i class="fa-solid fa-plus"></i> Thêm xe mới
+                    <a th:href="@{/owner/cars/create}" class="od-btn-primary">
+                        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                        Thêm xe mới
                     </a>
                 </div>
-            </div>
+            </header>
 
-            <div class="row g-4 mb-5">
-                <div class="col-xl-3 col-md-6">
-                    <div class="card border-0 shadow-sm rounded-4 h-100">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="text-muted small fw-semibold text-uppercase">Tổng số xe</span>
-                                    <h2 class="fw-bold text-dark mt-1 mb-0" th:text="${totalCars ?: 0}">0</h2>
-                                </div>
-                                <div class="bg-dark bg-opacity-5 p-3 rounded-3 text-dark">
-                                    <i class="fa-solid fa-car-rear fs-4"></i>
-                                </div>
-                            </div>
+            <section class="od-stats" aria-label="Thống kê tổng quan">
+                <article class="od-stat-card od-stat-card--cars">
+                    <div class="od-stat-card__inner">
+                        <div>
+                            <span class="od-stat-card__label">Tổng số xe</span>
+                            <p class="od-stat-card__value" th:text="${totalCars ?: 0}">0</p>
+                        </div>
+                        <div class="od-stat-card__icon" aria-hidden="true">
+                            <i class="fa-solid fa-car-rear"></i>
                         </div>
                     </div>
-                </div>
+                </article>
 
-                <div class="col-xl-3 col-md-6">
-                    <div class="card border-0 shadow-sm rounded-4 h-100">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="text-muted small fw-semibold text-uppercase">Xe đang hoạt động</span>
-                                    <h2 class="fw-bold text-success mt-1 mb-0" th:text="${activeCars ?: 0}">0</h2>
-                                </div>
-                                <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success">
-                                    <i class="fa-solid fa-circle-check fs-4"></i>
-                                </div>
-                            </div>
+                <article class="od-stat-card od-stat-card--active">
+                    <div class="od-stat-card__inner">
+                        <div>
+                            <span class="od-stat-card__label">Xe đang hoạt động</span>
+                            <p class="od-stat-card__value" th:text="${activeCars ?: 0}">0</p>
+                        </div>
+                        <div class="od-stat-card__icon" aria-hidden="true">
+                            <i class="fa-solid fa-circle-check"></i>
                         </div>
                     </div>
-                </div>
+                </article>
 
-                <div class="col-xl-3 col-md-6">
-                    <div class="card border-0 shadow-sm rounded-4 h-100">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="text-muted small fw-semibold text-uppercase">Đơn chờ xác nhận</span>
-                                    <h2 class="fw-bold text-warning mt-1 mb-0" th:text="${pendingOrders ?: 0}">0</h2>
-                                </div>
-                                <div class="bg-warning bg-opacity-10 p-3 rounded-3 text-warning">
-                                    <i class="fa-solid fa-clock fs-4"></i>
-                                </div>
-                            </div>
+                <article class="od-stat-card od-stat-card--pending">
+                    <div class="od-stat-card__inner">
+                        <div>
+                            <span class="od-stat-card__label">Đơn chờ xác nhận</span>
+                            <p class="od-stat-card__value" th:text="${pendingOrders ?: 0}">0</p>
+                        </div>
+                        <div class="od-stat-card__icon" aria-hidden="true">
+                            <i class="fa-solid fa-clock"></i>
                         </div>
                     </div>
-                </div>
+                </article>
 
-                <div class="col-xl-3 col-md-6">
-                    <div class="card border-0 shadow-sm rounded-4 h-100">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="text-muted small fw-semibold text-uppercase">Doanh thu tạm tính</span>
-                                    <h2 class="fw-bold text-primary mt-1 mb-0" th:text="${totalRevenue != null ? #numbers.formatInteger(totalRevenue, 0, 'COMMA') + 'đ' : '0đ'}">0đ</h2>
-                                </div>
-                                <div class="bg-primary bg-opacity-10 p-3 rounded-3 text-primary">
-                                    <i class="fa-solid fa-wallet fs-4"></i>
-                                </div>
-                            </div>
+                <article class="od-stat-card od-stat-card--revenue">
+                    <div class="od-stat-card__inner">
+                        <div>
+                            <span class="od-stat-card__label">Doanh thu tạm tính</span>
+                            <p class="od-stat-card__value"
+                               th:text="${totalRevenue != null ? #numbers.formatInteger(totalRevenue, 0, 'COMMA') + 'đ' : '0đ'}">0đ</p>
+                        </div>
+                        <div class="od-stat-card__icon" aria-hidden="true">
+                            <i class="fa-solid fa-wallet"></i>
                         </div>
                     </div>
-                </div>
-            </div>
+                </article>
+            </section>
 
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                <div class="card-header bg-white border-bottom-0 p-4 d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold mb-0 text-dark" style="font-family: 'Outfit', sans-serif;">Đơn đặt chuyến gần đây</h5>
-                    <a th:href="@{/owner/orders}" class="btn btn-link btn-sm text-decoration-none fw-semibold">Xem tất cả <i class="fa-solid fa-arrow-right ms-1"></i></a>
+            <section class="od-panel" aria-labelledby="odRecentOrdersTitle">
+                <div class="od-panel__head">
+                    <h2 class="od-panel__title" id="odRecentOrdersTitle">Đơn đặt chuyến gần đây</h2>
+                    <a th:href="@{/owner/orders}" class="od-panel__link">
+                        Xem tất cả
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    </a>
                 </div>
-                
-                <div class="table-responsive px-4 pb-4">
-                    <table class="table align-middle table-hover mb-0">
-                        <thead class="table-light text-muted small text-uppercase">
+
+                <div class="od-table-wrap">
+                    <table class="od-table">
+                        <thead>
                             <tr>
-                                <th class="border-0 py-3">Mã đơn</th>
-                                <th class="border-0 py-3">Khách hàng</th>
-                                <th class="border-0 py-3">Xe yêu cầu</th>
-                                <th class="border-0 py-3">Ngày đặt</th>
-                                <th class="border-0 py-3">Tổng thành tiền</th>
-                                <th class="border-0 py-3">Trạng thái</th>
-                                <th class="border-0 py-3 text-end">Thao tác</th>
+                                <th>Mã đơn</th>
+                                <th>Khách hàng</th>
+                                <th>Xe yêu cầu</th>
+                                <th>Ngày đặt</th>
+                                <th>Tổng thành tiền</th>
+                                <th>Trạng thái</th>
+                                <th class="text-end">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr th:each="order : ${recentOrders}">
-                                <td class="fw-bold text-dark py-3">#<span th:text="${order.orderId}"></span></td>
+                                <td class="fw-bold">#<span th:text="${order.orderId}"></span></td>
                                 <td>
-                                    <div class="fw-semibold text-dark" th:text="${order.customer?.fullName} ?: 'Ẩn danh'"></div>
-                                    <small class="text-muted" th:text="${order.customer?.phone} ?: ''"></small>
+                                    <div class="fw-semibold" th:text="${order.customer?.fullName} ?: 'Ẩn danh'"></div>
+                                    <small class="od-table__muted" th:text="${order.customer?.phone} ?: ''"></small>
                                 </td>
-                                <td class="fw-medium text-secondary" th:text="${(order.car?.brand?.brandName ?: '') + ' ' + (order.car?.modelName ?: 'Không rõ')}"></td>
-                                <td class="text-muted" th:text="${order.createdAt != null ? #temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm') : 'N/A'}"></td>
-                                <td class="fw-bold text-dark" th:text="${order.totalAmount != null ? #numbers.formatInteger(order.totalAmount, 0, 'COMMA') + 'đ' : '0đ'}"></td>
+                                <td th:text="${(order.car?.brand?.brandName ?: '') + ' ' + (order.car?.modelName ?: 'Không rõ')}"></td>
+                                <td class="od-table__muted"
+                                    th:text="${order.createdAt != null ? #temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm') : 'N/A'}"></td>
+                                <td class="fw-bold"
+                                    th:text="${order.totalAmount != null ? #numbers.formatInteger(order.totalAmount, 0, 'COMMA') + 'đ' : '0đ'}"></td>
                                 <td>
-                                    <span th:if="${order.status?.name() == 'Pending'}" class="badge rounded-pill bg-warning bg-opacity-10 text-warning px-3 py-2 fw-semibold">Chờ thanh toán cọc</span>
-                                    <span th:if="${order.status?.name() == 'PendingApproval'}" class="badge rounded-pill bg-warning bg-opacity-10 text-warning px-3 py-2 fw-semibold">Chờ xác nhận</span>
-                                    <span th:if="${order.status?.name() == 'Confirmed'}" class="badge rounded-pill bg-info bg-opacity-10 text-info px-3 py-2 fw-semibold">Đã xác nhận</span>
-                                    <span th:if="${order.status?.name() == 'InProgress'}" class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3 py-2 fw-semibold">Đang thuê</span>
-                                    <span th:if="${order.status?.name() == 'Completed'}" class="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2 fw-semibold">Hoàn thành</span>
-                                    <span th:if="${order.status?.name() == 'Cancelled'}" class="badge rounded-pill bg-danger bg-opacity-10 text-danger px-3 py-2 fw-semibold">Đã hủy</span>
-                                    <span th:if="${order.status?.name() == 'Rejected'}" class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary px-3 py-2 fw-semibold">Từ chối</span>
+                                    <span th:if="${order.status?.name() == 'Pending'}"
+                                          class="od-badge od-badge--pending">Chờ thanh toán cọc</span>
+                                    <span th:if="${order.status?.name() == 'PendingApproval'}"
+                                          class="od-badge od-badge--pending">Chờ xác nhận</span>
+                                    <span th:if="${order.status?.name() == 'Confirmed'}"
+                                          class="od-badge od-badge--confirmed">Đã xác nhận</span>
+                                    <span th:if="${order.status?.name() == 'InProgress'}"
+                                          class="od-badge od-badge--progress">Đang thuê</span>
+                                    <span th:if="${order.status?.name() == 'Completed'}"
+                                          class="od-badge od-badge--completed">Hoàn thành</span>
+                                    <span th:if="${order.status?.name() == 'Cancelled'}"
+                                          class="od-badge od-badge--cancelled">Đã hủy</span>
+                                    <span th:if="${order.status?.name() == 'Rejected'}"
+                                          class="od-badge od-badge--rejected">Từ chối</span>
                                 </td>
                                 <td class="text-end">
-                                    <a th:href="@{/owner/orders/{id}(id=${order.orderId})}" 
-                                       class="btn btn-light btn-sm rounded-3 px-2.5 border">
-                                        <i class="fa-solid fa-eye text-secondary"></i> Chi tiết
+                                    <a th:href="@{/owner/orders/{id}(id=${order.orderId})}"
+                                       class="od-btn-detail">
+                                        <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                                        Chi tiết
                                     </a>
                                 </td>
                             </tr>
-                            
-                            <tr th:if="${recentOrders == null or recentOrders.isEmpty()}">
-                                <td colspan="7" class="text-center text-muted py-5">
-                                    <i class="fa-solid fa-inbox fa-3x mb-3 text-opacity-20 text-dark"></i>
-                                    <p class="mb-0 fw-medium">Chưa ghi nhận đơn hàng nào gần đây</p>
+
+                            <tr th:if="${recentOrders == null or recentOrders.isEmpty()}"
+                                class="od-table__empty-row">
+                                <td colspan="7" class="od-empty">
+                                    <i class="fa-solid fa-inbox od-empty__icon" aria-hidden="true"></i>
+                                    <p class="od-empty__text">Chưa ghi nhận đơn hàng nào gần đây</p>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </section>
         </main>
     </div>
 </div>
 
+<button type="button" class="od-sidebar-toggle" id="odSidebarToggle" aria-label="Mở menu">
+    <i class="fa-solid fa-bars"></i>
+</button>
+
 <div th:replace="~{fragments/footer :: footer}"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function () {
+    var sidebar = document.getElementById('odSidebar');
+    var backdrop = document.getElementById('odSidebarBackdrop');
+    var toggle = document.getElementById('odSidebarToggle');
+    if (!sidebar || !toggle) return;
+
+    function closeSidebar() {
+        sidebar.classList.remove('od-sidebar--open');
+        if (backdrop) backdrop.classList.remove('od-sidebar-backdrop--visible');
+    }
+
+    function openSidebar() {
+        sidebar.classList.add('od-sidebar--open');
+        if (backdrop) backdrop.classList.add('od-sidebar-backdrop--visible');
+    }
+
+    toggle.addEventListener('click', function () {
+        if (sidebar.classList.contains('od-sidebar--open')) closeSidebar();
+        else openSidebar();
+    });
+
+    if (backdrop) backdrop.addEventListener('click', closeSidebar);
+
+    window.addEventListener('resize', function () {
+        if (window.innerWidth >= 992) closeSidebar();
+    });
+})();
+</script>
 </body>
 </html>

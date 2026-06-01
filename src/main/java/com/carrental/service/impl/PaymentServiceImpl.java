@@ -1,11 +1,14 @@
 package com.carrental.service.impl;
 
 import com.carrental.entity.Payment;
+import com.carrental.entity.OwnerRegistration;
 import com.carrental.entity.RentalOrder;
 import com.carrental.enums.OrderStatus;
 import com.carrental.enums.PaymentMethod;
 import com.carrental.enums.PaymentStatus;
 import com.carrental.enums.TransactionType;
+import com.carrental.enums.VerificationStatus;
+import com.carrental.repository.OwnerRegistrationRepository;
 import com.carrental.repository.PaymentRepository;
 import com.carrental.repository.RentalOrderRepository;
 import com.carrental.service.PaymentService;
@@ -27,6 +30,25 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final RentalOrderRepository rentalOrderRepository;
+    private final OwnerRegistrationRepository ownerRegistrationRepository;
+
+    @Override
+    public void addOwnerBankInfoToModel(RentalOrder order, Model model) {
+        OwnerRegistration ownerReg = null;
+        if (order != null && order.getCar() != null && order.getCar().getOwner() != null) {
+            ownerReg = ownerRegistrationRepository
+                    .findTopByUserUserIdAndStatusOrderBySubmittedAtDesc(
+                            order.getCar().getOwner().getUserId(),
+                            VerificationStatus.Approved)
+                    .orElse(null);
+        }
+        model.addAttribute("ownerBankName",
+                ownerReg != null ? ownerReg.getBankName() : "Chưa cập nhật");
+        model.addAttribute("ownerBankAccount",
+                ownerReg != null ? ownerReg.getBankAccount() : "Chưa cập nhật");
+        model.addAttribute("ownerAccountHolder",
+                ownerReg != null ? ownerReg.getAccountHolder() : "Chưa cập nhật");
+    }
 
     @Override
     public boolean processDepositPayment(Long orderId, PaymentMethod method,
@@ -74,9 +96,8 @@ public class PaymentServiceImpl implements PaymentService {
         RentalOrder order = rentalOrderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
 
-        if (order.getStatus() != OrderStatus.InProgress) {
-            ra.addFlashAttribute("error", "Đơn hàng không ở trạng thái đang thuê");
-            return false;
+        if (order.getStatus() != OrderStatus.Completed) {
+            throw new RuntimeException("Chỉ có thể thanh toán sau khi chủ xe đã xác nhận trả xe");
         }
 
         BigDecimal remainingAmount = calculateRemainingAmount(order, extraFee);
@@ -93,12 +114,10 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
         paymentRepository.save(finalPayment);
 
-        order.setStatus(OrderStatus.Completed);
-        order.setActualReturnTime(LocalDateTime.now());
         if (damages != null && !damages.isEmpty()) {
             order.setReturnChecklistNote("Hư hỏng/phụ thu: " + damages + " | Số tiền: " + extraFee + "đ");
+            rentalOrderRepository.save(order);
         }
-        rentalOrderRepository.save(order);
 
         ra.addFlashAttribute("success", "Thanh toán thành công! Cảm ơn bạn đã sử dụng dịch vụ.");
         return true;
@@ -194,6 +213,7 @@ public class PaymentServiceImpl implements PaymentService {
         model.addAttribute("order", order);
         model.addAttribute("amountToPay", order.getDepositAmount());
         model.addAttribute("paymentMethods", com.carrental.enums.PaymentMethod.values());
+        addOwnerBankInfoToModel(order, model);
         return "pages/payment/checkout";
     }
 
@@ -203,12 +223,17 @@ public class PaymentServiceImpl implements PaymentService {
         if (order == null)
             return "redirect:/owner/orders";
 
+        if (order.getStatus() != OrderStatus.Completed) {
+            return "redirect:/booking/order/" + orderId;
+        }
+
         BigDecimal remainingAmount = calculateRemainingAmount(order, extraFee);
         model.addAttribute("order", order);
         model.addAttribute("remainingAmount", remainingAmount);
         model.addAttribute("extraFee", extraFee != null ? extraFee : BigDecimal.ZERO);
         model.addAttribute("damages", damages);
         model.addAttribute("paymentMethods", com.carrental.enums.PaymentMethod.values());
+        addOwnerBankInfoToModel(order, model);
         return "pages/payment/final-payment";
     }
-}
+}

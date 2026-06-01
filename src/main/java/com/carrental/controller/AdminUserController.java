@@ -125,6 +125,36 @@ public class AdminUserController {
         return "redirect:/admin/users/" + id;
     }
 
+    // ── POST: Duyệt GPLX ─────────────────────────────────────────
+    @PostMapping("/{id}/approve-license")
+    public String approveLicense(@PathVariable Long id, RedirectAttributes ra) {
+        try {
+            adminUserService.approveLicenseVerification(id);
+            ra.addFlashAttribute("successMessage", "Đã duyệt GPLX thành công");
+        } catch (Exception e) {
+            ra.addFlashAttribute("errorMessage", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/users/" + id + "/identity";
+    }
+
+    // ── POST: Từ chối GPLX ───────────────────────────────────────
+    @PostMapping("/{id}/reject-license")
+    public String rejectLicense(@PathVariable Long id,
+                                @RequestParam String rejectReason,
+                                RedirectAttributes ra) {
+        if (rejectReason == null || rejectReason.isBlank()) {
+            ra.addFlashAttribute("errorMessage", "Vui lòng nhập lý do từ chối");
+            return "redirect:/admin/users/" + id + "/identity";
+        }
+        try {
+            adminUserService.rejectLicenseVerification(id, rejectReason);
+            ra.addFlashAttribute("successMessage", "Đã từ chối GPLX");
+        } catch (Exception e) {
+            ra.addFlashAttribute("errorMessage", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/users/" + id + "/identity";
+    }
+
     // ── Helpers ───────────────────────────────────────────────────
     private <E extends Enum<E>> E parseEnum(Class<E> type, String value) {
         if (value == null || value.isBlank()) return null;

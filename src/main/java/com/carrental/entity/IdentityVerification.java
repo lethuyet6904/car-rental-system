@@ -1,5 +1,6 @@
 package com.carrental.entity;
 
+import com.carrental.enums.LicenseStatus;
 import com.carrental.enums.VerificationStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -44,6 +45,10 @@ public class IdentityVerification {
     @Column(name = "backImage", nullable = true, length = 200)
     private String backImage;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "licenseStatus", nullable = false, length = 20)
+    private LicenseStatus licenseStatus;
+
     // ── Trạng thái & metadata ────────────────────────────────────
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
@@ -63,6 +68,14 @@ public class IdentityVerification {
         this.submittedAt = LocalDateTime.now();
         if (this.status == null)
             this.status = VerificationStatus.Pending;
+        if (this.licenseStatus == null)
+            this.licenseStatus = LicenseStatus.None;
+    }
+
+    @PostLoad
+    public void postLoad() {
+        if (this.licenseStatus == null)
+            this.licenseStatus = LicenseStatus.None;
     }
 
     // ── Helper methods ───────────────────────────────────────────
@@ -71,8 +84,8 @@ public class IdentityVerification {
         return VerificationStatus.Approved.equals(this.status);
     }
 
-    /** Đã có GPLX (dù chưa duyệt hay rồi — chỉ check data tồn tại) */
+    /** GPLX đã được admin duyệt */
     public boolean hasLicense() {
-        return this.licenseNumber != null && !this.licenseNumber.isBlank();
+        return LicenseStatus.Approved.equals(this.licenseStatus);
     }
 }

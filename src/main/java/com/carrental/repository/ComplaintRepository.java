@@ -61,4 +61,33 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Long> {
             WHERE c.complaintId = :id
             """)
     Optional<Complaint> findWithDetailsById(@Param("id") Long id);
+
+    @Query("""
+            SELECT c FROM Complaint c
+            JOIN FETCH c.rentalOrder r
+            JOIN FETCH r.car
+            WHERE c.rentalOrder.orderId = :orderId
+            AND c.sender.userId = :senderId
+            ORDER BY c.createdAt DESC
+            """)
+    List<Complaint> findByOrderAndSenderOrderByCreatedAtDesc(
+            @Param("orderId") Long orderId,
+            @Param("senderId") Long senderId);
+
+    @Query("""
+            SELECT c FROM Complaint c
+            JOIN FETCH c.rentalOrder r
+            JOIN FETCH r.car
+            WHERE c.sender.userId = :senderId
+            """)
+    Page<Complaint> findBySenderUserId(@Param("senderId") Long senderId, Pageable pageable);
+
+    @Query("""
+            SELECT c FROM Complaint c
+            JOIN FETCH c.sender
+            JOIN FETCH c.rentalOrder r
+            JOIN FETCH r.car
+            WHERE c.complaintId = :id
+            """)
+    Optional<Complaint> findWithDetailsByIdAndSender(@Param("id") Long id, @Param("senderId") Long senderId);
 }

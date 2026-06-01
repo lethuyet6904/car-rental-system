@@ -61,4 +61,9 @@ public interface PaymentService {
      * Hiển thị trang thanh toán nốt
      */
     String showFinalPaymentPage(Long orderId, BigDecimal extraFee, String damages, Model model);
+
+    /**
+     * Thêm thông tin tài khoản ngân hàng của chủ xe vào model thanh toán
+     */
+    void addOwnerBankInfoToModel(RentalOrder order, Model model);
 }

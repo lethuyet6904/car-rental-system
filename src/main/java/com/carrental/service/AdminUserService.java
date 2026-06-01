@@ -27,4 +27,10 @@ public interface AdminUserService {
 
     // Từ chối xác minh CCCD/GPLX
     void rejectIdentityVerification(Long userId, String reason);
+
+    // Duyệt GPLX
+    void approveLicenseVerification(Long userId);
+
+    // Từ chối GPLX
+    void rejectLicenseVerification(Long userId, String reason);
 }

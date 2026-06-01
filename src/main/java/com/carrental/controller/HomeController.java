@@ -43,8 +43,11 @@ public class HomeController {
             }
         }
 
-        // Hiển thị 8 xe nổi bật trên trang chủ (trang đầu tiên, sắp xếp mặc định)
-        Page<CarListResponse> carPage = carService.searchActiveCars(null, null, null, null, PageRequest.of(0, 4));
+        // Hiển thị 8 xe nổi bật: Active, sắp xếp avgRating DESC rồi createdAt DESC
+        Page<CarListResponse> carPage = carService.searchActiveCarsWithFilter(
+                null, null, null, null, null, null, null, null, null,
+                "rating",
+                PageRequest.of(0, 8));
         model.addAttribute("cars", carPage.getContent());
         model.addAttribute("regions", regionService.getActiveRegions());
 

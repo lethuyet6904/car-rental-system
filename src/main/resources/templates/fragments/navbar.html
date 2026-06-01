@@ -32,9 +32,6 @@
             >
               <a class="nav-link ct-navbar__link" th:href="@{/}">Trang chủ</a>
             </li>
-            <!-- <li class="nav-item">
-                    <a class="nav-link ct-navbar__link" th:href="@{/about}">Về Carto</a>
-                </li> -->
             <li
               class="nav-item"
               th:if="${session.user != null and session.user.role.name() == 'Customer'}"
@@ -98,6 +95,22 @@
                     </a>
                   </li>
                   <li>
+                    <a
+                      class="dropdown-item ct-dropdown-item"
+                      th:href="@{/booking/my-orders}"
+                    >
+                      <i class="fa-solid fa-file-contract"></i> Đơn thuê của tôi
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      class="dropdown-item ct-dropdown-item"
+                      th:href="@{/complaint/my-complaints}"
+                    >
+                      <i class="fa-solid fa-triangle-exclamation"></i> Khiếu nại của tôi
+                    </a>
+                  </li>
+                  <li>
                     <hr class="ct-dropdown-divider" />
                   </li>
 
@@ -152,6 +165,14 @@
                       th:href="@{/owner/dashboard}"
                     >
                       <i class="ti ti-layout-dashboard"></i> Quản lý xe
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      class="dropdown-item ct-dropdown-item"
+                      th:href="@{/complaint/my-complaints}"
+                    >
+                      <i class="fa-solid fa-triangle-exclamation"></i> Khiếu nại của tôi
                     </a>
                   </li>
                   <li>

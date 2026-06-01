@@ -201,13 +201,6 @@ public class OwnerServiceImpl implements OwnerService {
 
         Car savedCar = carRepository.save(car);
 
-        System.out.println("registrationImage empty: " +
-                (request.getRegistrationImage() != null ? request.getRegistrationImage().isEmpty() : "null"));
-        System.out.println("inspectionImage empty: " +
-                (request.getInspectionImage() != null ? request.getInspectionImage().isEmpty() : "null"));
-        System.out.println("insuranceImage empty: " +
-                (request.getInsuranceImage() != null ? request.getInsuranceImage().isEmpty() : "null"));
-
         // Lưu ảnh xe nếu có
         saveCarImages(savedCar, request.getImages());
 
@@ -505,6 +498,9 @@ public class OwnerServiceImpl implements OwnerService {
         order.setStatus(OrderStatus.Completed);
         order.setActualReturnTime(LocalDateTime.now());
         rentalOrderRepository.save(order);
+
+        carScheduleRepository.findByRentalOrderOrderId(orderId)
+                .ifPresent(carScheduleRepository::delete);
     }
 
     @Override
@@ -515,16 +511,14 @@ public class OwnerServiceImpl implements OwnerService {
             throw new org.springframework.security.access.AccessDeniedException("Bạn không có quyền thực hiện trên đơn hàng này, hoặc đơn không tồn tại");
         if (order.getStatus() != OrderStatus.InProgress)
             throw new RuntimeException("Chỉ cho phép chuyển từ IN_PROGRESS sang COMPLETED");
-            
-        com.carrental.entity.Payment finalPayment = paymentService.getPaymentByOrderAndType(orderId, com.carrental.enums.TransactionType.FinalPayment);
-        if (finalPayment == null || finalPayment.getStatus() != com.carrental.enums.PaymentStatus.Success) {
-            throw new RuntimeException("Khách hàng chưa thanh toán phần còn lại.");
-        }
-        
+
         order.setStatus(OrderStatus.Completed);
         order.setActualReturnTime(LocalDateTime.now());
         order.setReturnChecklistNote(checklistNote);
-        
+
+        carScheduleRepository.findByRentalOrderOrderId(orderId)
+                .ifPresent(carScheduleRepository::delete);
+
         List<String> savedFiles = new ArrayList<>();
         try {
             rentalOrderRepository.save(order);
@@ -560,13 +554,11 @@ public class OwnerServiceImpl implements OwnerService {
      * sortOrder bắt đầu từ 0 — ảnh đầu tiên là ảnh bìa (thumbnail).
      */
     private void saveCarImages(Car car, List<MultipartFile> images) {
-        System.out.println("saveCarImages called, count: " + (images != null ? images.size() : "null"));
         if (images == null || images.isEmpty())
             return;
 
         int order = 0;
         for (MultipartFile file : images) {
-            System.out.println("car image empty: " + (file != null ? file.isEmpty() : "null"));
             if (file == null || file.isEmpty())
                 continue;
 

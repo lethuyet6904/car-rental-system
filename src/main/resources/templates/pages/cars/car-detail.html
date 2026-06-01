@@ -87,27 +87,6 @@
                     <div class="cd-desc-content" th:if="${car.description == null}">Chưa có mô tả cho xe này.</div>
                     <hr class="my-4">
 
-                    <!-- Owner info -->
-                    <h3 class="cd-desc-title">Thông tin chủ xe</h3>
-                    <div class="cd-owner-card">
-                        <div class="cd-owner-avatar">
-                            <div class="bg-success text-white rounded-circle d-flex justify-content-center align-items-center"
-                                style="width:60px;height:60px;font-size:24px;">
-                                <i class="fa-solid fa-user"></i>
-                            </div>
-                        </div>
-                        <div class="cd-owner-info">
-                            <div class="cd-owner-name" th:text="${car.ownerName}">Tên Chủ Xe</div>
-                            <div class="cd-owner-meta">
-                                <div class="cd-reviews-summary">
-                                    <i class="fa-solid fa-star text-warning"></i>
-                                    <strong th:text="${car.avgRating}">0.0</strong>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <hr class="my-4">
-
                     <!-- Features -->
                     <h3 class="cd-desc-title">Các tiện nghi khác</h3>
                     <div class="cd-features-list" th:if="${car.features != null and !car.features.isEmpty()}">
@@ -134,7 +113,26 @@
                         <div class="cd-box-content">Không yêu cầu khách thuê thế chấp Tiền mặt hoặc Xe máy</div>
                     </div>
                     <hr class="my-4">
-
+                                        <!-- Owner info -->
+                    <h3 class="cd-desc-title">Thông tin chủ xe</h3>
+                    <div class="cd-owner-card">
+                        <div class="cd-owner-avatar">
+                            <div class="bg-success text-white rounded-circle d-flex justify-content-center align-items-center"
+                                style="width:60px;height:60px;font-size:24px;">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                        </div>
+                        <div class="cd-owner-info">
+                            <div class="cd-owner-name" th:text="${car.ownerName}">Tên Chủ Xe</div>
+                            <div class="cd-owner-meta">
+                                <div class="cd-reviews-summary">
+                                    <i class="fa-solid fa-star text-warning"></i>
+                                    <strong th:text="${car.avgRating}">0.0</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="my-4">
                     <!-- ===== REVIEWS ===== -->
                     <div class="cd-reviews-section">
                         <div class="d-flex align-items-center gap-3 mb-4">

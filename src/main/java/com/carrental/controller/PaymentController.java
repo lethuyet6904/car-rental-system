@@ -51,6 +51,11 @@ public class PaymentController {
             return "redirect:/booking/my-orders";
         }
 
+        if (!order.getCustomer().getUserId().equals(user.getUserId())) {
+            ra.addFlashAttribute("error", "Bạn không có quyền thanh toán đơn hàng này");
+            return "redirect:/booking/my-orders";
+        }
+
         // Chỉ cho vào checkout khi đang chờ thanh toán cọc
         if (order.getStatus() != OrderStatus.Pending) {
             ra.addFlashAttribute("error", "Đơn hàng không cần thanh toán hoặc đã được thanh toán");
@@ -60,6 +65,7 @@ public class PaymentController {
         model.addAttribute("order", order);
         model.addAttribute("amountToPay", order.getDepositAmount());
         model.addAttribute("paymentMethods", PaymentMethod.values());
+        paymentService.addOwnerBankInfoToModel(order, model);
         return "pages/payment/checkout";
     }
 
@@ -121,6 +127,11 @@ public class PaymentController {
             return "redirect:/";
         }
 
+        if (order.getStatus() != OrderStatus.Completed) {
+            ra.addFlashAttribute("error", "Chỉ có thể thanh toán sau khi chủ xe đã xác nhận trả xe");
+            return "redirect:/booking/order/" + orderId;
+        }
+
         return paymentService.showFinalPaymentPage(orderId, extraFee, damages, model);
     }
 
@@ -134,6 +145,23 @@ public class PaymentController {
             @RequestParam(required = false) String damages,
             @RequestParam(required = false) String transactionId,
             RedirectAttributes ra) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return "redirect:/auth/login";
+        }
+
+        RentalOrder order = bookingService.getOrderById(orderId);
+        if (order == null) {
+            ra.addFlashAttribute("error", "Không tìm thấy đơn hàng");
+            return "redirect:/booking/my-orders";
+        }
+
+        User currentUser = userService.findByPhone(auth.getName());
+        if (currentUser == null || !order.getCustomer().getUserId().equals(currentUser.getUserId())) {
+            ra.addFlashAttribute("error", "Bạn không có quyền thực hiện thanh toán này");
+            return "redirect:/booking/my-orders";
+        }
 
         boolean success = paymentService.processFinalPayment(orderId, paymentMethod, extraFee, damages, ra);
 

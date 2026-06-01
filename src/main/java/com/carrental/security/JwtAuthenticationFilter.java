@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -19,6 +20,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // OncePerRequestFilter đảm bảo filter chỉ chạy 1 lần mỗi request
 
         private final JwtTokenProvider jwtTokenProvider;
+        private final CustomUserDetailsService customUserDetailsService;
 
         @Override
         protected void doFilterInternal(HttpServletRequest request,
@@ -32,26 +34,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // Bước 2: Nếu có token và token hợp lệ
                 if (token != null && jwtTokenProvider.validateToken(token)) {
 
-                        // Bước 3: Lấy phone và role từ token thay vì gọi DB
+                        // Chỉ dùng JWT để xác định phone; role/authorities lấy từ DB (tránh token cũ sau khi Admin đổi role)
                         String phone = jwtTokenProvider.getPhoneFromToken(token);
-                        String role = jwtTokenProvider.getRoleFromToken(token);
 
-                        // Bước 4: Tạo UserDetails ảo (chỉ cần phone và role)
-                        UserDetails userDetails = org.springframework.security.core.userdetails.User
-                                        .withUsername(phone)
-                                        .password("") // không cần thiết ở bước này
-                                        .roles(role) // roles() sẽ tự động prepend "ROLE_"
-                                        .build();
+                        try {
+                                UserDetails userDetails = customUserDetailsService.loadUserByUsername(phone);
 
-                        // Bước 5: Tạo Authentication object và set vào SecurityContext
-                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                                        userDetails,
-                                        null,
-                                        userDetails.getAuthorities());
-                        authentication.setDetails(
+                                UsernamePasswordAuthenticationToken authentication =
+                                        new UsernamePasswordAuthenticationToken(
+                                                userDetails,
+                                                null,
+                                                userDetails.getAuthorities());
+                                authentication.setDetails(
                                         new WebAuthenticationDetailsSource().buildDetails(request));
 
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                                SecurityContextHolder.getContext().setAuthentication(authentication);
+                        } catch (UsernameNotFoundException ignored) {
+                                // Token hợp lệ nhưng user đã bị xóa — không set authentication
+                        }
                 }
 
                 // Bước 6: Tiếp tục chain — cho request đi tiếp dù có token hay không

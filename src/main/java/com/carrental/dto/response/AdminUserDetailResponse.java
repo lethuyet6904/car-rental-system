@@ -3,6 +3,7 @@ package com.carrental.dto.response;
 import com.carrental.entity.IdentityVerification;
 import com.carrental.entity.OwnerRegistration;
 import com.carrental.entity.User;
+import com.carrental.enums.LicenseStatus;
 import com.carrental.enums.UserRole;
 import com.carrental.enums.UserStatus;
 import com.carrental.enums.VerificationStatus;
@@ -29,6 +30,7 @@ public class AdminUserDetailResponse {
     private final VerificationStatus identityStatus;
     private final String nationalId;
     private final String licenseNumber;
+    private final LicenseStatus licenseStatus;
     private final String nationalIdFrontImage;
     private final String nationalIdBackImage;
     private final String licenseFrontImage;  // = frontImage trong entity
@@ -61,6 +63,7 @@ public class AdminUserDetailResponse {
             this.identityStatus        = identity.getStatus();
             this.nationalId            = identity.getNationalId();
             this.licenseNumber         = identity.getLicenseNumber();
+            this.licenseStatus         = identity.getLicenseStatus();
             this.nationalIdFrontImage  = identity.getNationalIdFrontImage();
             this.nationalIdBackImage   = identity.getNationalIdBackImage();
             this.licenseFrontImage     = identity.getFrontImage();
@@ -70,6 +73,7 @@ public class AdminUserDetailResponse {
         } else {
             this.identityStatus = null;
             this.nationalId = this.licenseNumber = null;
+            this.licenseStatus = null;
             this.nationalIdFrontImage = this.nationalIdBackImage = null;
             this.licenseFrontImage = this.licenseBackImage = null;
             this.identityRejectReason = null;

@@ -46,6 +46,16 @@ public interface IdentityVerificationService {
     IdentityVerification rejectCccd(Long verificationId, String reason);
 
     /**
+     * Admin: Duyệt GPLX (theo verificationId)
+     */
+    IdentityVerification approveLicense(Long verificationId);
+
+    /**
+     * Admin: Từ chối GPLX
+     */
+    IdentityVerification rejectLicense(Long verificationId, String reason);
+
+    /**
      * Lấy hồ sơ đã xác minh (dùng khi fill thông tin owner registration)
      */
     IdentityVerification getApprovedByUser(Long userId);

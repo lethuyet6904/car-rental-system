@@ -143,6 +143,6 @@ public class CustomerController {
 
         model.addAttribute("orders", userService.getOrdersByCustomer(user.getUserId()));
         model.addAttribute("user", user);
-        return "pages/customer/my-orders";
+        return "pages/booking/my-orders";
     }
 }

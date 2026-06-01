@@ -4,6 +4,7 @@ import com.carrental.dto.request.CarRequest;
 import com.carrental.dto.request.OwnerRegistrationRequest;
 import com.carrental.entity.*;
 import com.carrental.enums.CarStatus;
+import com.carrental.enums.ComplaintType;
 import com.carrental.enums.OrderStatus;
 import com.carrental.enums.RentalImageType;
 import com.carrental.enums.TransactionType;
@@ -11,7 +12,7 @@ import com.carrental.enums.UserRole;
 import com.carrental.enums.VerificationStatus;
 import com.carrental.repository.OwnerRegistrationRepository;
 import com.carrental.repository.RentalImageRepository;
-import com.carrental.service.CarService;
+import com.carrental.service.ComplaintService;
 import com.carrental.service.IdentityVerificationService;
 import com.carrental.service.OwnerService;
 import com.carrental.service.PaymentService;
@@ -42,11 +43,11 @@ public class OwnerController {
 
     private final UserService userService;
     private final OwnerService ownerService;
-    private final CarService carService;
     private final PaymentService paymentService;
     private final IdentityVerificationService identityVerificationService;
     private final OwnerRegistrationRepository ownerRegistrationRepository;
     private final RentalImageRepository rentalImageRepository;
+    private final ComplaintService complaintService;
 
     // ====================== HELPER: Lấy user hiện tại ======================
     private User getCurrentUser() {
@@ -286,6 +287,14 @@ public class OwnerController {
                 rentalImageRepository.findByRentalOrderOrderIdAndImageType(orderId, RentalImageType.Pickup));
         model.addAttribute("returnImages",
                 rentalImageRepository.findByRentalOrderOrderIdAndImageType(orderId, RentalImageType.Return));
+        model.addAttribute("existingComplaint",
+                complaintService.findByOrderAndSender(orderId, user.getUserId()).orElse(null));
+        model.addAttribute("complaintTypes", new ComplaintType[]{
+                ComplaintType.VehicleDamage,
+                ComplaintType.LateReturn,
+                ComplaintType.PricingIssue,
+                ComplaintType.Other
+        });
         return "pages/owner/order-detail";
     }
 

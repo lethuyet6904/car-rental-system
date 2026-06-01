@@ -56,11 +56,6 @@
                                     <i class="fa-solid fa-lock"></i> Đổi mật khẩu
                                 </a>
                             </li>
-                            <li>
-                                <a th:href="@{/booking/my-orders}">
-                                    <i class="fa-solid fa-file-contract"></i> Đơn thuê của tôi
-                                </a>
-                            </li>
                             <li th:if="${identityStatus == null or identityStatus.name() == 'Rejected'}">
                                 <a th:href="@{/verification/cccd}">
                                     <i class="fa-solid fa-id-card"></i> Xác minh CCCD

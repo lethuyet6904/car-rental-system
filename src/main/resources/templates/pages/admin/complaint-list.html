@@ -30,7 +30,12 @@
               <option value="" th:selected="${type == null or type == ''}">Loại báo cáo</option>
               <option th:each="t : ${types}"
                       th:value="${t.name()}"
-                      th:text="${t.name()}"
+                      th:text="${t.name() == 'VehicleCondition' ? 'Tình trạng xe không đúng mô tả' :
+                                 t.name() == 'OwnerBehavior' ? 'Thái độ chủ xe không tốt' :
+                                 t.name() == 'LatePickup' ? 'Giao xe trễ giờ' :
+                                 t.name() == 'VehicleDamage' ? 'Khách hàng gây hư hỏng xe' :
+                                 t.name() == 'LateReturn' ? 'Khách hàng trả xe trễ' :
+                                 t.name() == 'PricingIssue' ? 'Vấn đề về giá/phí phát sinh' : 'Vấn đề khác'}"
                       th:selected="${t.name() == type}">
               </option>
             </select>
@@ -87,7 +92,15 @@
                   </div>
                 </div>
               </td>
-              <td th:text="${c.type.name()}"></td>
+              <td th:switch="${c.type.name()}">
+                <span th:case="'VehicleCondition'">Tình trạng xe không đúng mô tả</span>
+                <span th:case="'OwnerBehavior'">Thái độ chủ xe không tốt</span>
+                <span th:case="'LatePickup'">Giao xe trễ giờ</span>
+                <span th:case="'VehicleDamage'">Khách hàng gây hư hỏng xe</span>
+                <span th:case="'LateReturn'">Khách hàng trả xe trễ</span>
+                <span th:case="'PricingIssue'">Vấn đề về giá/phí phát sinh</span>
+                <span th:case="'Other'">Vấn đề khác</span>
+              </td>
               <td>
                 <span style="font-family:monospace;font-size:12px;color:#6b7280"
                       th:text="${'#' + c.orderId}"></span>

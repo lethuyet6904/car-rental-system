@@ -63,6 +63,12 @@ public class SecurityConfig {
                 // Trang xác minh danh tính: Customer và Owner đều cần vào
                 .requestMatchers("/verification/**").hasAnyRole("Customer", "Owner")
 
+                // Đánh giá chuyến đi: chỉ Customer
+                .requestMatchers("/review/**").hasRole("Customer")
+
+                // Khiếu nại: Customer và Owner
+                .requestMatchers("/complaint/**").hasAnyRole("Customer", "Owner")
+
                 // Còn lại phải đăng nhập
                 .anyRequest().authenticated()
             )

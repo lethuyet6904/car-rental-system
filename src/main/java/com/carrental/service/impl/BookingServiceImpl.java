@@ -13,7 +13,6 @@ import com.carrental.enums.ScheduleType;
 import com.carrental.repository.CarScheduleRepository;
 import com.carrental.service.BookingService;
 import com.carrental.service.CarService;
-import com.carrental.service.BookingService.RefundPolicy;
 import com.carrental.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;

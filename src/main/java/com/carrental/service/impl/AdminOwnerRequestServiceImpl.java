@@ -7,7 +7,6 @@ import com.carrental.entity.OwnerRegistration;
 import com.carrental.entity.User;
 import com.carrental.enums.UserRole;
 import com.carrental.enums.VerificationStatus;
-import com.carrental.repository.IdentityVerificationRepository;
 import com.carrental.repository.OwnerRegistrationRepository;
 import com.carrental.repository.UserRepository;
 import com.carrental.service.AdminOwnerRequestService;
@@ -26,7 +25,6 @@ import java.time.LocalDateTime;
 public class AdminOwnerRequestServiceImpl implements AdminOwnerRequestService {
 
     private final OwnerRegistrationRepository ownerRegistrationRepository;
-    private final IdentityVerificationRepository identityVerificationRepository;
     private final UserRepository userRepository;
 
     @Override

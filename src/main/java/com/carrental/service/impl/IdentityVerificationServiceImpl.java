@@ -3,6 +3,7 @@ package com.carrental.service.impl;
 import com.carrental.dto.request.IdentityVerificationRequest;
 import com.carrental.entity.IdentityVerification;
 import com.carrental.entity.User;
+import com.carrental.enums.LicenseStatus;
 import com.carrental.enums.VerificationStatus;
 import com.carrental.repository.IdentityVerificationRepository;
 import com.carrental.repository.UserRepository;
@@ -67,6 +68,7 @@ public class IdentityVerificationServiceImpl implements IdentityVerificationServ
                 .frontImage(null)
                 .backImage(null)
                 .status(VerificationStatus.Pending)
+                .licenseStatus(LicenseStatus.None)
                 .submittedAt(LocalDateTime.now())
                 .build();
 
@@ -86,7 +88,7 @@ public class IdentityVerificationServiceImpl implements IdentityVerificationServ
         if (iv.getStatus() != VerificationStatus.Approved) {
             throw new RuntimeException("CCCD của bạn chưa được Admin duyệt. Vui lòng chờ kết quả trước.");
         }
-        if (iv.hasLicense()) {
+        if (iv.getLicenseStatus() == LicenseStatus.Pending || iv.getLicenseStatus() == LicenseStatus.Approved) {
             throw new RuntimeException("Bạn đã nộp GPLX rồi.");
         }
 
@@ -96,6 +98,7 @@ public class IdentityVerificationServiceImpl implements IdentityVerificationServ
         iv.setLicenseNumber(request.getLicenseNumber().trim());
         iv.setFrontImage(frontPath);
         iv.setBackImage(backPath);
+        iv.setLicenseStatus(LicenseStatus.Pending);
 
         return identityVerificationRepository.save(iv);
     }
@@ -158,6 +161,33 @@ public class IdentityVerificationServiceImpl implements IdentityVerificationServ
     }
 
     // ════════════════════════════════════════════════════════════
+    // ADMIN: Duyệt / Từ chối GPLX
+    // ════════════════════════════════════════════════════════════
+    @Override
+    @Transactional
+    public IdentityVerification approveLicense(Long verificationId) {
+        IdentityVerification iv = findByIdOrThrow(verificationId);
+        assertLicensePending(iv);
+        iv.setLicenseStatus(LicenseStatus.Approved);
+        iv.setReviewedAt(LocalDateTime.now());
+        return identityVerificationRepository.save(iv);
+    }
+
+    @Override
+    @Transactional
+    public IdentityVerification rejectLicense(Long verificationId, String reason) {
+        if (reason == null || reason.isBlank())
+            throw new RuntimeException("Vui lòng nhập lý do từ chối");
+
+        IdentityVerification iv = findByIdOrThrow(verificationId);
+        assertLicensePending(iv);
+        iv.setLicenseStatus(LicenseStatus.Rejected);
+        iv.setRejectReason(reason.trim());
+        iv.setReviewedAt(LocalDateTime.now());
+        return identityVerificationRepository.save(iv);
+    }
+
+    // ════════════════════════════════════════════════════════════
     // PRIVATE HELPERS
     // ════════════════════════════════════════════════════════════
     private IdentityVerification findByIdOrThrow(Long id) {
@@ -168,6 +198,15 @@ public class IdentityVerificationServiceImpl implements IdentityVerificationServ
     private void assertPending(IdentityVerification iv) {
         if (iv.getStatus() != VerificationStatus.Pending) {
             throw new IllegalStateException("Hồ sơ đã được xử lý (trạng thái: " + iv.getStatus() + ")");
+        }
+    }
+
+    private void assertLicensePending(IdentityVerification iv) {
+        if (iv.getStatus() != VerificationStatus.Approved) {
+            throw new IllegalStateException("CCCD phải được duyệt trước khi xử lý GPLX");
+        }
+        if (iv.getLicenseStatus() != LicenseStatus.Pending) {
+            throw new IllegalStateException("GPLX không ở trạng thái chờ duyệt");
         }
     }
 

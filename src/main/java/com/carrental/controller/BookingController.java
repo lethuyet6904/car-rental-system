@@ -3,13 +3,19 @@ package com.carrental.controller;
 import com.carrental.entity.RentalOrder;
 import com.carrental.entity.User;
 import com.carrental.enums.PickupMethod;
+import com.carrental.enums.ComplaintType;
+import com.carrental.enums.RentalImageType;
+import com.carrental.enums.TransactionType;
+import com.carrental.repository.RentalImageRepository;
 import com.carrental.service.BookingService;
-import com.carrental.service.CarService;
+import com.carrental.service.ComplaintService;
 import com.carrental.service.IdentityVerificationService;
 import com.carrental.service.PaymentService;
+import com.carrental.service.ReviewService;
 import com.carrental.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -23,13 +29,16 @@ import java.time.LocalTime;
 @Controller
 @RequestMapping("/booking")
 @RequiredArgsConstructor
+@Slf4j
 public class BookingController {
 
-    private final CarService carService;
     private final BookingService bookingService;
     private final UserService userService;
     private final IdentityVerificationService identityVerificationService;
     private final PaymentService paymentService;
+    private final ReviewService reviewService;
+    private final ComplaintService complaintService;
+    private final RentalImageRepository rentalImageRepository;
 
     @PostMapping("/create")
     public String createBooking(
@@ -83,7 +92,7 @@ public class BookingController {
             return "redirect:/payment/checkout/" + order.getOrderId();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Đặt xe thất bại carId={}", carId, e);
             redirectAttributes.addFlashAttribute("error", "Đặt xe thất bại: " + e.getMessage());
             return "redirect:/cars/" + carId;
         }
@@ -105,6 +114,24 @@ public class BookingController {
         request.getSession().setAttribute("user", user);
         model.addAttribute("order", order);
         model.addAttribute("user", user);
+        model.addAttribute("depositPayment",
+                paymentService.getPaymentByOrderAndType(orderId, TransactionType.Deposit));
+        model.addAttribute("finalPayment",
+                paymentService.getPaymentByOrderAndType(orderId, TransactionType.FinalPayment));
+        model.addAttribute("review", reviewService.findByOrderId(orderId).orElse(null));
+        model.addAttribute("existingComplaint",
+                complaintService.findByOrderAndSender(orderId, user.getUserId()).orElse(null));
+        model.addAttribute("complaintTypes", new ComplaintType[]{
+                ComplaintType.VehicleCondition,
+                ComplaintType.OwnerBehavior,
+                ComplaintType.LatePickup,
+                ComplaintType.PricingIssue,
+                ComplaintType.Other
+        });
+        model.addAttribute("pickupImages",
+                rentalImageRepository.findByRentalOrderOrderIdAndImageType(orderId, RentalImageType.Pickup));
+        model.addAttribute("returnImages",
+                rentalImageRepository.findByRentalOrderOrderIdAndImageType(orderId, RentalImageType.Return));
 
         return "pages/booking/order-detail";
     }
@@ -143,9 +170,6 @@ public class BookingController {
 
             bookingService.cancelOrder(orderId, user.getUserId(), reason);
 
-            // Xử lý hoàn tiền (mock)
-            paymentService.processRefund(orderId, policy.getRefundPercent(), redirectAttributes);
-
             if (policy.getRefundPercent() > 0) {
                 redirectAttributes.addFlashAttribute("success",
                         "Hủy đơn thành công. Bạn được hoàn " + policy.getRefundPercent()
@@ -156,7 +180,7 @@ public class BookingController {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Hủy đơn thất bại orderId={}", orderId, e);
             redirectAttributes.addFlashAttribute("error", "Lỗi hủy đơn: " + e.getMessage());
         }
 

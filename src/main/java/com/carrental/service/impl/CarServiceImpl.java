@@ -104,7 +104,9 @@ public class CarServiceImpl implements CarService {
         Sort sort = switch (sortBy == null ? "" : sortBy) {
             case "price_asc" -> Sort.by("pricePerDay").ascending();
             case "price_desc" -> Sort.by("pricePerDay").descending();
-            case "rating" -> Sort.by("avgRating").descending();
+            case "rating" -> Sort.by(
+                    Sort.Order.desc("avgRating"),
+                    Sort.Order.desc("createdAt"));
             default -> Sort.by("createdAt").descending();
         };
 

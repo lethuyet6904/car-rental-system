@@ -3,50 +3,6 @@
 
 <head th:replace="~{fragments/head :: head('Đăng ký trở thành chủ xe', ~{::link})}">
     <link rel="stylesheet" th:href="@{/assets/css/verification.css}" />
-    <style>
-        /* Ghi đè nhỏ cho trang này */
-        .ct-readonly-field {
-            background: var(--ct-gray-100);
-            border: 1.5px solid var(--ct-gray-200);
-            border-radius: var(--r-md);
-            padding: 10px 14px;
-            font-size: 0.93rem;
-            font-weight: 500;
-            color: var(--ct-text-muted);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .ct-confirm-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .ct-confirm-table td {
-            padding: 11px 0;
-            border-bottom: 1px solid var(--ct-gray-200);
-            font-size: 0.9rem;
-        }
-
-        .ct-confirm-table td:first-child {
-            color: var(--ct-text-muted);
-            font-weight: 600;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: .05em;
-            width: 160px;
-        }
-
-        .ct-confirm-table td:last-child {
-            color: var(--ct-text-main);
-            font-weight: 500;
-        }
-
-        .ct-confirm-table tr:last-child td {
-            border-bottom: none;
-        }
-    </style>
 </head>
 
 <body>

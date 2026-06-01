@@ -96,6 +96,24 @@ public class AdminUserServiceImpl implements AdminUserService {
         identityVerificationService.rejectCccd(identity.getVerificationId(), reason);
     }
 
+    @Override
+    @Transactional
+    public void approveLicenseVerification(Long userId) {
+        IdentityVerification identity = identityVerificationRepository
+                .findTopByUserUserIdOrderBySubmittedAtDesc(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy hồ sơ xác minh"));
+        identityVerificationService.approveLicense(identity.getVerificationId());
+    }
+
+    @Override
+    @Transactional
+    public void rejectLicenseVerification(Long userId, String reason) {
+        IdentityVerification identity = identityVerificationRepository
+                .findTopByUserUserIdOrderBySubmittedAtDesc(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy hồ sơ xác minh"));
+        identityVerificationService.rejectLicense(identity.getVerificationId(), reason);
+    }
+
     private User findUserOrThrow(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng userId =" + userId));

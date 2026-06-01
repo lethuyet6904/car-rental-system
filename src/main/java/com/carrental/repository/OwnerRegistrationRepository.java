@@ -27,6 +27,9 @@ public interface OwnerRegistrationRepository extends JpaRepository<OwnerRegistra
 
     // Lấy đơn mới nhất của user
     Optional<OwnerRegistration> findTopByUserUserIdOrderBySubmittedAtDesc(Long userId);
+
+    Optional<OwnerRegistration> findTopByUserUserIdAndStatusOrderBySubmittedAtDesc(
+            Long userId, VerificationStatus status);
     
     // Admin: filter theo status + keyword (tên, SĐT)
        @Query("""

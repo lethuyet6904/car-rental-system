@@ -115,14 +115,20 @@
 
                             <hr class="my-4">
 
+                            <div id="qrSection">
                             <div class="bank-info" id="bankInfo" style="display: none;">
                                 <div class="alert alert-info">
                                     <i class="fa-solid fa-circle-info"></i>
                                     <strong>Thông tin chuyển khoản:</strong><br>
-                                    Ngân hàng: <strong>Vietcombank</strong><br>
-                                    Số tài khoản: <strong>1234567890</strong><br>
-                                    Chủ tài khoản: <strong>CARTO RENTAL COMPANY</strong><br>
-                                    Nội dung: <strong class="text-primary">FINAL_[orderId]</strong>
+                                    Ngân hàng: <strong th:text="${ownerBankName}">Chưa cập nhật</strong><br>
+                                    Số tài khoản: <strong th:text="${ownerBankAccount}">Chưa cập nhật</strong><br>
+                                    Chủ tài khoản: <strong th:text="${ownerAccountHolder}">Chưa cập nhật</strong><br>
+                                    Nội dung: <strong class="text-primary">FINAL_<span th:text="${order.orderId}"></span></strong><br>
+                                    Số tiền: <strong th:text="${#numbers.formatInteger(remainingAmount, 0, 'COMMA')} + 'đ'"></strong>
+                                    <div style="font-size:12px; color:#6b7280; margin-top:8px;">
+                                        * Sau khi chuyển khoản, nhấn "Xác nhận thanh toán"
+                                        để hệ thống ghi nhận giao dịch của bạn.
+                                    </div>
                                 </div>
                             </div>
 
@@ -133,7 +139,21 @@
                                     <div class="text-center mt-2">
                                         <img th:src="@{/assets/images/momo-qr-placeholder.png}" alt="Momo QR" style="max-width: 200px;">
                                     </div>
+                                    <p class="small text-muted mb-0 mt-2 text-center">Quét mã để chuyển chính xác: <strong
+                                            class="text-dark"
+                                            th:text="${#numbers.formatInteger(remainingAmount, 0, 'COMMA')} + 'đ'"></strong>
+                                    </p>
                                 </div>
+                            </div>
+                            </div>
+
+                            <div id="cashMessage" style="display:none; background:#f0fdf4; border:1px solid #bbf7d0;
+                                          border-radius:8px; padding:16px; margin-top:16px;
+                                          font-size:14px; color:#15803d;">
+                                <i class="bi bi-info-circle"></i>
+                                Vui lòng thanh toán trực tiếp bằng tiền mặt cho chủ xe
+                                khi trả xe. Nhấn "Xác nhận thanh toán" sau khi đã
+                                thanh toán xong.
                             </div>
 
                             <button type="submit" class="btn btn-success w-100 py-3 mt-3 fw-semibold">
@@ -158,18 +178,27 @@
     function selectMethod(method) {
         const bankInfo = document.getElementById('bankInfo');
         const momoInfo = document.getElementById('momoInfo');
-        
+        const qrSection = document.getElementById('qrSection');
+        const cashMessage = document.getElementById('cashMessage');
+
         bankInfo.style.display = 'none';
         momoInfo.style.display = 'none';
-        
-        if (method === 'BankTransfer') {
-            bankInfo.style.display = 'block';
-        } else if (method === 'Momo') {
-            momoInfo.style.display = 'block';
+
+        if (method === 'Cash') {
+            if (qrSection) qrSection.style.display = 'none';
+            if (cashMessage) cashMessage.style.display = 'block';
+        } else {
+            if (qrSection) qrSection.style.display = 'block';
+            if (cashMessage) cashMessage.style.display = 'none';
+            if (method === 'BankTransfer') {
+                bankInfo.style.display = 'block';
+            } else if (method === 'Momo') {
+                momoInfo.style.display = 'block';
+            }
         }
     }
-    
-    document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
+
+    document.querySelectorAll('input[name="paymentMethod"]').forEach(function(radio) {
         radio.addEventListener('change', function() {
             selectMethod(this.value);
         });
