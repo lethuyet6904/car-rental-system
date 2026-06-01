@@ -32,6 +32,8 @@ public class AdminOrderDetailResponse {
     private final LocalDateTime actualReturnTime;
     private final BigDecimal remainingAmount;
     private final Boolean depositPaid;
+    private String pickupChecklistNote;
+    private String returnChecklistNote;
 
     // Khách hàng
     private final Long customerId;
@@ -80,6 +82,8 @@ public class AdminOrderDetailResponse {
         this.status           = o.getStatus();
         this.actualPickupTime = o.getActualPickupTime();
         this.actualReturnTime = o.getActualReturnTime();
+        this.pickupChecklistNote = o.getPickupChecklistNote();
+        this.returnChecklistNote = o.getReturnChecklistNote();
 
         this.customerId   = o.getCustomer().getUserId();
         this.customerName = o.getCustomer().getFullName();

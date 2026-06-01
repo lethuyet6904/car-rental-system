@@ -160,7 +160,7 @@
 							</div>
 							
                             <!-- Form bổ sung GPLX -->
-                            <div th:if="${((alreadyHasLicense == null and licensePending == null) or licenseRejected) and success == null}">
+                            <div th:if="((alreadyHasLicense == null and licensePending == null) or licenseRejected == true) and success == null">
                                 <form th:action="@{/verification/license}" method="post" enctype="multipart/form-data">
 									
                                     <div class="mb-3">
