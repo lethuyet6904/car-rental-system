@@ -116,9 +116,16 @@ public class IdentityVerificationController {
             return "redirect:/verification/cccd";
         }
 
-        // Đã có GPLX rồi
         if (iv.hasLicense()) {
+            // licenseStatus == Approved
             model.addAttribute("alreadyHasLicense", true);
+        } else if (iv.getLicenseStatus() == LicenseStatus.Pending) {
+            // Đã nộp, chờ admin duyệt
+            model.addAttribute("licensePending", true);
+        } else if (iv.getLicenseStatus() == LicenseStatus.Rejected) {
+            // Bị từ chối → cho nộp lại
+            model.addAttribute("licenseRejected", true);
+            model.addAttribute("licenseRejectReason", iv.getRejectReason());
         }
 
         model.addAttribute("user", user);
