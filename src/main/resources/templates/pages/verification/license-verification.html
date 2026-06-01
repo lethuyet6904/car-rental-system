@@ -53,20 +53,17 @@
                         <div class="ct-verif-card__body">
 
                             <!-- Flash alerts -->
-                            <div th:if="${success}" class="ct-state-card success" style="margin-bottom:20px">
-                                <div class="ct-state-icon"><i class="fa-solid fa-circle-check"></i></div>
-                                <div>
-                                    <p class="ct-state-title">Cập nhật thành công!</p>
-                                    <p class="ct-state-desc" th:text="${success}"></p>
-                                </div>
-                            </div>
-                            <div th:if="${error}" class="ct-state-card rejected" style="margin-bottom:20px">
-                                <div class="ct-state-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
-                                <div>
-                                    <p class="ct-state-title">Có lỗi xảy ra</p>
-                                    <p class="ct-state-desc" th:text="${error}"></p>
-                                </div>
-                            </div>
+							<div th:if="${success}" class="alert alert-success alert-dismissible fade show d-flex align-items-center mb-4" role="alert" style="border-radius: var(--r-md);">
+							    <i class="fa-solid fa-circle-check me-2 fs-5"></i>
+							    <div th:text="${success}">Cập nhật thành công!</div>
+							    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+							</div>
+
+							<div th:if="${error}" class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-4" role="alert" style="border-radius: var(--r-md);">
+							    <i class="fa-solid fa-circle-exclamation me-2 fs-5"></i>
+							    <div th:text="${error}">Có lỗi xảy ra</div>
+							    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+							</div>
 
                             <!-- CCCD summary box -->
                             <div
@@ -108,59 +105,55 @@
                             </div>
 							
 							
-							<!-- ── Đã được admin duyệt ── -->
 							<div th:if="${alreadyHasLicense}">
-							    <div class="ct-state-card success">
-							        <div class="ct-state-icon"><i class="fa-solid fa-circle-check"></i></div>
-							        <div>
-							            <p class="ct-state-title">GPLX đã được xác minh</p>
-							            <p class="ct-state-desc">
-							                Số GPLX: <strong th:text="${identity != null ? identity.licenseNumber : ''}"></strong><br>
-							                Hồ sơ của bạn đã đầy đủ. Bạn có thể thuê xe ngay bây giờ.
-							            </p>
-							        </div>
-							    </div>
-							    <a th:href="@{/}" class="ct-btn-submit mt-3" style="text-decoration:none;display:flex">
-							        <i class="fa-solid fa-magnifying-glass"></i> Tìm xe ngay
-							    </a>
-							    <a th:href="@{/customer/profile}" class="ct-link-back">
-							        <i class="fa-solid fa-arrow-left me-1"></i> Quay lại hồ sơ cá nhân
-							    </a>
-							</div>
-							
-							<!-- Đang chờ admin duyệt -->
-							<div th:if="${licensePending}">
-							    <div class="ct-state-card pending">
-							        <div class="ct-state-icon"><i class="fa-solid fa-clock"></i></div>
-							        <div>
-							            <p class="ct-state-title">GPLX đang chờ Admin xét duyệt</p>
-							            <p class="ct-state-desc">
-							                Số GPLX: <strong th:text="${identity != null ? identity.licenseNumber : ''}"></strong><br>
-							                Admin sẽ xét duyệt trong 1–3 ngày làm việc.
-							            </p>
-							        </div>
-							    </div>
-							    <a th:href="@{/customer/profile}" class="ct-link-back">
-							        <i class="fa-solid fa-arrow-left me-1"></i> Quay lại hồ sơ cá nhân
-							    </a>
-							</div>
-							
-							<!-- GPLX bị từ chối -->
-							<div th:if="${licenseRejected}" class="mb-3">
-							    <div class="ct-state-card rejected">
-							        <div class="ct-state-icon"><i class="fa-solid fa-circle-xmark"></i></div>
-							        <div>
-							            <p class="ct-state-title">GPLX bị từ chối</p>
-							            <p class="ct-state-desc">
-							                Lý do: <strong th:text="${licenseRejectReason}"></strong><br>
-							                Vui lòng kiểm tra và nộp lại bên dưới.
-							            </p>
-							        </div>
-							    </div>
-							</div>
-							
-                            <!-- Form bổ sung GPLX -->
-                            <div th:if="((alreadyHasLicense == null and licensePending == null) or licenseRejected == true) and success == null">
+                                <div class="ct-state-card success">
+                                    <div class="ct-state-icon"><i class="fa-solid fa-circle-check"></i></div>
+                                    <div>
+                                        <p class="ct-state-title">GPLX đã được xác minh</p>
+                                        <p class="ct-state-desc">
+                                            Số GPLX: <strong th:text="${identity != null ? identity.licenseNumber : ''}"></strong><br>
+                                            Hồ sơ của bạn đã đầy đủ. Bạn có thể thuê xe ngay bây giờ.
+                                        </p>
+                                    </div>
+                                </div>
+                                <a th:href="@{/}" class="ct-btn-submit mt-3" style="text-decoration:none;display:flex">
+                                    <i class="fa-solid fa-magnifying-glass"></i> Tìm xe ngay
+                                </a>
+                                <a th:href="@{/customer/profile}" class="ct-link-back">
+                                    <i class="fa-solid fa-arrow-left me-1"></i> Quay lại hồ sơ cá nhân
+                                </a>
+                            </div>
+                            
+                            <div th:if="${licensePending}">
+                                <div class="ct-state-card pending">
+                                    <div class="ct-state-icon"><i class="fa-solid fa-clock"></i></div>
+                                    <div>
+                                        <p class="ct-state-title">GPLX đang chờ Admin xét duyệt</p>
+                                        <p class="ct-state-desc">
+                                            Số GPLX: <strong th:text="${identity != null ? identity.licenseNumber : ''}"></strong><br>
+                                            Admin sẽ xét duyệt trong 1–3 ngày làm việc.
+                                        </p>
+                                    </div>
+                                </div>
+                                <a th:href="@{/customer/profile}" class="ct-link-back">
+                                    <i class="fa-solid fa-arrow-left me-1"></i> Quay lại hồ sơ cá nhân
+                                </a>
+                            </div>
+                            
+                            <div th:if="${licenseRejected}" class="mb-3">
+                                <div class="ct-state-card rejected">
+                                    <div class="ct-state-icon"><i class="fa-solid fa-circle-xmark"></i></div>
+                                    <div>
+                                        <p class="ct-state-title">GPLX bị từ chối</p>
+                                        <p class="ct-state-desc">
+                                            Lý do: <strong th:text="${licenseRejectReason}"></strong><br>
+                                            Vui lòng kiểm tra và nộp lại bên dưới.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div th:if="${alreadyHasLicense != true and licensePending != true}">
                                 <form th:action="@{/verification/license}" method="post" enctype="multipart/form-data">
 									
                                     <div class="mb-3">
