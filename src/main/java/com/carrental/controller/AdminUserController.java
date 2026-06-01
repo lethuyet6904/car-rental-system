@@ -35,10 +35,11 @@ public class AdminUserController {
 
         UserRole   roleEnum   = parseEnum(UserRole.class,   role);
         UserStatus statusEnum = parseEnum(UserStatus.class, status);
-        VerificationStatus identityStatusEnum = parseEnum(VerificationStatus.class, identityStatus);
+        // identityStatus giữ nguyên String vì có giá trị đặc biệt: None, ApprovedNoLicense
+        String identityStatusStr = (identityStatus != null && !identityStatus.isBlank()) ? identityStatus : null;
 
         var pageResult = adminUserService.getUserList(
-                keyword, roleEnum, statusEnum, identityStatusEnum,
+                keyword, roleEnum, statusEnum, identityStatusStr,
                 PageRequest.of(page, PAGE_SIZE, Sort.by("createdAt").descending()));
 
         model.addAttribute("users",       pageResult);
@@ -48,7 +49,7 @@ public class AdminUserController {
         model.addAttribute("identityStatus", identityStatus);
         model.addAttribute("roles",       UserRole.values());
         model.addAttribute("statuses",    UserStatus.values());
-        model.addAttribute("extraParams", buildExtraParams(keyword, role, status));
+        model.addAttribute("extraParams", buildExtraParams(keyword, role, status, identityStatus));
 
         return "pages/admin/user-list";
     }
@@ -124,7 +125,7 @@ public class AdminUserController {
         }
         return "redirect:/admin/users/" + id;
     }
-
+    
     // ── POST: Duyệt GPLX ─────────────────────────────────────────
     @PostMapping("/{id}/approve-license")
     public String approveLicense(@PathVariable Long id, RedirectAttributes ra) {
@@ -154,7 +155,7 @@ public class AdminUserController {
         }
         return "redirect:/admin/users/" + id + "/identity";
     }
-
+    
     // ── Helpers ───────────────────────────────────────────────────
     private <E extends Enum<E>> E parseEnum(Class<E> type, String value) {
         if (value == null || value.isBlank()) return null;
@@ -162,11 +163,12 @@ public class AdminUserController {
         catch (IllegalArgumentException e) { return null; }
     }
 
-    private String buildExtraParams(String keyword, String role, String status) {
+    private String buildExtraParams(String keyword, String role, String status, String identityStatus) {
         StringBuilder sb = new StringBuilder();
         if (keyword != null && !keyword.isBlank()) sb.append("&keyword=").append(keyword);
         if (role    != null && !role.isBlank())    sb.append("&role=").append(role);
         if (status  != null && !status.isBlank())  sb.append("&status=").append(status);
+        if (identityStatus != null && !identityStatus.isBlank()) sb.append("&identityStatus=").append(identityStatus);
         return sb.toString();
     }
 }

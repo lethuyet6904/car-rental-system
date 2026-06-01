@@ -162,6 +162,38 @@
               <div style="display:flex;justify-content:space-between;align-items:center">
                 <span style="font-size:12px;color:#6b7280">
                   <span style="display:inline-block;width:10px;height:10px;
+                               border-radius:50%;background:#7F77DD;margin-right:5px"></span>
+                  Đang thuê
+                </span>
+                <span class="badge-none" th:text="${stats.inProgressOrders}">0</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:12px;color:#6b7280">
+                  <span style="display:inline-block;width:10px;height:10px;
+                               border-radius:50%;background:#3b82f6;margin-right:5px"></span>
+                  Đã xác nhận
+                </span>
+                <span class="badge-confirmed" th:text="${stats.confirmedOrders}">0</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:12px;color:#6b7280">
+                  <span style="display:inline-block;width:10px;height:10px;
+                               border-radius:50%;background:#f59e0b;margin-right:5px"></span>
+                  Chờ duyệt
+                </span>
+                <span class="badge-pending" th:text="${stats.pendingApprovalOrders}">0</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:12px;color:#6b7280">
+                  <span style="display:inline-block;width:10px;height:10px;
+                               border-radius:50%;background:#94a3b8;margin-right:5px"></span>
+                  Chờ đặt cọc
+                </span>
+                <span class="badge-pending" th:text="${stats.pendingOrders}">0</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:12px;color:#6b7280">
+                  <span style="display:inline-block;width:10px;height:10px;
                                border-radius:50%;background:#ef4444;margin-right:5px"></span>
                   Đã hủy
                 </span>
@@ -170,10 +202,10 @@
               <div style="display:flex;justify-content:space-between;align-items:center">
                 <span style="font-size:12px;color:#6b7280">
                   <span style="display:inline-block;width:10px;height:10px;
-                               border-radius:50%;background:#7F77DD;margin-right:5px"></span>
-                  Đang thuê
+                               border-radius:50%;background:#be185d;margin-right:5px"></span>
+                  Đã từ chối
                 </span>
-                <span class="badge-none" th:text="${stats.inProgressOrders}">0</span>
+                <span class="badge-rejected" th:text="${stats.rejectedOrders}">0</span>
               </div>
             </div>
           </div>
@@ -284,7 +316,6 @@
 		  position: 'left',
 		  title: { display: true, text: 'Số lượng đơn' },
 		  beginAtZero: true,
-		  max: 100,
 		  ticks: {
 		    precision: 0   
 		  }
@@ -295,8 +326,14 @@
 		  position: 'right',
 		  title: { display: true, text: 'Doanh thu (VNĐ)' },
 		  beginAtZero: true,
-		  max: 100000000,
-		  grid: { drawOnChartArea: false }
+		  grid: { drawOnChartArea: false },
+		  ticks: {
+		    callback: function(value) {
+		      if (value >= 1000000) return (value / 1000000) + 'M';
+		      if (value >= 1000) return (value / 1000) + 'K';
+		      return value;
+		    }
+		  }
         }
       }
     }
@@ -304,27 +341,31 @@
 
   // --- DỮ LIỆU PIE CHART ---
   const completed = /*[[${stats.completedOrders}]]*/ 0;
-  const cancelled = /*[[${stats.cancelledOrders}]]*/ 0;
   const inProgress = /*[[${stats.inProgressOrders}]]*/ 0;
+  const confirmed = /*[[${stats.confirmedOrders}]]*/ 0;
+  const pendingApproval = /*[[${stats.pendingApprovalOrders}]]*/ 0;
+  const pending = /*[[${stats.pendingOrders}]]*/ 0;
+  const cancelled = /*[[${stats.cancelledOrders}]]*/ 0;
+  const rejected = /*[[${stats.rejectedOrders}]]*/ 0;
 
   // 2. Vẽ biểu đồ tròn (Doughnut)
   const ctxPie = document.getElementById('pieChart').getContext('2d');
   new Chart(ctxPie, {
     type: 'doughnut', 
     data: {
-      labels: ['Hoàn thành', 'Đã hủy', 'Đang thuê'],
+      labels: ['Hoàn thành', 'Đang thuê', 'Đã xác nhận', 'Chờ duyệt', 'Chờ đặt cọc', 'Đã hủy', 'Đã từ chối'],
       datasets: [{
-        data: [completed, cancelled, inProgress],
-        backgroundColor: ['#10b981', '#ef4444', '#7F77DD'], // Xanh lá, Đỏ, Tím
+        data: [completed, inProgress, confirmed, pendingApproval, pending, cancelled, rejected],
+        backgroundColor: ['#10b981', '#7F77DD', '#3b82f6', '#f59e0b', '#94a3b8', '#ef4444', '#be185d'],
         borderWidth: 0
       }]
     },
     options: {
       responsive: true,
 	  maintainAspectRatio: false,
-      cutout: '65%', // Tạo khoảng trống ở giữa cho đẹp
+      cutout: '65%',
       plugins: {
-        legend: { display: false } // Ẩn chú thích mặc định vì đã có list chú thích HTML bên dưới
+        legend: { display: false }
       }
     }
   });

@@ -18,6 +18,10 @@
         <i class="bi bi-check-circle-fill"></i>
         <span th:text="${successMessage}"></span>
       </div>
+      <div th:if="${errorMessage}" class="alert-error-admin">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span th:text="${errorMessage}"></span>
+      </div>
 
       <div class="admin-card">
         <div style="font-size:14px;font-weight:600;margin-bottom:16px;color:#111827">
@@ -30,7 +34,8 @@
             <select name="status">
               <option value="" th:selected="${status == null or status == ''}">Trạng thái</option>
               <option value="Pending"   th:selected="${status == 'Pending'}">Chờ duyệt</option>
-              <option value="Active" th:selected="${status == 'Available'}">Có sẵn</option>
+              <option value="Active"    th:selected="${status == 'Active'}">Đang hoạt động</option>
+              <option value="Inactive"  th:selected="${status == 'Inactive'}">Tạm ngừng</option>
               <option value="Rejected"  th:selected="${status == 'Rejected'}">Đã từ chối</option>
             </select>
             <input type="text" name="keyword"
@@ -90,10 +95,12 @@
               <td style="color:#6b7280"
                   th:text="${#temporals.format(c.createdAt,'dd/MM/yyyy')}"></td>
               <td>
-                <span th:class="${c.status.name() == 'Active' ? 'badge-approved' :
-                                  c.status.name() == 'Rejected'  ? 'badge-rejected' : 'badge-pending'}"
-                      th:text="${c.status.name() == 'Active' ? 'Có sẵn' :
-                                 c.status.name() == 'Rejected'  ? 'Đã từ chối' : 'Chờ duyệt'}">
+                <span th:class="${c.status.name() == 'Active'   ? 'badge-approved'  :
+                                  c.status.name() == 'Inactive' ? 'badge-none'      :
+                                  c.status.name() == 'Rejected' ? 'badge-rejected'  : 'badge-pending'}"
+                      th:text="${c.status.name() == 'Active'   ? 'Đang hoạt động'  :
+                                 c.status.name() == 'Inactive' ? 'Tạm ngừng'       :
+                                 c.status.name() == 'Rejected' ? 'Đã từ chối'      : 'Chờ duyệt'}">
                 </span>
               </td>
               <td>

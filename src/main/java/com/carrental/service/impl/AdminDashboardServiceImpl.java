@@ -41,10 +41,14 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         long pendingIdentities = identityVerificationRepository.countByStatus(VerificationStatus.Pending);
 
         // Pie
-     // Sau khi fix — lọc theo fromDate
-        long completedOrders  = rentalOrderRepository.countByStatusAndFromDate(OrderStatus.Completed,  fromDate);
-        long cancelledOrders  = rentalOrderRepository.countByStatusAndFromDate(OrderStatus.Cancelled,  fromDate);
-        long inProgressOrders = rentalOrderRepository.countByStatusAndFromDate(OrderStatus.InProgress, fromDate);
+        // Sau khi fix — lọc theo fromDate
+        long completedOrders       = rentalOrderRepository.countByStatusAndFromDate(OrderStatus.Completed,       fromDate);
+        long cancelledOrders       = rentalOrderRepository.countByStatusAndFromDate(OrderStatus.Cancelled,       fromDate);
+        long inProgressOrders      = rentalOrderRepository.countByStatusAndFromDate(OrderStatus.InProgress,      fromDate);
+        long confirmedOrders       = rentalOrderRepository.countByStatusAndFromDate(OrderStatus.Confirmed,       fromDate);
+        long pendingApprovalOrders = rentalOrderRepository.countByStatusAndFromDate(OrderStatus.PendingApproval, fromDate);
+        long pendingOrders         = rentalOrderRepository.countByStatusAndFromDate(OrderStatus.Pending,         fromDate);
+        long rejectedOrders        = rentalOrderRepository.countByStatusAndFromDate(OrderStatus.Rejected,        fromDate);
 
         // Chart data — dùng labels từ orderCount (bao quát hơn revenue)
         List<Object[]> orderRaw;
@@ -103,6 +107,10 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                 .completedOrders(completedOrders)
                 .cancelledOrders(cancelledOrders)
                 .inProgressOrders(inProgressOrders)
+                .confirmedOrders(confirmedOrders)
+                .pendingApprovalOrders(pendingApprovalOrders)
+                .pendingOrders(pendingOrders)
+                .rejectedOrders(rejectedOrders)
                 .chartLabels(chartLabels)
                 .orderCountData(orderCountData)
                 .revenueData(revenueData)

@@ -12,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface AdminUserService {
 
-    Page<AdminUserListResponse> getUserList(String keyword, UserRole role, UserStatus status, VerificationStatus identityStatus, Pageable pageable);
+    Page<AdminUserListResponse> getUserList(String keyword, UserRole role, UserStatus status, String identityStatus, Pageable pageable);
 
     AdminUserDetailResponse getUserDetail(Long userId);
 
@@ -27,7 +27,7 @@ public interface AdminUserService {
 
     // Từ chối xác minh CCCD/GPLX
     void rejectIdentityVerification(Long userId, String reason);
-
+    
     // Duyệt GPLX
     void approveLicenseVerification(Long userId);
 

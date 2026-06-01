@@ -28,40 +28,55 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * Tìm kiếm user theo keyword (phone / email / fullName) + lọc theo role + status.
      * Truyền null để bỏ qua filter đó.
      */
-    @Query("""
-            SELECT u FROM User u
+    /**
+     * Tìm kiếm user theo keyword, role, status và identityStatus
+     * Sử dụng Native Query để hỗ trợ COLLATE tiếng Việt và logic LEFT JOIN phức tạp
+     */
+    @Query(value = """
+            SELECT u.* FROM [User] u
+            LEFT JOIN IdentityVerification iv ON iv.userId = u.userId
+              AND iv.submittedAt = (
+                  SELECT MAX(iv2.submittedAt) FROM IdentityVerification iv2
+                  WHERE iv2.userId = u.userId)
             WHERE (:keyword IS NULL
-                   OR u.phone LIKE CONCAT('%', :keyword, '%')
-                   OR LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                   OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+                   OR u.fullName COLLATE Vietnamese_CI_AI LIKE CONCAT(N'%', :keyword, N'%')
+                   OR u.phone    LIKE CONCAT(N'%', :keyword, N'%')
+                   OR u.email    COLLATE Vietnamese_CI_AI LIKE CONCAT(N'%', :keyword, N'%'))
               AND (:role   IS NULL OR u.role   = :role)
               AND (:status IS NULL OR u.status = :status)
-            """)
+              AND (:identityStatus IS NULL
+                   OR (:identityStatus = 'None'             AND iv.userId IS NULL)
+                   OR (:identityStatus = 'Pending'          AND iv.status = 'Pending')
+                   OR (:identityStatus = 'Rejected'         AND iv.status = 'Rejected')
+                   OR (:identityStatus = 'Approved'         AND iv.status = 'Approved' AND iv.licenseNumber IS NOT NULL AND iv.licenseNumber != '')
+                   OR (:identityStatus = 'ApprovedNoLicense' AND iv.status = 'Approved' AND (iv.licenseNumber IS NULL OR iv.licenseNumber = '')))
+            """,
+           countQuery = """
+            SELECT COUNT(*) FROM [User] u
+            LEFT JOIN IdentityVerification iv ON iv.userId = u.userId
+              AND iv.submittedAt = (
+                  SELECT MAX(iv2.submittedAt) FROM IdentityVerification iv2
+                  WHERE iv2.userId = u.userId)
+            WHERE (:keyword IS NULL
+                   OR u.fullName COLLATE Vietnamese_CI_AI LIKE CONCAT(N'%', :keyword, N'%')
+                   OR u.phone    LIKE CONCAT(N'%', :keyword, N'%')
+                   OR u.email    COLLATE Vietnamese_CI_AI LIKE CONCAT(N'%', :keyword, N'%'))
+              AND (:role   IS NULL OR u.role   = :role)
+              AND (:status IS NULL OR u.status = :status)
+              AND (:identityStatus IS NULL
+                   OR (:identityStatus = 'None'             AND iv.userId IS NULL)
+                   OR (:identityStatus = 'Pending'          AND iv.status = 'Pending')
+                   OR (:identityStatus = 'Rejected'         AND iv.status = 'Rejected')
+                   OR (:identityStatus = 'Approved'         AND iv.status = 'Approved' AND iv.licenseNumber IS NOT NULL AND iv.licenseNumber != '')
+                   OR (:identityStatus = 'ApprovedNoLicense' AND iv.status = 'Approved' AND (iv.licenseNumber IS NULL OR iv.licenseNumber = '')))
+            """,
+           nativeQuery = true)
     Page<User> searchUsers(
-            @Param("keyword") String keyword,
-            @Param("role")    UserRole role,
-            @Param("status")  UserStatus status,
-            Pageable pageable);
- 
-    @Query("""
-    	    SELECT u FROM User u
-    	    LEFT JOIN IdentityVerification iv ON iv.user.userId = u.userId
-    	      AND iv.submittedAt = (
-    	          SELECT MAX(iv2.submittedAt) FROM IdentityVerification iv2
-    	          WHERE iv2.user.userId = u.userId)
-    	    WHERE (:keyword IS NULL
-    	           OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-    	           OR LOWER(u.phone)    LIKE LOWER(CONCAT('%', :keyword, '%')))
-    	      AND (:role   IS NULL OR u.role   = :role)
-    	      AND (:status IS NULL OR u.status = :status)
-    	      AND (:identityStatus IS NULL OR iv.status = :identityStatus)
-    	    """)
-    	Page<User> searchUsers(
-    	    @Param("keyword")        String keyword,
-    	    @Param("role")           UserRole role,
-    	    @Param("status")         UserStatus status,
-    	    @Param("identityStatus") VerificationStatus identityStatus,
-    	    Pageable pageable);
+        @Param("keyword")        String keyword,
+        @Param("role")           String role,
+        @Param("status")         String status,
+        @Param("identityStatus") String identityStatus,
+        Pageable pageable);
     // ---------- Thống kê ----------
     long countByRole(UserRole role);
  

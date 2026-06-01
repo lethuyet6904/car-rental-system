@@ -31,10 +31,14 @@ public class AdminUserServiceImpl implements AdminUserService {
     private final IdentityVerificationService identityVerificationService;
 
     @Override
-    public Page<AdminUserListResponse> getUserList(String keyword, UserRole role, UserStatus status, VerificationStatus identityStatus,
+    public Page<AdminUserListResponse> getUserList(String keyword, UserRole role, UserStatus status, String identityStatus,
             Pageable pageable) {
         String kw = (keyword != null && !keyword.isBlank()) ? keyword.trim() : null;
-        return userRepository.searchUsers(kw, role, status, identityStatus, pageable).map(AdminUserListResponse::from);
+        String roleStr           = role           != null ? role.name()           : null;
+        String statusStr         = status         != null ? status.name()         : null;
+
+        return userRepository.searchUsers(kw, roleStr, statusStr, identityStatus, pageable)
+                             .map(AdminUserListResponse::from);
     }
 
     @Override
@@ -51,6 +55,10 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Transactional
     public void lockAccount(Long userId, LockAccountRequest request) {
         User user = findUserOrThrow(userId);
+
+        if (UserRole.Admin.equals(user.getRole())) {
+            throw new IllegalStateException("Không thể khóa tài khoản Admin");
+        }
 
         if (UserStatus.Locked.equals(user.getStatus())) {
             throw new IllegalStateException("Tài khoản đã bị khóa");
@@ -95,7 +103,7 @@ public class AdminUserServiceImpl implements AdminUserService {
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy hồ sơ xác minh"));
         identityVerificationService.rejectCccd(identity.getVerificationId(), reason);
     }
-
+    
     @Override
     @Transactional
     public void approveLicenseVerification(Long userId) {

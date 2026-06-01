@@ -24,6 +24,10 @@ public class DashboardResponse {
     private final long completedOrders;
     private final long cancelledOrders;
     private final long inProgressOrders;
+    private final long confirmedOrders;
+    private final long pendingApprovalOrders;
+    private final long pendingOrders;
+    private final long rejectedOrders;
 
     // Chart data — dùng chung labels cho cả 2 chart
     private final List<String> chartLabels;

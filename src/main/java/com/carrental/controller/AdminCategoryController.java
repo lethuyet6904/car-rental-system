@@ -181,23 +181,55 @@ public class AdminCategoryController {
 
     // ── Helper: Lưu file ảnh ─────────────────────────────────────
     
+    private static final long MAX_LOGO_SIZE = 2 * 1024 * 1024; // 2MB
+    private static final java.util.Set<String> ALLOWED_EXTENSIONS =
+            java.util.Set.of(".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg");
+
     private String saveLogoFile(MultipartFile logoFile) throws Exception {
-        if (logoFile != null && !logoFile.isEmpty()) {
-            String originalFilename = StringUtils.cleanPath(logoFile.getOriginalFilename());
-            String newFilename = UUID.randomUUID().toString() + "-" + originalFilename;
-
-            String uploadDir = "uploads/brands/";
-            Path uploadPath = Paths.get(uploadDir);
-
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            Path filePath = uploadPath.resolve(newFilename);
-            Files.copy(logoFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            return newFilename;
+        if (logoFile == null || logoFile.isEmpty()) {
+            return null;
         }
-        return null;
+
+        // Validate MIME type
+        String contentType = logoFile.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new RuntimeException("Chỉ chấp nhận file ảnh (JPG, PNG, WEBP, SVG...)");
+        }
+
+        // Validate file size
+        if (logoFile.getSize() > MAX_LOGO_SIZE) {
+            throw new RuntimeException("Logo không được vượt quá 2MB");
+        }
+
+        // Validate extension
+        String originalFilename = logoFile.getOriginalFilename();
+        String extension = "";
+        if (originalFilename != null && originalFilename.contains(".")) {
+            extension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
+        }
+        if (!ALLOWED_EXTENSIONS.contains(extension)) {
+            throw new RuntimeException("Định dạng file không được hỗ trợ. Chấp nhận: JPG, PNG, GIF, WEBP, SVG");
+        }
+
+        // Generate safe filename (no original name to prevent path traversal)
+        String newFilename = UUID.randomUUID().toString() + extension;
+
+        String uploadDir = "uploads/brands/";
+        Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+
+        Path filePath = uploadPath.resolve(newFilename).normalize();
+
+        // Đảm bảo file path vẫn nằm trong upload directory (chống path traversal)
+        if (!filePath.startsWith(uploadPath)) {
+            throw new RuntimeException("Đường dẫn file không hợp lệ");
+        }
+
+        Files.copy(logoFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        return newFilename;
     }
 }

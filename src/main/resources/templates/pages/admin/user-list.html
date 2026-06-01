@@ -43,7 +43,7 @@
 
             <!-- Trạng thái -->
             <select name="status">
-              <option value="" th:selected="${status == null or status == ''}">Trạng thái</option>
+              <option value="" th:selected="${status == null or status == ''}">Trạng thái tài khoản</option>
               <option th:each="s : ${statuses}"
                       th:value="${s.name()}"
                       th:text="${s.name() == 'Active' ? 'Đang hoạt động' : 'Bị khóa'}"
@@ -51,6 +51,15 @@
               </option>
             </select>
 
+			<select name="identityStatus">
+			  <option value="" th:selected="${identityStatus == null or identityStatus == ''}">Xác minh danh tính</option>
+			  <option value="None"        th:selected="${identityStatus == 'None'}">Chưa xác minh</option>
+			  <option value="Pending"     th:selected="${identityStatus == 'Pending'}">Chờ duyệt CCCD</option>
+			  <option value="ApprovedNoLicense" th:selected="${identityStatus == 'ApprovedNoLicense'}">Đã xác minh CCCD · Chưa có GPLX</option>
+			  <option value="Approved"    th:selected="${identityStatus == 'Approved'}">Đã xác minh đầy đủ</option>
+			  <option value="Rejected"    th:selected="${identityStatus == 'Rejected'}">Đã từ chối</option>
+			</select>
+			
             <!-- Search -->
             <input type="text" name="keyword"
                    placeholder="Tìm theo tên, SĐT, email…"

@@ -108,11 +108,15 @@
           <div class="detail-row">
             <span class="detail-label">Trạng thái xác minh danh tính</span>
             <span class="detail-value">
-              <span th:if="${user.identityStatus == null}" class="badge-none">Chưa xác minh</span>
-              <span th:if="${user.identityStatus != null}" th:class="${user.identityStatus.name() == 'Approved' ? 'badge-approved' :
-                              user.identityStatus.name() == 'Rejected' ? 'badge-rejected' : 'badge-pending'}" th:text="${user.identityStatus.name() == 'Approved' ? 'Đã xác minh' :
-                              user.identityStatus.name() == 'Rejected' ? 'Đã từ chối' : 'Chờ xác minh'}">
-              </span>
+				<span th:if="${user.identityStatus == null}" class="badge-none">Chưa xác minh</span>
+				<span th:if="${user.identityStatus != null and user.identityStatus.name() == 'Pending'}" 
+				      class="badge-pending">Chờ xác minh</span>
+				<span th:if="${user.identityStatus != null and user.identityStatus.name() == 'Rejected'}" 
+				      class="badge-rejected">Đã từ chối</span>
+				<span th:if="${user.identityStatus != null and user.identityStatus.name() == 'Approved' and user.licenseNumber == null}" 
+				      class="badge-confirmed">Đã xác minh CCCD · Chờ GPLX</span>
+				<span th:if="${user.identityStatus != null and user.identityStatus.name() == 'Approved' and user.licenseNumber != null}" 
+				      class="badge-approved">Đã xác minh đầy đủ</span>
             </span>
           </div>
 
@@ -163,11 +167,20 @@
               data-bs-toggle="modal" data-bs-target="#unlockModal">
               <i class="bi bi-unlock"></i> Mở khóa tài khoản
             </button>
-            <!-- Duyệt xác minh danh tính — chỉ khi Pending -->
-            <a th:if="${user.identityStatus != null and user.identityStatus.name() == 'Pending'}"
-              th:href="@{/admin/users/{id}/identity(id=${user.userId}, returnPage=${returnPage})}" class="btn btn-primary btn-sm">
-              <i class="bi bi-card-checklist"></i> Duyệt xác minh danh tính
-            </a>
+
+			<!-- Duyệt CCCD — chỉ khi Pending -->
+			<a th:if="${user.identityStatus != null and user.identityStatus.name() == 'Pending'}"
+			   th:href="@{/admin/users/{id}/identity(id=${user.userId}, returnPage=${returnPage})}"
+			   class="btn btn-primary btn-sm">
+			  <i class="bi bi-card-checklist"></i> Duyệt CCCD
+			</a>
+
+			<!-- Xem hồ sơ — chỉ khi Approved hoặc Rejected -->
+			<a th:if="${user.identityStatus != null and (user.identityStatus.name() == 'Approved' or user.identityStatus.name() == 'Rejected')}"
+			   th:href="@{/admin/users/{id}/identity(id=${user.userId}, returnPage=${returnPage})}"
+			   class="btn btn-secondary btn-sm">
+			  <i class="bi bi-eye"></i> Xem hồ sơ xác minh
+			</a>
           </div>
         </div>
       </div>
