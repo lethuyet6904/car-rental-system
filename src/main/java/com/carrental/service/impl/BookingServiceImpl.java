@@ -119,8 +119,10 @@ public class BookingServiceImpl implements BookingService {
         if (order != null) {
             Hibernate.initialize(order.getCustomer());
             Hibernate.initialize(order.getCar());
-            if (order.getCar() != null)
+            if (order.getCar() != null) {
                 Hibernate.initialize(order.getCar().getBrand());
+                Hibernate.initialize(order.getCar().getOwner());
+            }
         }
         return order;
     }
