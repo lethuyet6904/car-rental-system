@@ -54,10 +54,11 @@
 			<select name="identityStatus">
 			  <option value="" th:selected="${identityStatus == null or identityStatus == ''}">Xác minh danh tính</option>
 			  <option value="None"        th:selected="${identityStatus == 'None'}">Chưa xác minh</option>
+			  <option value="AllPending" th:selected="${identityStatus == 'AllPending'}">Tất cả yêu cầu duyệt (CCCD + GPLX)</option>
 			  <option value="Pending"     th:selected="${identityStatus == 'Pending'}">Chờ duyệt CCCD</option>
 			  <option value="ApprovedNoLicense" th:selected="${identityStatus == 'ApprovedNoLicense'}">Đã xác minh CCCD · Chưa có GPLX</option>
+			  <option value="PendingLicense" th:selected="${identityStatus == 'PendingLicense'}">Chờ duyệt GPLX</option>
 			  <option value="Approved"    th:selected="${identityStatus == 'Approved'}">Đã xác minh đầy đủ</option>
-			  <option value="Rejected"    th:selected="${identityStatus == 'Rejected'}">Đã từ chối</option>
 			</select>
 			
             <!-- Search -->

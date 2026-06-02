@@ -21,6 +21,15 @@ public interface IdentityVerificationRepository extends JpaRepository<IdentityVe
     // Admin: xem danh sách hồ sơ theo status
     List<IdentityVerification> findByStatus(VerificationStatus status);
     
-    @Query("SELECT COUNT(iv) FROM IdentityVerification iv WHERE iv.status = :status")
-    long countByStatus(@Param("status") VerificationStatus status);
+	// Thêm hàm này vào dưới hàm countByStatus hiện tại
+    @Query("""
+	        SELECT COUNT(iv) FROM IdentityVerification iv 
+	        WHERE iv.status = :pendingStatus 
+	           OR (iv.status = :approvedStatus AND iv.licenseStatus = :pendingLicenseStatus)
+	    """)
+    long countTotalPendingVerifications(
+            @Param("pendingStatus") VerificationStatus pendingStatus, 
+            @Param("approvedStatus") VerificationStatus approvedStatus,
+            @Param("pendingLicenseStatus") com.carrental.enums.LicenseStatus pendingLicenseStatus
+    );
 }
