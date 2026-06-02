@@ -61,14 +61,6 @@
                                     <i class="fa-solid fa-id-card"></i> Xác minh CCCD
                                 </a>
                             </li>
-							<li th:if="${identityStatus != null and identityStatus.name() == 'Approved'
-							        and (identity == null 
-							             or identity.licenseNumber == null 
-							             or (identity.licenseStatus != null and identity.licenseStatus.name() == 'Rejected'))}">
-							    <a th:href="@{/verification/license}">
-							        <i class="fa-solid fa-car"></i> Bổ sung GPLX
-							    </a>
-							</li>
                         </ul>
 
                     </div>
@@ -95,7 +87,6 @@
                                     <i class="fa-solid fa-user-gear me-2 text-secondary" style="font-size:1.1rem"></i>
                                     Thông tin cá nhân
                                 </h2>
-                                <p class="ct-profile-card__subtitle">Quản lý thông tin hồ sơ của bạn</p>
                             </div>
                             <button id="editBtn" class="ct-btn-edit" onclick="toggleEdit()">
                                 <i class="fa-solid fa-pen-to-square"></i> Chỉnh sửa
@@ -103,7 +94,30 @@
                         </div>
 
                         <div class="ct-profile-card__body">
-                            <form id="profileForm" th:action="@{/customer/profile/update}" method="post">
+                            <form id="profileForm" th:action="@{/customer/profile/update}" method="post" enctype="multipart/form-data">
+
+                                <!-- Avatar Upload Section -->
+                                <div class="ct-avatar-upload-section d-none mb-4" id="avatarUploadSection">
+                                    <div class="ct-upload-area border-2 border-dashed rounded-4 p-4 text-center" id="uploadArea" style="cursor: pointer; background: var(--ct-gray-50); border-color: var(--ct-primary); transition: all 0.3s ease;">
+                                        <i class="fa-solid fa-cloud-arrow-up fa-2x text-primary mb-2" style="display: block; color: var(--ct-primary);"></i>
+                                        <p class="mb-1 small fw-bold text-dark">Kéo và thả ảnh đại diện</p>
+                                        <p class="text-muted x-small" style="font-size: 0.75rem;">Định dạng JPG, PNG tối đa 5MB</p>
+                                    </div>
+                                    <input type="file" id="avatarInput" name="avatar" accept="image/jpeg,image/png,image/jpg" style="display: none;" />
+
+                                    <!-- Avatar Preview -->
+                                    <div id="avatarPreviewContainer" class="mt-3 text-center d-none">
+                                        <img id="avatarPreview" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--ct-primary);" alt="Preview" />
+                                        <p class="text-muted small mt-2" id="avatarFileName"></p>
+                                        <button type="button" class="btn btn-sm btn-link text-danger" id="removeBtnAvatar" onclick="removeAvatarPreview()">
+                                            <i class="fa-solid fa-trash"></i> Xóa ảnh
+                                        </button>
+                                    </div>
+
+                                    <div id="avatarErrorContainer" class="mt-2 d-none">
+                                        <p class="text-danger small" id="avatarError"></p>
+                                    </div>
+                                </div>
 
                                 <!-- Họ và tên -->
                                 <div class="ct-info-row">
@@ -183,7 +197,6 @@
                                     <i class="fa-solid fa-id-card me-2 text-secondary" style="font-size:1.1rem"></i>
                                     Xác minh danh tính
                                 </h2>
-                                <p class="ct-profile-card__subtitle">Xác minh CCCD và GPLX để thuê xe</p>
                             </div>
                         </div>
 
@@ -340,6 +353,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const editableFields = ['fullName', 'email', 'address'];
+        let avatarFileSelected = false;
 
         function toggleEdit() {
             const isEditing = !document.getElementById('fullName-edit').classList.contains('d-none');
@@ -360,10 +374,93 @@
 
             document.getElementById('editBtn').classList.toggle('d-none', !isEditing);
             document.getElementById('actionBar').classList.toggle('d-none', isEditing);
+            document.getElementById('avatarUploadSection').classList.toggle('d-none', isEditing);
 
             if (!isEditing) {
                 document.getElementById('fullName-edit').focus();
+                setupAvatarUpload();
             }
+        }
+
+        function setupAvatarUpload() {
+            const uploadArea = document.getElementById('uploadArea');
+            const avatarInput = document.getElementById('avatarInput');
+
+            // Click to browse
+            uploadArea.addEventListener('click', () => avatarInput.click());
+
+            // Drag and drop
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = 'var(--ct-primary)';
+                uploadArea.style.backgroundColor = 'rgba(95, 207, 134, 0.08)';
+            });
+
+            uploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = 'var(--ct-primary)';
+                uploadArea.style.backgroundColor = 'var(--ct-gray-50)';
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = 'var(--ct-primary)';
+                uploadArea.style.backgroundColor = 'var(--ct-gray-50)';
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    avatarInput.files = files;
+                    handleAvatarSelect();
+                }
+            });
+
+            // File input change
+            avatarInput.addEventListener('change', handleAvatarSelect);
+        }
+
+        function handleAvatarSelect() {
+            const avatarInput = document.getElementById('avatarInput');
+            const file = avatarInput.files[0];
+            const errorContainer = document.getElementById('avatarErrorContainer');
+            const errorMsg = document.getElementById('avatarError');
+
+            // Clear previous errors
+            errorContainer.classList.add('d-none');
+            errorMsg.textContent = '';
+
+            if (!file) return;
+
+            // Validate file type
+            if (!file.type.match('image/(jpeg|png|jpg)')) {
+                errorMsg.textContent = 'Chỉ chấp nhận file JPG hoặc PNG';
+                errorContainer.classList.remove('d-none');
+                avatarInput.value = '';
+                return;
+            }
+
+            // Validate file size (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                errorMsg.textContent = 'File ảnh không được vượt quá 5MB';
+                errorContainer.classList.remove('d-none');
+                avatarInput.value = '';
+                return;
+            }
+
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('avatarPreview').src = e.target.result;
+                document.getElementById('avatarFileName').textContent = file.name;
+                document.getElementById('avatarPreviewContainer').classList.remove('d-none');
+                avatarFileSelected = true;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeAvatarPreview() {
+            document.getElementById('avatarInput').value = '';
+            document.getElementById('avatarPreviewContainer').classList.add('d-none');
+            document.getElementById('avatarErrorContainer').classList.add('d-none');
+            avatarFileSelected = false;
         }
     </script>
 

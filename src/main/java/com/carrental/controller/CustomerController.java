@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -50,6 +51,7 @@ public class CustomerController {
     public String updateProfile(@RequestParam(required = false) String fullName,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String address,
+            @RequestParam(required = false) MultipartFile avatar,
             Authentication auth,
             RedirectAttributes redirectAttributes) {
 
@@ -71,6 +73,12 @@ public class CustomerController {
             }
             if (address != null) {
                 user.setAddress(address.trim());
+            }
+
+            // Handle avatar upload if provided
+            if (avatar != null && !avatar.isEmpty()) {
+                String avatarPath = userService.saveImage(avatar);
+                user.setAvatar(avatarPath);
             }
 
             userService.updateUser(user);

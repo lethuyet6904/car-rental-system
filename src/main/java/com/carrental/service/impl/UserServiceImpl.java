@@ -17,11 +17,18 @@ import com.carrental.service.IdentityVerificationService;
 import com.carrental.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +40,9 @@ public class UserServiceImpl implements UserService {
     private final RentalOrderRepository          rentalOrderRepository;
     private final PasswordEncoder                passwordEncoder;
     private final IdentityVerificationService    identityVerificationService;
+
+    @Value("${upload.path:/uploads}")
+    private String uploadPath;
 
     // ====================== ĐĂNG KÝ ======================
     @Override
@@ -153,5 +163,39 @@ public class UserServiceImpl implements UserService {
             return new ArrayList<>();
         }
         return rentalOrderRepository.findByCustomer(customer);
+    }
+
+    // ====================== FILE UPLOAD ======================
+    public String saveImage(MultipartFile file) {
+        if (file == null || file.isEmpty())
+            throw new RuntimeException("Vui lòng upload ảnh đại diện");
+
+        String ct = file.getContentType();
+        if (ct == null || (!ct.equals("image/jpeg") && !ct.equals("image/png") && !ct.equals("image/jpg")))
+            throw new RuntimeException("Chỉ chấp nhận file JPG hoặc PNG");
+
+        if (file.getSize() > 5 * 1024 * 1024)
+            throw new RuntimeException("File ảnh không được vượt quá 5MB");
+
+        try {
+            String original = file.getOriginalFilename();
+            if (original == null || !original.contains("."))
+                throw new RuntimeException("Tên file không hợp lệ");
+
+            String ext = original.substring(original.lastIndexOf(".")).toLowerCase();
+            String filename = UUID.randomUUID() + ext;
+
+            Path uploadDir = Paths.get(uploadPath).toAbsolutePath().normalize().resolve("avatars");
+            if (!Files.exists(uploadDir))
+                Files.createDirectories(uploadDir);
+
+            Files.copy(file.getInputStream(),
+                    uploadDir.resolve(filename),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+            return "/uploads/avatars/" + filename;
+        } catch (IOException e) {
+            throw new RuntimeException("Lỗi khi lưu ảnh: " + e.getMessage());
+        }
     }
 }

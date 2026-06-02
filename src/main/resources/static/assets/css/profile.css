@@ -334,7 +334,93 @@
     margin-bottom: 20px;
 }
 
-/* ── SECTION XÁC MINH ────────────────────────────── */
+/* Avatar Upload Section */
+.ct-avatar-upload-section {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--ct-gray-200);
+}
+
+.ct-upload-area {
+    padding: 40px 20px;
+    text-align: center;
+    background: var(--ct-gray-50);
+    border: 2px dashed var(--ct-primary);
+    border-radius: var(--r-lg);
+    transition: all 0.3s ease;
+}
+
+.ct-upload-area:hover {
+    background: rgba(95, 207, 134, 0.08);
+    border-color: var(--ct-primary-hover);
+}
+
+.ct-upload-area i {
+    font-size: 2rem;
+    color: var(--ct-primary);
+    margin-bottom: 12px;
+    display: block;
+}
+
+.ct-upload-area p {
+    margin: 0;
+    font-size: 0.88rem;
+}
+
+.ct-upload-area .fw-bold {
+    color: var(--ct-text-main);
+    font-weight: 600;
+}
+
+/* Avatar Preview Container */
+#avatarPreviewContainer {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--ct-gray-200);
+}
+
+#avatarPreview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--ct-primary);
+    box-shadow: 0 4px 16px rgba(95, 207, 134, 0.2);
+}
+
+#avatarFileName {
+    font-size: 0.85rem;
+    color: var(--ct-text-muted);
+    margin-top: 8px;
+    word-break: break-word;
+}
+
+#removeBtnAvatar {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    text-decoration: none;
+}
+
+#removeBtnAvatar:hover {
+    text-decoration: underline;
+}
+
+/* Avatar Error Container */
+#avatarErrorContainer {
+    padding: 8px 12px;
+    background: var(--ct-danger-bg);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: var(--r-md);
+    margin-top: 12px;
+}
+
+#avatarError {
+    color: var(--ct-danger);
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+/* ── ACTION BAR ──────────────────────────────────── */
 .ct-identity-section {
     padding: 20px 0 0;
     margin-top: 4px;

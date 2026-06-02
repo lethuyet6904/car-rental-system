@@ -103,27 +103,7 @@
                                     <i class="fa-solid fa-arrow-left me-1"></i> Quay lại hồ sơ cá nhân
                                 </a>
                             </div>
-							
-							
-							<div th:if="${alreadyHasLicense}">
-                                <div class="ct-state-card success">
-                                    <div class="ct-state-icon"><i class="fa-solid fa-circle-check"></i></div>
-                                    <div>
-                                        <p class="ct-state-title">GPLX đã được xác minh</p>
-                                        <p class="ct-state-desc">
-                                            Số GPLX: <strong th:text="${identity != null ? identity.licenseNumber : ''}"></strong><br>
-                                            Hồ sơ của bạn đã đầy đủ. Bạn có thể thuê xe ngay bây giờ.
-                                        </p>
-                                    </div>
-                                </div>
-                                <a th:href="@{/}" class="ct-btn-submit mt-3" style="text-decoration:none;display:flex">
-                                    <i class="fa-solid fa-magnifying-glass"></i> Tìm xe ngay
-                                </a>
-                                <a th:href="@{/customer/profile}" class="ct-link-back">
-                                    <i class="fa-solid fa-arrow-left me-1"></i> Quay lại hồ sơ cá nhân
-                                </a>
-                            </div>
-                            
+
                             <div th:if="${licensePending}">
                                 <div class="ct-state-card pending">
                                     <div class="ct-state-icon"><i class="fa-solid fa-clock"></i></div>

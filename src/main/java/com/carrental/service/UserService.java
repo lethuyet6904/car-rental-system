@@ -6,6 +6,7 @@ import com.carrental.dto.request.OwnerRegistrationRequest;
 import com.carrental.dto.request.RegisterRequest;
 import com.carrental.entity.RentalOrder;
 import com.carrental.entity.User;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
     User register(RegisterRequest request);
@@ -15,10 +16,11 @@ public interface UserService {
     User findByPhone(String phone);
 
     void applyForOwner(Long userId, OwnerRegistrationRequest request);
-    
+
     // THÊM PHƯƠNG THỨC MỚI
     User getUserWithIdentity(Long userId);
     User updateUser(User user);                    // ← THÊM
-    
+    String saveImage(MultipartFile file);
+
     List<RentalOrder> getOrdersByCustomer(Long customerId);
 }

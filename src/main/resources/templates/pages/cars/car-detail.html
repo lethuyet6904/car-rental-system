@@ -117,7 +117,12 @@
                     <h3 class="cd-desc-title">Thông tin chủ xe</h3>
                     <div class="cd-owner-card">
                         <div class="cd-owner-avatar">
-                            <div class="bg-success text-white rounded-circle d-flex justify-content-center align-items-center"
+                            <img th:if="${car.owner != null && car.owner.avatar != null}"
+                                th:src="${car.owner.avatar}"
+                                alt="Owner avatar"
+                                style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid #5FCF86;flex-shrink:0;">
+                            <div th:if="${car.owner == null || car.owner.avatar == null}"
+                                class="bg-success text-white rounded-circle d-flex justify-content-center align-items-center"
                                 style="width:60px;height:60px;font-size:24px;">
                                 <i class="fa-solid fa-user"></i>
                             </div>
@@ -148,7 +153,12 @@
                             <div class="cd-review-item" th:each="review : ${reviews}">
                                 <div class="cd-review-header">
                                     <div class="cd-review-avatar">
-                                        <div class="bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center"
+                                        <img th:if="${review.customer != null && review.customer.avatar != null}"
+                                            th:src="${review.customer.avatar}"
+                                            th:alt="${review.customer.fullName}"
+                                            style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:1px solid #ccc;flex-shrink:0;">
+                                        <div th:if="${review.customer == null || review.customer.avatar == null}"
+                                            class="bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center"
                                             style="width:42px;height:42px;font-size:18px;flex-shrink:0;">
                                             <i class="fa-solid fa-user"></i>
                                         </div>

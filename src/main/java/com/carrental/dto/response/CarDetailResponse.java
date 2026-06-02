@@ -2,6 +2,7 @@
 	
 	import com.carrental.entity.Car;
 	import com.carrental.entity.CarImage;
+	import com.carrental.entity.User;
 	import com.carrental.enums.FuelType;
 	import com.carrental.enums.TransmissionType;
 	import lombok.Getter;
@@ -31,6 +32,7 @@
 	    private final List<String> imageUrls;
 	    private final String ownerName;
 	    private final String ownerPhone;
+	    private final User owner;
 	    
 	    // Thuộc tính phụ có thể có trong Entity, ta lấy nếu có
 	    // Dựa vào DB thiết kế, ta lấy các field cần thiết cho Detail view
@@ -59,6 +61,7 @@
 	        // Owner info
 	        this.ownerName         = car.getOwner().getFullName();
 	        this.ownerPhone        = car.getOwner().getPhone();
+	        this.owner             = car.getOwner();
 	
 	        this.imageUrls = images.stream()
 	                .sorted(Comparator.comparingInt(CarImage::getSortOrder))
