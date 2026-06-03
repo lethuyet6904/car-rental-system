@@ -27,12 +27,6 @@
                     <span>Quản lý đơn hàng</span>
                 </a>
                 <a class="od-sidebar__link"
-                   th:classappend="${activePage == 'myOrders'} ? 'od-sidebar__link--active'"
-                   th:href="@{/owner/my-orders}">
-                    <i class="fa-solid fa-receipt"></i>
-                    <span>Đơn hàng của tôi</span>
-                </a>
-                <a class="od-sidebar__link"
                    th:classappend="${activePage == 'complaints'} ? 'od-sidebar__link--active'"
                    th:href="@{/complaint/my-complaints}">
                     <i class="fa-solid fa-triangle-exclamation"></i>

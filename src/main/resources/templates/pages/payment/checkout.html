@@ -11,18 +11,14 @@
 
     <div class="container py-5" style="padding-top: 100px !important;">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
+            <div class="col-md-10 col-lg-7">
 
-                <div class="text-center mb-5">
-                    <span class="text-success fw-semibold small text-uppercase tracking-wider">
-                        <i class="fa-solid fa-shield-halved me-2"></i>Hệ thống thanh toán an toàn
-                    </span>
-                    <h1 class="h2 fw-bold text-dark mt-2" style="font-family: 'Outfit', sans-serif;">
-                        Thanh toán đơn hàng
+                <div class="text-center mb-4">
+                    <span class="text-primary fw-semibold small text-uppercase tracking-wider">Hệ thống thanh toán an
+                        toàn</span>
+                    <h1 class="h3 fw-bold text-dark mb-1" style="font-family: 'Outfit', sans-serif;">Thanh toán đơn hàng
                     </h1>
-                    <p class="text-muted small mt-2">
-                        <i class="fa-solid fa-info-circle me-1"></i>
-                        Vui lòng hoàn tất giao dịch để xác nhận lịch trình di chuyển của bạn.
+                    <p class="text-muted small">Vui lòng hoàn tất giao dịch để xác nhận lịch trình di chuyển của bạn.
                     </p>
                 </div>
 
@@ -39,74 +35,49 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
 
-                <!-- Order Info Card -->
-                <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 bg-white">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold text-dark mb-3">
-                            <i class="fa-solid fa-receipt me-2 text-success"></i>
-                            Thông tin đơn hàng #<span th:text="${order.orderId}"></span>
-                        </h5>
-
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <span class="text-muted small">Phương tiện:</span>
-                                    <strong class="text-end text-dark" th:text="${order.car.brandName + ' ' + order.car.modelName}"></strong>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <span class="text-muted small">Biển số:</span>
-                                    <strong class="text-end text-dark font-monospace" th:text="${order.car.licensePlate}"></strong>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <span class="text-muted small">Nhận xe:</span>
-                                    <strong class="text-end text-dark" th:text="${#temporals.format(order.pickupDate, 'dd/MM/yyyy')}"></strong>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <span class="text-muted small">Trả xe:</span>
-                                    <strong class="text-end text-dark" th:text="${#temporals.format(order.returnDate, 'dd/MM/yyyy')}"></strong>
-                                </div>
-                            </div>
-                        </div>
-
-                        <hr class="my-3">
-
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="text-muted small">Tổng ngày thuê:</span>
-                                    <strong class="text-dark" th:text="${order.totalDays + ' ngày'}"></strong>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="text-muted small">Giá/ngày:</span>
-                                    <strong class="text-dark" th:text="${#numbers.formatInteger(order.car.pricePerDay, 0, 'COMMA') + 'đ'}"></strong>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="d-flex justify-content-between align-items-center border-top pt-3">
-                                    <span class="text-muted small">Tổng chi phí:</span>
-                                    <strong class="text-dark fs-6" th:text="${#numbers.formatInteger(order.totalAmount, 0, 'COMMA') + 'đ'}"></strong>
-                                </div>
-                            </div>
-                            <div class="col-12 bg-success bg-opacity-10 rounded-3 p-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="fw-bold text-dark small">Tiền cọc thanh toán (30%):</span>
-                                    <span class="fw-bold text-success fs-5" th:text="${#numbers.formatInteger(order.depositAmount, 0, 'COMMA') + 'đ'}"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Payment Method Card -->
                 <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold text-dark mb-3">
-                            <i class="fa-solid fa-wallet me-2 text-success"></i>
-                            Chọn phương thức thanh toán
+                    <div class="card-body p-4 p-md-5">
+
+                        <div class="mb-4">
+                            <h5 class="fw-bold text-dark mb-3" style="font-family: 'Outfit', sans-serif;">
+                                <i class="fa-solid fa-receipt me-2 text-secondary fs-5"></i>Thông tin đơn hàng #<span
+                                    th:text="${order.orderId}"></span>
+                            </h5>
+
+                            <div class="d-flex flex-column gap-2.5 rounded-3 border p-3.5 bg-light bg-opacity-30">
+                                <div class="d-flex justify-content-between align-items-center text-dark small">
+                                    <span class="text-secondary fw-medium">Phương tiện thuê:</span>
+                                    <span class="fw-semibold text-end"
+                                        th:text="${order.car.modelName} + ' - ' + ${order.car.licensePlate}"></span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center text-dark small">
+                                    <span class="text-secondary fw-medium">Thời gian hành trình:</span>
+                                    <span class="fw-medium text-end"
+                                        th:text="${#temporals.format(order.pickupDate, 'dd/MM/yyyy')} + ' → ' + ${#temporals.format(order.returnDate, 'dd/MM/yyyy')}"></span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center text-dark small">
+                                    <span class="text-secondary fw-medium">Tổng số ngày thuê:</span>
+                                    <span class="fw-medium text-end font-monospace"
+                                        th:text="${order.totalDays} + ' ngày'"></span>
+                                </div>
+                                <div
+                                    class="d-flex justify-content-between align-items-center text-dark small border-top pt-2.5">
+                                    <span class="text-secondary fw-medium">Tổng chi phí cơ bản:</span>
+                                    <span class="fw-semibold text-end"
+                                        th:text="${#numbers.formatInteger(order.totalAmount, 0, 'COMMA')} + 'đ'"></span>
+                                </div>
+                                <div
+                                    class="d-flex justify-content-between align-items-center border-top border-dark border-opacity-10 pt-3 mt-1">
+                                    <span class="fw-bold text-dark small text-uppercase">Tiền cọc cần thanh toán
+                                        (30%):</span>
+                                    <span class="fw-bold text-danger fs-4" style="font-family: 'Outfit', sans-serif;"
+                                        th:text="${#numbers.formatInteger(order.depositAmount, 0, 'COMMA')} + 'đ'"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold text-dark mb-3" style="font-family: 'Outfit', sans-serif;">
+                            <i class="fa-solid fa-wallet me-2 text-secondary fs-5"></i>Chọn phương thức thanh toán
                         </h5>
 
                         <form th:action="@{/payment/process-deposit}" method="post">
@@ -114,104 +85,84 @@
                                 th:if="${_csrf != null}" />
                             <input type="hidden" name="orderId" th:value="${order.orderId}" />
 
-                            <!-- MoMo Payment Option -->
-                            <div class="payment-option mb-3">
-                                <div class="form-check p-3 rounded-3 border-2 border-light d-flex align-items-start cursor-pointer"
-                                    onclick="selectMethod('Momo')" style="transition: all 0.3s ease;">
-                                    <input class="form-check-input mt-1" type="radio" name="paymentMethod"
-                                        id="momo" value="Momo" required>
-                                    <label class="form-check-label w-100 ms-3 cursor-pointer" for="momo">
-                                        <div class="fw-bold text-dark mb-1">
-                                            <i class="fa-solid fa-qrcode text-danger me-2"></i>Ví điện tử MoMo
-                                        </div>
-                                        <div class="text-muted small">Thanh toán tức thời qua ứng dụng ví điện tử MoMo bằng mã QR</div>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- Bank Transfer Option -->
-                            <div class="payment-option mb-4">
-                                <div class="form-check p-3 rounded-3 border-2 border-light d-flex align-items-start cursor-pointer"
-                                    onclick="selectMethod('BankTransfer')" style="transition: all 0.3s ease;">
-                                    <input class="form-check-input mt-1" type="radio" name="paymentMethod"
-                                        id="bankTransfer" value="BankTransfer">
-                                    <label class="form-check-label w-100 ms-3 cursor-pointer" for="bankTransfer">
-                                        <div class="fw-bold text-dark mb-1">
-                                            <i class="fa-solid fa-building-columns text-primary me-2"></i>
-                                            Chuyển khoản ngân hàng
-                                        </div>
-                                        <div class="text-muted small">Chuyển khoản trực tiếp qua ngân hàng nội địa bằng Mobile Banking</div>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- Payment Details Info -->
-                            <div id="paymentInfo">
-                                <!-- Bank Transfer Info -->
-                                <div class="bank-info" id="bankInfo" style="display: none;">
-                                    <div class="alert alert-info border-0 shadow-sm rounded-3 mb-0">
-                                        <h6 class="fw-bold text-info mb-3">
-                                            <i class="fa-solid fa-circle-info me-2"></i>Thông tin tài khoản thụ hưởng
-                                        </h6>
-                                        <div class="row g-3">
-                                            <div class="col-md-6">
-                                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                                    <span class="text-muted small">Ngân hàng:</span>
-                                                    <strong class="text-dark text-end" th:text="${ownerBankName}">Chưa cập nhật</strong>
-                                                </div>
-                                                <div class="d-flex justify-content-between align-items-start">
-                                                    <span class="text-muted small">Chủ tài khoản:</span>
-                                                    <strong class="text-dark text-end" th:text="${ownerAccountHolder}">Chưa cập nhật</strong>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                                    <span class="text-muted small">Số tài khoản:</span>
-                                                    <strong class="text-dark text-end font-monospace" th:text="${ownerBankAccount}">Chưa cập nhật</strong>
-                                                </div>
-                                                <div class="d-flex justify-content-between align-items-start">
-                                                    <span class="text-muted small">Nội dung CK:</span>
-                                                    <strong class="text-primary font-monospace">PAYMENT_<span th:text="${order.orderId}"></span></strong>
-                                                </div>
-                                            </div>
-                                            <div class="col-12 border-top pt-3 mt-2">
-                                                <div class="alert alert-warning mb-0 py-2">
-                                                    <i class="fa-solid fa-warning me-2"></i>
-                                                    <small>Sau khi chuyển khoản, nhấn "Xác nhận thanh toán" để hệ thống ghi nhận giao dịch của bạn.</small>
-                                                </div>
-                                            </div>
-                                        </div>
+                            <div class="form-check p-3 rounded-4 border mb-2.5 hover-bg-light transition-all cursor-pointer d-flex align-items-center"
+                                onclick="selectMethod('Momo')">
+                                <input class="form-check-input ms-0 me-3 shadow-none" type="radio" name="paymentMethod"
+                                    id="momo" value="Momo" required>
+                                <label class="form-check-label w-100 cursor-pointer" for="momo">
+                                    <div class="fw-bold text-dark mb-0.5"><i
+                                            class="fa-solid fa-qrcode text-danger me-2 opacity-80"></i>Ví điện tử MoMo
                                     </div>
-                                </div>
+                                    <div class="text-muted small">Thanh toán tức thời qua ứng dụng ví điện tử MoMo bằng
+                                        mã QR.</div>
+                                </label>
+                            </div>
 
-                                <!-- MoMo QR Info -->
-                                <div class="momo-info" id="momoInfo" style="display: none;">
-                                    <div class="alert alert-success border-0 shadow-sm rounded-3 text-center mb-0">
-                                        <h6 class="fw-bold text-success mb-3">
-                                            <i class="fa-solid fa-qrcode me-2"></i>Quét mã QR MoMo
-                                        </h6>
-                                        <div class="bg-white d-inline-block p-4 rounded-3 border border-success border-opacity-20 mb-3">
-                                            <i class="fa-solid fa-qrcode text-success" style="font-size: 4rem;"></i>
+                            <div class="form-check p-3 rounded-4 border mb-2.5 hover-bg-light transition-all cursor-pointer d-flex align-items-center"
+                                onclick="selectMethod('BankTransfer')">
+                                <input class="form-check-input ms-0 me-3 shadow-none" type="radio" name="paymentMethod"
+                                    id="bankTransfer" value="BankTransfer">
+                                <label class="form-check-label w-100 cursor-pointer" for="bankTransfer">
+                                    <div class="fw-bold text-dark mb-0.5"><i
+                                            class="fa-solid fa-building-columns text-primary me-2 opacity-80"></i>Chuyển
+                                        khoản ngân hàng</div>
+                                    <div class="text-muted small">Chuyển khoản trực tiếp qua ngân hàng nội địa bằng
+                                        Mobile Banking.</div>
+                                </label>
+                            </div>
+
+                            <div id="qrSection">
+                            <div class="bank-info mb-4" id="bankInfo" style="display: none;">
+                                <div
+                                    class="alert alert-info border-0 shadow-sm rounded-3 p-3.5 bg-info bg-opacity-10 text-dark">
+                                    <div
+                                        class="fw-bold text-info border-bottom border-info border-opacity-20 pb-2 mb-2.5">
+                                        <i class="fa-solid fa-circle-info me-1.5"></i>Thông tin tài khoản thụ hưởng:
+                                    </div>
+                                    <div class="d-flex flex-column gap-1.5 font-monospace fs-7">
+                                        <div>Ngân hàng: <strong class="text-dark" th:text="${ownerBankName}">Chưa cập nhật</strong></div>
+                                        <div>Số tài khoản: <strong class="text-dark" th:text="${ownerBankAccount}">Chưa cập nhật</strong></div>
+                                        <div>Chủ tài khoản: <strong class="text-dark" th:text="${ownerAccountHolder}">Chưa cập nhật</strong>
                                         </div>
-                                        <div class="small">
-                                            <p class="text-muted mb-2">Quét mã để chuyển chính xác:</p>
-                                            <p class="text-dark fw-bold" th:text="${#numbers.formatInteger(order.depositAmount, 0, 'COMMA') + 'đ'}"></p>
-                                        </div>
+                                        <div>Nội dung CK: <strong
+                                                class="text-primary fw-bold">PAYMENT_<span th:text="${order.orderId}"></span></strong></div>
+                                        <div>Số tiền: <strong class="text-dark"
+                                                th:text="${#numbers.formatInteger(order.depositAmount, 0, 'COMMA')} + 'đ'"></strong></div>
+                                    </div>
+                                    <div style="font-size:12px; color:#6b7280; margin-top:8px;">
+                                        * Sau khi chuyển khoản, nhấn "Xác nhận thanh toán"
+                                        để hệ thống ghi nhận giao dịch của bạn.
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Submit Button -->
+                            <div class="momo-info mb-4" id="momoInfo" style="display: none;">
+                                <div
+                                    class="alert alert-success border-0 shadow-sm rounded-3 p-4 bg-success bg-opacity-10 text-dark text-center">
+                                    <div
+                                        class="fw-bold text-success mb-3 text-start border-bottom border-success border-opacity-20 pb-2">
+                                        <i class="fa-solid fa-qrcode me-1.5"></i>Quét mã QR MoMo an toàn:
+                                    </div>
+                                    <div class="bg-white d-inline-block p-3 rounded-3 shadow-none border mb-2">
+                                        <i class="fa-solid fa-qrcode text-success" style="font-size: 5rem;"></i>
+                                    </div>
+                                    <p class="small text-muted mb-0">Quét mã để chuyển chính xác: <strong
+                                            class="text-dark"
+                                            th:text="${#numbers.formatInteger(order.depositAmount, 0, 'COMMA')} + 'đ'"></strong>
+                                    </p>
+                                </div>
+                            </div>
+                            </div>
+
                             <button type="submit"
-                                class="btn btn-success w-100 rounded-3 py-3 fw-bold mt-4 shadow-sm border-0 d-flex align-items-center justify-content-center gap-2">
-                                <i class="fa-solid fa-shield-check"></i>
-                                Xác nhận thanh toán đơn hàng
+                                class="btn btn-dark w-100 rounded-3 py-3 fw-bold fs-6 shadow-sm border-0 d-flex align-items-center justify-content-center gap-2 transition-all">
+                                <i class="fa-solid fa-shield-check fs-5"></i> Xác nhận thanh toán đơn hàng
                             </button>
                         </form>
 
                         <p class="text-center text-muted small mt-4 mb-0">
-                            <i class="fa-solid fa-lock text-success me-1"></i>
-                            Giao dịch được bảo mật hóa SSL toàn vẹn dữ liệu
+                            <i class="fa-solid fa-user-shield me-1 text-secondary opacity-75"></i> Giao dịch được bảo
+                            mật hóa SSL toàn vẹn dữ liệu
                         </p>
                     </div>
                 </div>

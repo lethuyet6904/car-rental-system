@@ -44,10 +44,6 @@ public interface OwnerService {
 
     RentalOrder getOrderByIdAndOwner(Long orderId, Long ownerId);
 
-    Page<RentalOrder> getOrdersByCustomer(Long customerId, OrderStatus status, Pageable pageable);
-
-    RentalOrder getOrderByIdAndCustomer(Long orderId, Long customerId);
-
     void confirmOrder(Long orderId, Long ownerId);
 
     void rejectOrder(Long orderId, Long ownerId, String reason);

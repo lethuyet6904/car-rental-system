@@ -1,329 +1,339 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
 <body>
 
-<section th:fragment="jumbotron" class="ct-jumbotron">
-    <div class="ct-jumbotron__bg">
-        <img th:src="@{/assets/images/hero-car.jpg}" 
-             src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1920&q=80" 
-             alt="Carto Hero" class="ct-jumbotron__bg-img" />
-        <div class="ct-jumbotron__overlay"></div>
-    </div>
+    <section th:fragment="jumbotron" class="ct-jumbotron">
+        <div class="ct-jumbotron__bg">
+            <img th:src="@{/assets/images/hero-car.jpg}"
+                src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1920&q=80"
+                alt="Carto Hero" class="ct-jumbotron__bg-img" />
+            <div class="ct-jumbotron__overlay"></div>
+        </div>
 
-    <div class="ct-jumbotron__inner">
-        <div class="container px-4">
-            <div class="ct-hero-content text-center text-lg-start">
-                <h1 class="ct-hero-title">
-                    Carto – Cùng Bạn <br class="d-none d-lg-block"/>Trên <em>Mọi Hành Trình</em>
-                </h1>
-                <p class="ct-hero-subtitle d-none d-md-block">
-                    Nền tảng chia sẻ ô tô tự lái uy tín, thủ tục nhanh gọn, giao xe tận nhà.
-                </p>
+        <div class="ct-jumbotron__inner">
+            <div class="container px-4">
+                <div class="ct-hero-content text-center text-lg-start">
+                    <h1 class="ct-hero-title">
+                        Carto – Cùng Bạn <br class="d-none d-lg-block" />Trên <em>Mọi Hành Trình</em>
+                    </h1>
+                    <p class="ct-hero-subtitle d-none d-md-block">
+                        Nền tảng chia sẻ ô tô tự lái uy tín, thủ tục nhanh gọn, giao xe tận nhà.
+                    </p>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="ct-search-wrap">
-        <div class="container px-4">
-            <div class="ct-search-card">
-                <div class="ct-search-tabs">
-                    <button class="ct-search-tab ct-search-tab--active">
-                        <i class="fa-solid fa-car-side"></i> Xe tự lái
-                    </button>
-                </div>
-
-                <form id="searchForm" th:action="@{/cars}" method="get">
-                    <div class="ct-search-fields">
-                        
-                        <div class="ct-field dropdown">
-                            <label class="ct-field__label">
-                                <i class="fa-solid fa-location-dot"></i> Địa điểm
-                            </label>
-
-                            <div class="ct-field__input dropdown-toggle ct-custom-select" data-bs-toggle="dropdown" aria-expanded="false" id="locationDisplay">
-                                <span class="text-placeholder">Bạn muốn đi đâu?</span>
-                            </div>
-
-                            <ul class="dropdown-menu ct-dropdown-menu w-100 shadow-lg" style="max-height: 300px; overflow-y: auto;">
-                                <li th:each="region : ${regions}">
-                                    <a class="dropdown-item" href="#" th:data-value="${region.regionName}" th:text="${region.regionName}"></a>
-                                </li>
-                            </ul>
-
-                            <input type="hidden" name="city" id="locationValue">
-                        </div>
-
-                        <div class="ct-field-divider"></div>
-
-                        <div class="ct-field">
-                            <label class="ct-field__label" for="dateFrom">
-                                <i class="fa-regular fa-calendar-plus"></i> Nhận xe
-                            </label>
-                            <div class="ct-field__input" id="homeDateFromTrigger"
-                                 style="cursor:pointer; min-height:24px; display:flex; align-items:center; color: #A1A1AA;"
-                                 data-bs-toggle="modal" data-bs-target="#homeDateModal">
-                                <span id="homePickupText" style="color: #A1A1AA; font-weight: 600; font-size: 0.95rem;">03/06/2026</span>
-                            </div>
-                            <input type="hidden" name="dateFrom" id="homeDateFrom">
-                        </div>
-
-                        <div class="ct-field-divider"></div>
-
-                        <div class="ct-field">
-                            <label class="ct-field__label" for="dateTo">
-                                <i class="fa-regular fa-calendar-check"></i> Trả xe
-                            </label>
-                            <div class="ct-field__input" id="homeDateToTrigger"
-                                 style="cursor:pointer; min-height:24px; display:flex; align-items:center; color: #A1A1AA;"
-                                 data-bs-toggle="modal" data-bs-target="#homeDateModal">
-                                <span id="homeReturnText" style="color: #A1A1AA; font-weight: 600; font-size: 0.95rem;">04/06/2026</span>
-                            </div>
-                            <input type="hidden" name="dateTo" id="homeDateTo">
-                        </div>
-
-                        <button type="submit" class="ct-search-btn">
-                            <i class="fa-solid fa-magnifying-glass"></i> Tìm xe ngay
+        <div class="ct-search-wrap">
+            <div class="container px-4">
+                <div class="ct-search-card">
+                    <div class="ct-search-tabs">
+                        <button class="ct-search-tab ct-search-tab--active">
+                            <i class="fa-solid fa-car-side"></i> Xe tự lái
                         </button>
                     </div>
-                </form>
+
+                    <form id="searchForm" th:action="@{/cars}" method="get">
+                        <div class="ct-search-fields">
+
+                            <div class="ct-field dropdown">
+                                <label class="ct-field__label">
+                                    <i class="fa-solid fa-location-dot"></i> Địa điểm
+                                </label>
+
+                                <div class="ct-field__input dropdown-toggle ct-custom-select" data-bs-toggle="dropdown"
+                                    aria-expanded="false" id="locationDisplay">
+                                    <span class="text-placeholder">Bạn muốn đi đâu?</span>
+                                </div>
+
+                                <ul class="dropdown-menu ct-dropdown-menu w-100 shadow-lg"
+                                    style="max-height: 300px; overflow-y: auto;">
+                                    <li th:each="region : ${regions}">
+                                        <a class="dropdown-item" href="#" th:data-value="${region.regionName}"
+                                            th:text="${region.regionName}"></a>
+                                    </li>
+                                </ul>
+
+                                <input type="hidden" name="city" id="locationValue">
+                            </div>
+
+                            <div class="ct-field-divider"></div>
+
+                            <div class="ct-field">
+                                <label class="ct-field__label" for="dateFrom">
+                                    <i class="fa-regular fa-calendar-plus"></i> Nhận xe
+                                </label>
+                                <div class="ct-field__input" id="homeDateFromTrigger"
+                                    style="cursor:pointer; min-height:24px; display:flex; align-items:center; color: #A1A1AA;"
+                                    data-bs-toggle="modal" data-bs-target="#homeDateModal">
+                                    <span id="homePickupText"
+                                        th:text="${#temporals.format(#temporals.createNow().plusDays(1), 'dd/MM/yyyy')}"
+                                        style="color: #A1A1AA; font-weight: 600; font-size: 0.95rem;"></span>
+                                </div>
+                                <input type="hidden" name="dateFrom" id="homeDateFrom">
+                            </div>
+
+                            <div class="ct-field-divider"></div>
+
+                            <div class="ct-field">
+                                <label class="ct-field__label" for="dateTo">
+                                    <i class="fa-regular fa-calendar-check"></i> Trả xe
+                                </label>
+                                <div class="ct-field__input" id="homeDateToTrigger"
+                                    style="cursor:pointer; min-height:24px; display:flex; align-items:center; color: #A1A1AA;"
+                                    data-bs-toggle="modal" data-bs-target="#homeDateModal">
+                                    <span id="homeReturnText"
+                                        th:text="${#temporals.format(#temporals.createNow().plusDays(2), 'dd/MM/yyyy')}"
+                                        style="color: #A1A1AA; font-weight: 600; font-size: 0.95rem;"></span>
+                                </div>
+                                <input type="hidden" name="dateTo" id="homeDateTo">
+                            </div>
+
+                            <button type="submit" class="ct-search-btn">
+                                <i class="fa-solid fa-magnifying-glass"></i> Tìm xe ngay
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="modal fade" id="homeDateModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg rounded-4">
-                <div class="modal-header border-bottom-0 pb-0">
-                    <h5 class="modal-title fw-bold mx-auto">Thời gian</h5>
-                    <button type="button" class="btn-close ms-0"
-                            data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row g-3 mb-4">
-                        <div class="col-6">
-                            <label class="form-label text-muted small fw-bold mb-2">
-                                <i class="fa-regular fa-calendar-plus" style="color: #5FCF86;"></i> Nhận xe
-                            </label>
-                            <input type="date" id="homeModalPickupDate"
-                                   class="form-control form-control-lg mb-2 rounded-2"
-                                   style="font-size: 0.95rem; border: 1px solid #E4E4E7;">
-                            <input type="time" id="homeModalPickupTime"
-                                   class="form-control form-control-lg rounded-2"
-                                   style="font-size: 0.95rem; border: 1px solid #E4E4E7;" 
-                                   value="09:00">
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label text-muted small fw-bold mb-2">
-                                <i class="fa-regular fa-calendar-check" style="color: #5FCF86;"></i> Trả xe
-                            </label>
-                            <input type="date" id="homeModalReturnDate"
-                                   class="form-control form-control-lg mb-2 rounded-2"
-                                   style="font-size: 0.95rem; border: 1px solid #E4E4E7;">
-                            <input type="time" id="homeModalReturnTime"
-                                   class="form-control form-control-lg rounded-2"
-                                   style="font-size: 0.95rem; border: 1px solid #E4E4E7;" 
-                                   value="09:00">
-                        </div>
+        <div class="modal fade" id="homeDateModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4">
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <h5 class="modal-title fw-bold mx-auto">Thời gian</h5>
+                        <button type="button" class="btn-close ms-0" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center
+                    <div class="modal-body">
+                        <div class="row g-3 mb-4">
+                            <div class="col-6">
+                                <label class="form-label text-muted small fw-bold mb-2">
+                                    <i class="fa-regular fa-calendar-plus" style="color: #5FCF86;"></i> Nhận xe
+                                </label>
+                                <input type="date" id="homeModalPickupDate"
+                                    class="form-control form-control-lg mb-2 rounded-2"
+                                    style="font-size: 0.95rem; border: 1px solid #E4E4E7;">
+                                <input type="time" id="homeModalPickupTime"
+                                    class="form-control form-control-lg rounded-2"
+                                    style="font-size: 0.95rem; border: 1px solid #E4E4E7;" value="09:00">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label text-muted small fw-bold mb-2">
+                                    <i class="fa-regular fa-calendar-check" style="color: #5FCF86;"></i> Trả xe
+                                </label>
+                                <input type="date" id="homeModalReturnDate"
+                                    class="form-control form-control-lg mb-2 rounded-2"
+                                    style="font-size: 0.95rem; border: 1px solid #E4E4E7;">
+                                <input type="time" id="homeModalReturnTime"
+                                    class="form-control form-control-lg rounded-2"
+                                    style="font-size: 0.95rem; border: 1px solid #E4E4E7;" value="09:00">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center
                                 bg-light p-3 rounded-3">
-                        <div>
-                            <div class="fw-semibold text-dark" id="homeModalDateSummary">
-                                Chưa chọn ngày
+                            <div>
+                                <div class="fw-semibold text-dark" id="homeModalDateSummary">
+                                    Chưa chọn ngày
+                                </div>
+                                <div class="text-muted small">Thời gian thuê:
+                                    <span id="homeModalDaysSummary" class="text-success fw-bold">-- ngày</span>
+                                </div>
                             </div>
-                            <div class="text-muted small">Thời gian thuê:
-                                <span id="homeModalDaysSummary"
-                                      class="text-success fw-bold">-- ngày</span>
-                            </div>
+                            <button type="button" class="btn btn-success fw-bold px-4 rounded-3 shadow-sm"
+                                id="homeBtnConfirmDate" data-bs-dismiss="modal">Tiếp tục</button>
                         </div>
-                        <button type="button"
-                                class="btn btn-success fw-bold px-4 rounded-3 shadow-sm"
-                                id="homeBtnConfirmDate"
-                                data-bs-dismiss="modal">Tiếp tục</button>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<script>
-console.log('Jumbotron script loading...');
+    <script>
+        console.log('Jumbotron script loading...');
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOMContentLoaded event fired');
-    
-    const dropdownItems = document.querySelectorAll('.ct-dropdown-menu .dropdown-item');
-    const locationDisplay = document.getElementById('locationDisplay');
-    const locationValue = document.getElementById('locationValue');
+        function initJumbotron() {
+            console.log('DOMContentLoaded event fired');
 
-    dropdownItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            const val = this.getAttribute('data-value');
-            locationDisplay.innerHTML = `<span style="color: #0F172A; font-weight: 500;">${val}</span>`;
-            locationValue.value = val;
-        });
-    });
+            const dropdownItems = document.querySelectorAll('.ct-dropdown-menu .dropdown-item');
+            const locationDisplay = document.getElementById('locationDisplay');
+            const locationValue = document.getElementById('locationValue');
 
-    // Set default dates
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-    const dayAfter = new Date(today);
-    dayAfter.setDate(today.getDate() + 2);
+            dropdownItems.forEach(item => {
+                item.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const val = this.getAttribute('data-value');
+                    locationDisplay.innerHTML = `<span style="color: #0F172A; font-weight: 500;">${val}</span>`;
+                    locationValue.value = val;
+                });
+            });
 
-    const formatDate = (date) => {
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
-    };
+            // Set default dates
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            const dayAfter = new Date(today);
+            dayAfter.setDate(today.getDate() + 2);
 
-    // Helper function to format date object to YYYY-MM-DD string
-    const formatDateToString = (date) => date.toISOString().split('T')[0];
+            const formatDate = (date) => {
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+            };
 
-    // Initialize elements
-    const homePickupText = document.getElementById('homePickupText');
-    const homeReturnText = document.getElementById('homeReturnText');
-    const homeDateFrom = document.getElementById('homeDateFrom');
-    const homeDateTo = document.getElementById('homeDateTo');
-    const homeModalPickupDate = document.getElementById('homeModalPickupDate');
-    const homeModalReturnDate = document.getElementById('homeModalReturnDate');
-    const homeModalPickupTime = document.getElementById('homeModalPickupTime');
-    const homeModalReturnTime = document.getElementById('homeModalReturnTime');
-    const homeModalDateSummary = document.getElementById('homeModalDateSummary');
-    const homeModalDaysSummary = document.getElementById('homeModalDaysSummary');
-    const homeBtnConfirmDate = document.getElementById('homeBtnConfirmDate');
+            // Helper function to format date object to YYYY-MM-DD string
+            const formatDateToString = (date) => date.toISOString().split('T')[0];
 
-    console.log('homePickupText:', homePickupText);
-    console.log('homeReturnText:', homeReturnText);
+            // Initialize elements
+            const homePickupText = document.getElementById('homePickupText');
+            const homeReturnText = document.getElementById('homeReturnText');
+            const homeDateFrom = document.getElementById('homeDateFrom');
+            const homeDateTo = document.getElementById('homeDateTo');
+            const homeModalPickupDate = document.getElementById('homeModalPickupDate');
+            const homeModalReturnDate = document.getElementById('homeModalReturnDate');
+            const homeModalPickupTime = document.getElementById('homeModalPickupTime');
+            const homeModalReturnTime = document.getElementById('homeModalReturnTime');
+            const homeModalDateSummary = document.getElementById('homeModalDateSummary');
+            const homeModalDaysSummary = document.getElementById('homeModalDaysSummary');
+            const homeBtnConfirmDate = document.getElementById('homeBtnConfirmDate');
 
-    // Check if all elements exist
-    if (!homePickupText || !homeReturnText || !homeModalPickupDate) {
-        console.error('Missing required date elements');
-        console.log('homePickupText:', homePickupText, 'homeReturnText:', homeReturnText, 'homeModalPickupDate:', homeModalPickupDate);
-        return;
-    }
+            console.log('homePickupText:', homePickupText);
+            console.log('homeReturnText:', homeReturnText);
 
-    // Set initial values
-    const pickupDateStr = formatDate(tomorrow);
-    const returnDateStr = formatDate(dayAfter);
-    
-    console.log('Setting pickup to:', pickupDateStr, 'return to:', returnDateStr);
-    
-    homePickupText.textContent = pickupDateStr;
-    homeReturnText.textContent = returnDateStr;
-    
-    if (homeDateFrom) homeDateFrom.value = formatDateToString(tomorrow);
-    if (homeDateTo) homeDateTo.value = formatDateToString(dayAfter);
-    if (homeModalPickupDate) homeModalPickupDate.value = formatDateToString(tomorrow);
-    if (homeModalReturnDate) homeModalReturnDate.value = formatDateToString(dayAfter);
-    if (homeModalPickupTime) homeModalPickupTime.value = '09:00';
-    if (homeModalReturnTime) homeModalReturnTime.value = '09:00';
-    
-    // Set min date to today to prevent selecting past dates
-    if (homeModalPickupDate) homeModalPickupDate.setAttribute('min', formatDateToString(today));
-    if (homeModalReturnDate) homeModalReturnDate.setAttribute('min', formatDateToString(tomorrow));
-
-    // Helper function to calculate days difference
-    const calculateDays = (pickupDate, returnDate) => {
-        const pickup = new Date(pickupDate);
-        const returnD = new Date(returnDate);
-        const diffMs = returnD - pickup;
-        return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-    };
-
-    // Helper function to update summary
-    const updateDateSummary = () => {
-        if (!homeModalPickupDate || !homeModalReturnDate || !homeModalDateSummary) return;
-        
-        const pickupDate = homeModalPickupDate.value;
-        const returnDate = homeModalReturnDate.value;
-        
-        if (pickupDate && returnDate) {
-            const pickup = new Date(pickupDate);
-            const returnD = new Date(returnDate);
-            
-            if (pickup <= returnD) {
-                const days = calculateDays(pickupDate, returnDate);
-                homeModalDateSummary.textContent = `${formatDate(pickup)} - ${formatDate(returnD)}`;
-                if (homeModalDaysSummary) homeModalDaysSummary.textContent = `${days} ngày`;
-            } else {
-                homeModalDateSummary.textContent = 'Ngày trả phải sau ngày nhận';
-                if (homeModalDaysSummary) homeModalDaysSummary.textContent = '-- ngày';
+            // Check if all elements exist
+            if (!homePickupText || !homeReturnText || !homeModalPickupDate) {
+                console.error('Missing required date elements');
+                console.log('homePickupText:', homePickupText, 'homeReturnText:', homeReturnText, 'homeModalPickupDate:', homeModalPickupDate);
+                return;
             }
-        }
-    };
 
-    // Add event listeners for date/time changes
-    if (homeModalPickupDate) {
-        homeModalPickupDate.addEventListener('change', function() {
-            // Update min date for return date when pickup date changes
-            if (this.value && homeModalReturnDate) {
-                homeModalReturnDate.setAttribute('min', this.value);
-                // If return date is before pickup date, reset it
-                if (homeModalReturnDate.value && new Date(homeModalReturnDate.value) < new Date(this.value)) {
-                    const nextDay = new Date(this.value);
-                    nextDay.setDate(nextDay.getDate() + 1);
-                    homeModalReturnDate.value = formatDateToString(nextDay);
-                }
-            }
-            updateDateSummary();
-        });
-    }
+            // Set initial values
+            const pickupDateStr = formatDate(tomorrow);
+            const returnDateStr = formatDate(dayAfter);
 
-    if (homeModalReturnDate) {
-        homeModalReturnDate.addEventListener('change', function() {
-            updateDateSummary();
-        });
-    }
+            console.log('Setting pickup to:', pickupDateStr, 'return to:', returnDateStr);
 
-    if (homeModalPickupTime) {
-        homeModalPickupTime.addEventListener('change', function() {
-            updateDateSummary();
-        });
-    }
+            homePickupText.textContent = pickupDateStr;
+            homeReturnText.textContent = returnDateStr;
 
-    if (homeModalReturnTime) {
-        homeModalReturnTime.addEventListener('change', function() {
-            updateDateSummary();
-        });
-    }
+            if (homeDateFrom) homeDateFrom.value = formatDateToString(tomorrow);
+            if (homeDateTo) homeDateTo.value = formatDateToString(dayAfter);
+            if (homeModalPickupDate) homeModalPickupDate.value = formatDateToString(tomorrow);
+            if (homeModalReturnDate) homeModalReturnDate.value = formatDateToString(dayAfter);
+            if (homeModalPickupTime) homeModalPickupTime.value = '09:00';
+            if (homeModalReturnTime) homeModalReturnTime.value = '09:00';
 
-    // Handle confirm button click
-    if (homeBtnConfirmDate) {
-        homeBtnConfirmDate.addEventListener('click', function() {
-            if (!homeModalPickupDate || !homeModalReturnDate) return;
-            
-            const pickupDate = homeModalPickupDate.value;
-            const returnDate = homeModalReturnDate.value;
-            
-            if (pickupDate && returnDate) {
+            // Set min date to today to prevent selecting past dates
+            if (homeModalPickupDate) homeModalPickupDate.setAttribute('min', formatDateToString(today));
+            if (homeModalReturnDate) homeModalReturnDate.setAttribute('min', formatDateToString(tomorrow));
+
+            // Helper function to calculate days difference
+            const calculateDays = (pickupDate, returnDate) => {
                 const pickup = new Date(pickupDate);
                 const returnD = new Date(returnDate);
-                
-                if (pickup <= returnD) {
-                    // Update display text
-                    homePickupText.textContent = formatDate(pickup);
-                    homeReturnText.textContent = formatDate(returnD);
-                    
-                    // Update hidden form values
-                    if (homeDateFrom) homeDateFrom.value = pickupDate;
-                    if (homeDateTo) homeDateTo.value = returnDate;
-                } else {
-                    alert('Vui lòng chọn ngày trả xe sau ngày nhận xe!');
-                    event.preventDefault();
-                }
-            }
-        });
-    }
+                const diffMs = returnD - pickup;
+                return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+            };
 
-    // Initial summary update
-    updateDateSummary();
-    console.log('Jumbotron script initialized successfully');
-});
-</script>
+            // Helper function to update summary
+            const updateDateSummary = () => {
+                if (!homeModalPickupDate || !homeModalReturnDate || !homeModalDateSummary) return;
+
+                const pickupDate = homeModalPickupDate.value;
+                const returnDate = homeModalReturnDate.value;
+
+                if (pickupDate && returnDate) {
+                    const pickup = new Date(pickupDate);
+                    const returnD = new Date(returnDate);
+
+                    if (pickup <= returnD) {
+                        const days = calculateDays(pickupDate, returnDate);
+                        homeModalDateSummary.textContent = `${formatDate(pickup)} - ${formatDate(returnD)}`;
+                        if (homeModalDaysSummary) homeModalDaysSummary.textContent = `${days} ngày`;
+                    } else {
+                        homeModalDateSummary.textContent = 'Ngày trả phải sau ngày nhận';
+                        if (homeModalDaysSummary) homeModalDaysSummary.textContent = '-- ngày';
+                    }
+                }
+            };
+
+            // Add event listeners for date/time changes
+            if (homeModalPickupDate) {
+                homeModalPickupDate.addEventListener('change', function () {
+                    // Update min date for return date when pickup date changes
+                    if (this.value && homeModalReturnDate) {
+                        homeModalReturnDate.setAttribute('min', this.value);
+                        // If return date is before pickup date, reset it
+                        if (homeModalReturnDate.value && new Date(homeModalReturnDate.value) < new Date(this.value)) {
+                            const nextDay = new Date(this.value);
+                            nextDay.setDate(nextDay.getDate() + 1);
+                            homeModalReturnDate.value = formatDateToString(nextDay);
+                        }
+                    }
+                    updateDateSummary();
+                });
+            }
+
+            if (homeModalReturnDate) {
+                homeModalReturnDate.addEventListener('change', function () {
+                    updateDateSummary();
+                });
+            }
+
+            if (homeModalPickupTime) {
+                homeModalPickupTime.addEventListener('change', function () {
+                    updateDateSummary();
+                });
+            }
+
+            if (homeModalReturnTime) {
+                homeModalReturnTime.addEventListener('change', function () {
+                    updateDateSummary();
+                });
+            }
+
+            // Handle confirm button click
+            if (homeBtnConfirmDate) {
+                homeBtnConfirmDate.addEventListener('click', function () {
+                    if (!homeModalPickupDate || !homeModalReturnDate) return;
+
+                    const pickupDate = homeModalPickupDate.value;
+                    const returnDate = homeModalReturnDate.value;
+
+                    if (pickupDate && returnDate) {
+                        const pickup = new Date(pickupDate);
+                        const returnD = new Date(returnDate);
+
+                        if (pickup <= returnD) {
+                            // Update display text
+                            homePickupText.textContent = formatDate(pickup);
+                            homeReturnText.textContent = formatDate(returnD);
+
+                            // Update hidden form values
+                            if (homeDateFrom) homeDateFrom.value = pickupDate;
+                            if (homeDateTo) homeDateTo.value = returnDate;
+                        } else {
+                            alert('Vui lòng chọn ngày trả xe sau ngày nhận xe!');
+                            event.preventDefault();
+                        }
+                    }
+                });
+            }
+
+            // Initial summary update
+            updateDateSummary();
+            console.log('Jumbotron script initialized successfully');
+        } // đóng function initJumbotron
+
+        // Gọi ngay lập tức hoặc chờ DOM sẵn sàng
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initJumbotron);
+        } else {
+            initJumbotron();
+        }
+    </script>
 
 </body>
+
 </html>

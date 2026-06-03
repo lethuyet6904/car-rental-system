@@ -46,8 +46,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
               AND (:status IS NULL OR u.status = :status)
               AND (:identityStatus IS NULL
                    OR (:identityStatus = 'None'             AND iv.userId IS NULL)
+                   OR (:identityStatus = 'AllPending'       AND (iv.status = 'Pending' OR (iv.status = 'Approved' AND iv.licenseStatus = 'Pending')))
                    OR (:identityStatus = 'Pending'          AND iv.status = 'Pending')
-                   OR (:identityStatus = 'Rejected'         AND iv.status = 'Rejected')
+                   OR (:identityStatus = 'PendingLicense'   AND iv.status = 'Approved' AND iv.licenseStatus = 'Pending')
                    OR (:identityStatus = 'Approved' AND iv.status = 'Approved' AND iv.licenseStatus = 'Approved')
                    OR (:identityStatus = 'ApprovedNoLicense' AND iv.status = 'Approved' AND iv.licenseStatus != 'Approved'))
             """,
@@ -65,8 +66,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
               AND (:status IS NULL OR u.status = :status)
               AND (:identityStatus IS NULL
                    OR (:identityStatus = 'None'             AND iv.userId IS NULL)
+                   OR (:identityStatus = 'AllPending'       AND (iv.status = 'Pending' OR (iv.status = 'Approved' AND iv.licenseStatus = 'Pending')))
                    OR (:identityStatus = 'Pending'          AND iv.status = 'Pending')
-                   OR (:identityStatus = 'Rejected'         AND iv.status = 'Rejected')
+                   OR (:identityStatus = 'PendingLicense'   AND iv.status = 'Approved' AND iv.licenseStatus = 'Pending')
                    OR (:identityStatus = 'Approved' AND iv.status = 'Approved' AND iv.licenseStatus = 'Approved')
                    OR (:identityStatus = 'ApprovedNoLicense' AND iv.status = 'Approved' AND iv.licenseStatus != 'Approved'))
             """,

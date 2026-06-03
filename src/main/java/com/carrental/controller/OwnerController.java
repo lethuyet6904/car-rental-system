@@ -264,62 +264,6 @@ public class OwnerController {
         return "pages/owner/orders";
     }
 
-    @GetMapping("/my-orders")
-    @Transactional(readOnly = true)
-    public String getMyOrders(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String status,
-            Model model,
-            HttpServletRequest request) {
-
-        User user = getCurrentUser();
-        if (user == null)
-            return "redirect:/auth/login";
-        request.getSession().setAttribute("user", user);
-
-        Pageable pageable = PageRequest.of(page, size);
-        OrderStatus orderStatus = null;
-        if (status != null && !status.isEmpty()) {
-            try {
-                orderStatus = OrderStatus.valueOf(status);
-            } catch (IllegalArgumentException ignored) {
-            }
-        }
-
-        // Lấy orders khi user là customer
-        Page<RentalOrder> orderPage = ownerService.getOrdersByCustomer(user.getUserId(), orderStatus, pageable);
-
-        model.addAttribute("orders", orderPage != null ? orderPage.getContent() : new ArrayList<>());
-        model.addAttribute("pageInfo", orderPage != null ? orderPage : Page.empty(pageable));
-        model.addAttribute("selectedStatus", status);
-        model.addAttribute("user", user);
-        return "pages/owner/my-orders";
-    }
-
-    @GetMapping("/my-orders/{orderId}")
-    public String myOrderDetail(@PathVariable Long orderId,
-            Model model,
-            RedirectAttributes redirectAttributes) {
-
-        User user = getCurrentUser();
-        if (user == null)
-            return "redirect:/auth/login";
-
-        RentalOrder order = ownerService.getOrderByIdAndCustomer(orderId, user.getUserId());
-        if (order == null) {
-            redirectAttributes.addFlashAttribute("error", "Không tìm thấy đơn hàng");
-            return "redirect:/owner/my-orders";
-        }
-
-        model.addAttribute("order", order);
-        model.addAttribute("user", user);
-        model.addAttribute("depositPayment", paymentService.getPaymentByOrderAndType(orderId, TransactionType.Deposit));
-        model.addAttribute("finalPayment", paymentService.getPaymentByOrderAndType(orderId, TransactionType.FinalPayment));
-        
-        return "pages/owner/my-order-detail";
-    }
-
     @GetMapping("/orders/{orderId}")
     public String orderDetail(@PathVariable Long orderId,
             Model model,

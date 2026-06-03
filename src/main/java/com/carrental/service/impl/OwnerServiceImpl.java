@@ -371,55 +371,6 @@ public class OwnerServiceImpl implements OwnerService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Page<RentalOrder> getOrdersByCustomer(Long customerId, OrderStatus status, Pageable pageable) {
-        User customer = userRepository.findById(customerId).orElse(null);
-        if (customer == null)
-            return Page.empty(pageable);
-
-        List<RentalOrder> allOrders = rentalOrderRepository.findByCustomer(customer);
-
-        if (status != null) {
-            allOrders = allOrders.stream()
-                    .filter(o -> o.getStatus() == status)
-                    .collect(Collectors.toList());
-        }
-
-        allOrders.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
-
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), allOrders.size());
-
-        List<RentalOrder> pageContent = (start > allOrders.size())
-                ? new ArrayList<>()
-                : allOrders.subList(start, end);
-
-        for (RentalOrder order : pageContent) {
-            Hibernate.initialize(order.getCustomer());
-            Hibernate.initialize(order.getCar());
-            if (order.getCar() != null) {
-                Hibernate.initialize(order.getCar().getBrand());
-                Hibernate.initialize(order.getCar().getOwner());
-            }
-        }
-
-        return new PageImpl<>(pageContent, pageable, allOrders.size());
-    }
-
-    @Override
-    public RentalOrder getOrderByIdAndCustomer(Long orderId, Long customerId) {
-        RentalOrder order = rentalOrderRepository.findWithDetailsById(orderId)
-                .filter(o -> o.getCustomer().getUserId().equals(customerId))
-                .orElse(null);
-
-        if (order != null && order.getCar() != null) {
-            Hibernate.initialize(order.getCar().getOwner());
-        }
-
-        return order;
-    }
-
-    @Override
     @Transactional
     public void confirmOrder(Long orderId, Long ownerId) {
         RentalOrder order = getOrderByIdAndOwner(orderId, ownerId);

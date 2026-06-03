@@ -1,317 +1,300 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
 <head th:replace="~{fragments/admin-layout :: adminHead('Chi tiết xe')}"></head>
+
 <body>
-<div class="admin-wrapper">
+  <div class="admin-wrapper">
 
-  <th:block th:replace="~{fragments/admin-layout :: sidebar('cars')}"></th:block>
+    <th:block th:replace="~{fragments/admin-layout :: sidebar('cars')}"></th:block>
 
-  <div class="admin-body">
-    <th:block th:replace="~{fragments/admin-layout :: topbar(
+    <div class="admin-body">
+      <th:block
+        th:replace="~{fragments/admin-layout :: topbar(
         'Chi tiết xe chờ duyệt',
         'Admin / <a href=&quot;/admin/cars&quot; style=&quot;color:#7F77DD;text-decoration:none&quot;>Xe đăng mới</a> / <span>Chi tiết</span>')}">
-    </th:block>
+      </th:block>
 
-    <div class="admin-content">
+      <div class="admin-content">
 
-      <div style="margin-bottom:16px">
-        <a th:href="@{/admin/cars(page=${returnPage})}"
-           style="font-size:13px;color:#6b7280;text-decoration:none">
-          <i class="bi bi-arrow-left"></i> Quay lại danh sách
-        </a>
-      </div>
-
-      <!-- Toast -->
-      <div th:if="${successMessage}" class="alert-success-admin">
-        <i class="bi bi-check-circle-fill"></i>
-        <span th:text="${successMessage}"></span>
-      </div>
-      <div th:if="${errorMessage}" class="alert-danger-admin">
-        <i class="bi bi-exclamation-circle-fill"></i>
-        <span th:text="${errorMessage}"></span>
-      </div>
-
-      <!-- Ảnh xe — full width -->
-      <div class="admin-card" style="margin-bottom:16px">
-        <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:#374151">
-          Ảnh xe
+        <div style="margin-bottom:16px">
+          <a th:href="@{/admin/cars(page=${returnPage})}" style="font-size:13px;color:#6b7280;text-decoration:none">
+            <i class="bi bi-arrow-left"></i> Quay lại danh sách
+          </a>
         </div>
-        <div th:if="${!#lists.isEmpty(car.images)}"
-             style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-          <img th:each="img : ${car.images}"
-               th:src="${img != null and img.startsWith('/') ? img : '/assets/images/cars/' + img}"
-               style="width:100%;height:90px;object-fit:cover;
-                      border-radius:8px;border:1px solid #e5e7eb"
-               alt="ảnh xe"/>
+
+        <!-- Toast -->
+        <div th:if="${successMessage}" class="alert-success-admin">
+          <i class="bi bi-check-circle-fill"></i>
+          <span th:text="${successMessage}"></span>
         </div>
-        <div th:if="${#lists.isEmpty(car.images)}"
-             style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-          <div th:each="i : ${#numbers.sequence(1,4)}"
-               class="img-box" style="height:90px">
-            <div style="text-align:center">
-              <i class="bi bi-image" style="font-size:20px;display:block;margin-bottom:4px"></i>
-              <span>Ảnh [[${i}]]</span>
+        <div th:if="${errorMessage}" class="alert-danger-admin">
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <span th:text="${errorMessage}"></span>
+        </div>
+
+        <!-- Ảnh xe — full width -->
+        <div class="admin-card" style="margin-bottom:16px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:#374151">
+            Ảnh xe
+          </div>
+          <div th:if="${!#lists.isEmpty(car.images)}" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+            <img th:each="img : ${car.images}"
+              th:src="${img != null and img.startsWith('/') ? img : '/assets/images/cars/' + img}" style="width:100%;height:90px;object-fit:cover;
+                      border-radius:8px;border:1px solid #e5e7eb" alt="ảnh xe" />
+          </div>
+          <div th:if="${#lists.isEmpty(car.images)}" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+            <div th:each="i : ${#numbers.sequence(1,4)}" class="img-box" style="height:90px">
+              <div style="text-align:center">
+                <i class="bi bi-image" style="font-size:20px;display:block;margin-bottom:4px"></i>
+                <span>Ảnh [[${i}]]</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- 2 cột: Thông tin xe + Giấy tờ -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+        <!-- 2 cột: Thông tin xe + Giấy tờ -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
 
-        <!-- Cột trái -->
-        <div style="display:flex;flex-direction:column;gap:16px">
+          <!-- Cột trái -->
+          <div style="display:flex;flex-direction:column;gap:16px">
 
-          <!-- Thông tin xe -->
-          <div class="admin-card">
-            <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:#374151">
-              Thông tin xe
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Tên xe</span>
-              <span class="detail-value" style="font-weight:500"
-                    th:text="${car.modelName}"></span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Hãng xe</span>
-              <span class="detail-value" th:text="${car.brandName}"></span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Biển số</span>
-              <span class="detail-value" th:text="${car.licensePlate}"></span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Loại xe</span>
-              <span class="detail-value" th:text="${car.typeName}"></span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Số chỗ ngồi</span>
-              <span class="detail-value" th:text="${car.seats + ' chỗ'}"></span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Năm sản xuất</span>
-              <span class="detail-value" th:text="${car.yearOfManufacture}"></span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Nhiên liệu</span>
-              <span class="detail-value" th:text="${car.fuel.name()}"></span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Hộp số</span>
-              <span class="detail-value" th:text="${car.transmission.name()}"></span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Giá thuê</span>
-              <span class="detail-value" style="font-weight:600;color:#534AB7"
-                    th:text="${#numbers.formatDecimal(car.pricePerDay,0,'COMMA',0,'POINT') + ' ₫/ngày'}">
-              </span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Khu vực</span>
-              <span class="detail-value" th:text="${car.regionName}"></span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Tính năng</span>
-              <span class="detail-value" th:text="${car.features}"></span>
-            </div>
-            <div th:if="${car.rejectReason != null}" class="detail-row">
-              <span class="detail-label">Lý do từ chối</span>
-              <span class="detail-value" style="color:#b91c1c"
-                    th:text="${car.rejectReason}"></span>
-            </div>
-            <!-- Mô tả -->
-            <div style="margin-top:12px;padding-top:12px;
+            <!-- Thông tin xe -->
+            <div class="admin-card">
+              <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:#374151">
+                Thông tin xe
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Tên xe</span>
+                <span class="detail-value" style="font-weight:500" th:text="${car.modelName}"></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Hãng xe</span>
+                <span class="detail-value" th:text="${car.brandName}"></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Biển số</span>
+                <span class="detail-value" th:text="${car.licensePlate}"></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Loại xe</span>
+                <span class="detail-value" th:text="${car.typeName}"></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Số chỗ ngồi</span>
+                <span class="detail-value" th:text="${car.seats + ' chỗ'}"></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Năm sản xuất</span>
+                <span class="detail-value" th:text="${car.yearOfManufacture}"></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Nhiên liệu</span>
+                <span class="detail-value" th:text="${car.fuel.name()}"></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Hộp số</span>
+                <span class="detail-value" th:text="${car.transmission.name()}"></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Giá thuê</span>
+                <span class="detail-value" style="font-weight:600;color:#534AB7"
+                  th:text="${#numbers.formatDecimal(car.pricePerDay,0,'COMMA',0,'POINT') + ' ₫/ngày'}">
+                </span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Khu vực</span>
+                <span class="detail-value" th:text="${car.regionName}"></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Tính năng</span>
+                <span class="detail-value" th:text="${car.features}"></span>
+              </div>
+              <div th:if="${car.rejectReason != null}" class="detail-row">
+                <span class="detail-label">Lý do từ chối</span>
+                <span class="detail-value" style="color:#b91c1c" th:text="${car.rejectReason}"></span>
+              </div>
+              <!-- Mô tả -->
+              <div style="margin-top:12px;padding-top:12px;
                         border-top:1px solid #f3f4f6">
-              <div style="font-size:11px;color:#6b7280;margin-bottom:6px">Mô tả xe</div>
-              <div style="font-size:13px;line-height:1.65;color:#374151"
-                   th:text="${car.description}"></div>
+                <div style="font-size:11px;color:#6b7280;margin-bottom:6px">Mô tả xe</div>
+                <div style="font-size:13px;line-height:1.65;color:#374151" th:text="${car.description}"></div>
+              </div>
             </div>
-          </div>
 
-          <!-- Chủ xe -->
-          <div class="admin-card">
-            <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:#374151">
-              Chủ xe
-            </div>
-            <div style="display:flex;align-items:center;gap:12px">
-              <div style="width:40px;height:40px;border-radius:50%;background:#ede9fe;
+            <!-- Chủ xe -->
+            <div class="admin-card">
+              <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:#374151">
+                Chủ xe
+              </div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="width:40px;height:40px;border-radius:50%;background:#ede9fe;
                            color:#5b21b6;display:flex;align-items:center;justify-content:center;
                            font-size:14px;font-weight:600;flex-shrink:0"
-                   th:text="${#strings.substring(car.ownerName,0,1)}"></div>
-              <div>
-                <div style="font-weight:500;font-size:13px"
-                     th:text="${car.ownerName}"></div>
-                <div class="text-muted-small" th:text="${car.ownerPhone}"></div>
-              </div>
-              <a th:href="@{/admin/users/{id}(id=${car.ownerId})}"
-                 style="margin-left:auto;font-size:12px;color:#7F77DD;
+                  th:text="${#strings.substring(car.ownerName,0,1)}"></div>
+                <div>
+                  <div style="font-weight:500;font-size:13px" th:text="${car.ownerName}"></div>
+                  <div class="text-muted-small" th:text="${car.ownerPhone}"></div>
+                </div>
+                <a th:href="@{/admin/users/{id}(id=${car.ownerId})}" style="margin-left:auto;font-size:12px;color:#7F77DD;
                         text-decoration:none;border:1px solid #7F77DD;
                         padding:3px 10px;border-radius:6px">
-                Xem hồ sơ
-              </a>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Cột phải: Giấy tờ xe -->
-        <div class="admin-card">
-          <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:#374151">
-            Giấy tờ xe
-          </div>
-
-          <!-- Ảnh cà vẹt -->
-          <div style="font-size:12px;color:#6b7280;margin-bottom:6px">Ảnh cà vẹt (Đăng ký xe)</div>
-          <div style="margin-bottom:14px">
-            <div th:if="${car.registrationImage != null}">
-              <img th:if="${car.registrationImage != null}"
-                   th:src="${car.registrationImage != null ? (car.registrationImage.startsWith('/') ? car.registrationImage : '/uploads/docs/' + car.registrationImage) : ''}"
-                   style="width:100%;border-radius:8px;border:1px solid #e5e7eb"
-                   alt="Cà vẹt"/>
-            </div>
-            <div th:if="${car.registrationImage == null}"
-                 class="img-box" style="height:100px">
-              <div style="text-align:center">
-                <i class="bi bi-file-text" style="font-size:22px;display:block;margin-bottom:4px"></i>
-                Chưa có ảnh
+                  Xem hồ sơ
+                </a>
               </div>
             </div>
+
           </div>
 
-          <!-- Ảnh bảo hiểm vật chất -->
-          <div style="font-size:12px;color:#6b7280;margin-bottom:6px">
-            Ảnh bảo hiểm vật chất
-          </div>
-          <div style="margin-bottom:14px">
-            <div th:if="${car.insuranceImage != null}">
-              <img th:if="${car.insuranceImage != null}"
-                   th:src="${car.insuranceImage != null ? (car.insuranceImage.startsWith('/') ? car.insuranceImage : '/uploads/docs/' + car.insuranceImage) : ''}"
-                   style="width:50%;border-radius:8px;border:1px solid #e5e7eb"
-                   alt="Bảo hiểm"/>
+          <!-- Cột phải: Giấy tờ xe -->
+          <div class="admin-card">
+            <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:#374151">
+              Giấy tờ xe
             </div>
-            <div th:if="${car.insuranceImage == null}"
-                 class="img-box" style="height:100px;width:50%">
-              <div style="text-align:center">
-                <i class="bi bi-shield-check" style="font-size:22px;display:block;margin-bottom:4px"></i>
-                Bảo hiểm
+
+            <!-- Ảnh cà vẹt -->
+            <div style="font-size:12px;color:#6b7280;margin-bottom:6px">Ảnh cà vẹt (Đăng ký xe)</div>
+            <div style="margin-bottom:14px">
+              <div th:if="${car.registrationImage != null}">
+                <img th:if="${car.registrationImage != null}"
+                  th:src="${car.registrationImage != null ? (car.registrationImage.startsWith('/') ? car.registrationImage : '/uploads/docs/' + car.registrationImage) : ''}"
+                  style="width:50%; max-height:160px; object-fit:cover;
+            border-radius:8px; border:1px solid #e5e7eb" alt="Cà vẹt" />
+              </div>
+              <div th:if="${car.registrationImage == null}" class="img-box" style="height:100px">
+                <div style="text-align:center">
+                  <i class="bi bi-file-text" style="font-size:22px;display:block;margin-bottom:4px"></i>
+                  Chưa có ảnh
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Ảnh đăng kiểm -->
-          <div style="font-size:12px;color:#6b7280;margin-bottom:6px">Ảnh đăng kiểm</div>
-          <div style="margin-bottom:20px">
-            <div th:if="${car.inspectionImage != null}">
-              <img th:if="${car.inspectionImage != null}"
-                   th:src="${car.inspectionImage != null ? (car.inspectionImage.startsWith('/') ? car.inspectionImage : '/uploads/docs/' + car.inspectionImage) : ''}"
-                   style="width:50%;border-radius:8px;border:1px solid #e5e7eb"
-                   alt="Đăng kiểm"/>
+            <!-- Ảnh bảo hiểm vật chất -->
+            <div style="font-size:12px;color:#6b7280;margin-bottom:6px">
+              Ảnh bảo hiểm vật chất
             </div>
-            <div th:if="${car.inspectionImage == null}"
-                 class="img-box" style="height:100px;width:50%">
-              <div style="text-align:center">
-                <i class="bi bi-search" style="font-size:22px;display:block;margin-bottom:4px"></i>
-                Đăng kiểm
+            <div style="margin-bottom:14px">
+              <div th:if="${car.insuranceImage != null}">
+                <img th:if="${car.insuranceImage != null}"
+                  th:src="${car.insuranceImage != null ? (car.insuranceImage.startsWith('/') ? car.insuranceImage : '/uploads/docs/' + car.insuranceImage) : ''}"
+                  style="width:50%; max-height:160px; object-fit:cover;
+            border-radius:8px; border:1px solid #e5e7eb" alt="Bảo hiểm" />
+              </div>
+              <div th:if="${car.insuranceImage == null}" class="img-box" style="height:100px;width:50%">
+                <div style="text-align:center">
+                  <i class="bi bi-shield-check" style="font-size:22px;display:block;margin-bottom:4px"></i>
+                  Bảo hiểm
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Action buttons — chỉ hiện khi Pending -->
-          <div th:if="${car.status.name() == 'Pending'}"
-               style="display:flex;gap:10px;padding-top:16px;
+            <!-- Ảnh đăng kiểm -->
+            <div style="font-size:12px;color:#6b7280;margin-bottom:6px">Ảnh đăng kiểm</div>
+            <div style="margin-bottom:20px">
+              <div th:if="${car.inspectionImage != null}">
+                <img th:if="${car.inspectionImage != null}"
+                  th:src="${car.inspectionImage != null ? (car.inspectionImage.startsWith('/') ? car.inspectionImage : '/uploads/docs/' + car.inspectionImage) : ''}"
+                  style="width:50%; max-height:160px; object-fit:cover;
+            border-radius:8px; border:1px solid #e5e7eb" alt="Đăng kiểm" />
+              </div>
+              <div th:if="${car.inspectionImage == null}" class="img-box" style="height:100px;width:50%">
+                <div style="text-align:center">
+                  <i class="bi bi-search" style="font-size:22px;display:block;margin-bottom:4px"></i>
+                  Đăng kiểm
+                </div>
+              </div>
+            </div>
+
+            <!-- Action buttons — chỉ hiện khi Pending -->
+            <div th:if="${car.status.name() == 'Pending'}" style="display:flex;gap:10px;padding-top:16px;
                       border-top:1px solid #f3f4f6">
-            <button type="button" class="btn btn-success"
-                    data-bs-toggle="modal" data-bs-target="#approveModal">
-              <i class="bi bi-check-lg"></i> Duyệt xe
-            </button>
-            <button type="button" class="btn btn-danger"
-                    data-bs-toggle="modal" data-bs-target="#rejectModal">
-              <i class="bi bi-x-lg"></i> Từ chối
-            </button>
-          </div>
+              <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#approveModal">
+                <i class="bi bi-check-lg"></i> Duyệt xe
+              </button>
+              <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                <i class="bi bi-x-lg"></i> Từ chối
+              </button>
+            </div>
 
+          </div>
         </div>
+
       </div>
-
     </div>
   </div>
-</div>
 
-<!-- Modal: Duyệt xe -->
-<div class="modal fade" id="approveModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <form th:action="@{/admin/cars/{id}/approve(id=${car.carId})}" method="post">
-		<input type="hidden" name="returnPage" th:value="${returnPage}"/>
-        <div class="modal-header">
-          <h6 class="modal-title">
-            <i class="bi bi-check-circle"></i> Duyệt xe đăng mới
-          </h6>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <p style="font-size:13px;color:#374151">
-            Xác nhận duyệt xe
-            <strong th:text="${car.modelName}"></strong>
-            (<span th:text="${car.licensePlate}"></span>)?
-          </p>
-          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;
+  <!-- Modal: Duyệt xe -->
+  <div class="modal fade" id="approveModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form th:action="@{/admin/cars/{id}/approve(id=${car.carId})}" method="post">
+          <input type="hidden" name="returnPage" th:value="${returnPage}" />
+          <div class="modal-header">
+            <h6 class="modal-title">
+              <i class="bi bi-check-circle"></i> Duyệt xe đăng mới
+            </h6>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p style="font-size:13px;color:#374151">
+              Xác nhận duyệt xe
+              <strong th:text="${car.modelName}"></strong>
+              (<span th:text="${car.licensePlate}"></span>)?
+            </p>
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;
                       padding:10px 14px;font-size:12px;color:#15803d;margin-top:10px">
-            <i class="bi bi-info-circle"></i>
-            Xe sẽ chuyển sang trạng thái <strong>Có sẵn</strong>
-            và hiển thị cho khách thuê.
+              <i class="bi bi-info-circle"></i>
+              Xe sẽ chuyển sang trạng thái <strong>Có sẵn</strong>
+              và hiển thị cho khách thuê.
+            </div>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary btn-sm"
-                  data-bs-dismiss="modal">Hủy</button>
-          <button type="submit" class="btn btn-success btn-sm">
-            <i class="bi bi-check-lg"></i> Xác nhận duyệt
-          </button>
-        </div>
-      </form>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-success btn-sm">
+              <i class="bi bi-check-lg"></i> Xác nhận duyệt
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Modal: Từ chối xe -->
-<div class="modal fade" id="rejectModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <form th:action="@{/admin/cars/{id}/reject(id=${car.carId})}" method="post">
-		<input type="hidden" name="returnPage" th:value="${returnPage}"/>
-        <div class="modal-header">
-          <h6 class="modal-title">Từ chối xe đăng mới</h6>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <p style="font-size:13px;color:#6b7280;margin-bottom:12px">
-            Từ chối duyệt xe
-            <strong th:text="${car.modelName}"></strong>
-            (<span th:text="${car.licensePlate}"></span>)
-          </p>
-          <div class="mb-3">
-            <label class="form-label" style="font-size:13px">
-              Lý do từ chối <span style="color:#ef4444">*</span>
-            </label>
-            <textarea name="rejectReason" class="form-control form-control-sm"
-                      rows="3"
-                      placeholder="Giấy tờ không hợp lệ, thông tin xe không đúng…"
-                      required></textarea>
+  <!-- Modal: Từ chối xe -->
+  <div class="modal fade" id="rejectModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form th:action="@{/admin/cars/{id}/reject(id=${car.carId})}" method="post">
+          <input type="hidden" name="returnPage" th:value="${returnPage}" />
+          <div class="modal-header">
+            <h6 class="modal-title">Từ chối xe đăng mới</h6>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary btn-sm"
-                  data-bs-dismiss="modal">Hủy</button>
-          <button type="submit" class="btn btn-danger btn-sm">
-            <i class="bi bi-x-lg"></i> Xác nhận từ chối
-          </button>
-        </div>
-      </form>
+          <div class="modal-body">
+            <p style="font-size:13px;color:#6b7280;margin-bottom:12px">
+              Từ chối duyệt xe
+              <strong th:text="${car.modelName}"></strong>
+              (<span th:text="${car.licensePlate}"></span>)
+            </p>
+            <div class="mb-3">
+              <label class="form-label" style="font-size:13px">
+                Lý do từ chối <span style="color:#ef4444">*</span>
+              </label>
+              <textarea name="rejectReason" class="form-control form-control-sm" rows="3"
+                placeholder="Giấy tờ không hợp lệ, thông tin xe không đúng…" required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-danger btn-sm">
+              <i class="bi bi-x-lg"></i> Xác nhận từ chối
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
 
-<th:block th:replace="~{fragments/admin-layout :: scripts}"></th:block>
+  <th:block th:replace="~{fragments/admin-layout :: scripts}"></th:block>
 </body>
+
 </html>

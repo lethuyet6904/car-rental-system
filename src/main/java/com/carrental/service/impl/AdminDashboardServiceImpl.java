@@ -38,7 +38,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         // Row 2
         long pendingCars       = carRepository.countByStatus(CarStatus.Pending);
         long pendingComplaints = complaintRepository.countByStatus(ComplaintStatus.Pending);
-        long pendingIdentities = identityVerificationRepository.countByStatus(VerificationStatus.Pending);
+        long pendingIdentities = identityVerificationRepository.countTotalPendingVerifications(VerificationStatus.Pending, VerificationStatus.Approved, LicenseStatus.Pending);
 
         // Pie
         // Sau khi fix — lọc theo fromDate
